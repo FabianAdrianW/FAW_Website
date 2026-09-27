@@ -2,100 +2,12 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Narzędzia · Adrian Wojtasik</title>
-<meta name="description" content="Narzędzia i technologie, z których korzysta Adrian Wojtasik.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Italiana&display=swap">
-<style>
-:root{color-scheme:dark;--abyss:#04070B;--tarn:#0A1820;--tide:#173038;--pearl:#E6ECE8;--mist:#8C9E9F;--lantern:#E3B26A;
-  --line:rgba(230,236,232,.13);--line-strong:rgba(230,236,232,.26);
-  --display:"Italiana","Cormorant Garamond","Didot",Georgia,serif;
-  --body:"Hanken Grotesk",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;--gut:clamp(16px,3vw,40px)}
-*{box-sizing:border-box}
-html{background:var(--abyss)}
-body{margin:0;min-height:100vh;color:var(--pearl);font-family:var(--body);font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased;
-  background:
-    radial-gradient(60vw 22vh at 55% 30vh,rgba(237,180,98,.18),transparent 70%),
-    linear-gradient(#02050a 0,#08161d 22vh,#23454f 30vh,#132a31 30.2vh,#08151b 42vh,#04070b 80vh) fixed;
-  padding:calc(env(safe-area-inset-top,0px) + clamp(18px,3vw,36px)) var(--gut) calc(env(safe-area-inset-bottom,0px) + 48px)}
-a{color:inherit}
-:focus-visible{outline:1.5px solid var(--lantern);outline-offset:3px;border-radius:4px}
-.sun{position:fixed;left:55%;top:calc(30vh - 5.4vh);width:3.2vh;height:3.2vh;border-radius:50%;transform:translateX(-50%);
-  background:radial-gradient(circle,#fff3dc 0,#EDB462 60%,rgba(237,180,98,0) 72%);box-shadow:0 0 60px 18px rgba(237,180,98,.18);pointer-events:none}
-.glint{position:fixed;left:55%;top:30.4vh;width:2px;height:46vh;transform:translateX(-50%);pointer-events:none;
-  background:repeating-linear-gradient(rgba(237,180,98,.35) 0 3px,transparent 3px 9px);-webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent);opacity:.6}
-header{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
-.mark{font-family:var(--display);font-size:22px;text-decoration:none}
-.mark:hover{color:var(--lantern)}
-nav{display:flex;flex-wrap:wrap;gap:4px 20px}
-nav a{font-size:13px;letter-spacing:.06em;color:var(--mist);text-decoration:none;padding:4px 0;border-bottom:1px solid transparent;transition:color .25s,border-color .25s}
-nav a:hover{color:var(--pearl);border-color:var(--lantern)}
-nav a[aria-current]{color:var(--pearl);border-color:var(--lantern)}
-main{position:relative;max-width:720px;margin:clamp(38vh,44vh,420px) auto 0;display:flex;flex-direction:column;gap:20px;text-shadow:0 1px 14px rgba(3,8,11,.8)}
-.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern)}
-h1{font-family:var(--display);font-weight:400;font-size:clamp(46px,7vw,86px);line-height:.95;margin:-4px 0 0;text-wrap:balance}
-h2{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);margin:0 0 10px}
-p{margin:0;max-width:62ch;color:#D3DDDA}
-p.lede{font-size:19px;line-height:1.5;color:var(--pearl)}
-p.note{font-size:13px;color:var(--mist);padding-top:14px;border-top:1px solid var(--line)}
-.facts{display:grid;grid-template-columns:minmax(90px,160px) 1fr;gap:10px 22px;margin:0;padding:16px 0 0;border-top:1px solid var(--line)}
-.facts dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist);padding-top:3px}
-.facts dd{margin:0}
-.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:26px 30px;padding-top:18px;border-top:1px solid var(--line)}
-.groups ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
-.groups li b{font-weight:500;display:block}
-.groups li span{font-size:13.5px;color:var(--mist)}
-.links{display:flex;flex-wrap:wrap;gap:8px 18px}
-.links a{text-decoration:none;border-bottom:1px solid var(--line-strong);padding-bottom:2px;transition:color .25s,border-color .25s}
-.links a:hover{color:var(--lantern);border-color:var(--lantern)}
-.back{align-self:flex-start;display:inline-flex;align-items:center;gap:10px;height:38px;padding:0 18px;border-radius:19px;border:1px solid var(--line-strong);background:rgba(4,10,14,.35);text-decoration:none;font-size:13.5px;transition:border-color .25s,color .25s;margin-top:10px}
-.back:hover{border-color:var(--lantern);color:var(--lantern)}
-@media (max-width:600px){.facts{grid-template-columns:1fr;gap:2px}.facts dd{margin-bottom:10px}p.lede{font-size:17px}}
-</style>
+<meta http-equiv="refresh" content="0;url=index.html#narzedzia">
+<link rel="canonical" href="index.html#narzedzia">
+<style>html,body{margin:0;height:100%;background:#04070B;color:#8C9E9F;font:14px "Hanken Grotesk",system-ui,sans-serif}body{display:grid;place-items:center}a{color:#E3B26A}</style>
+<script>location.replace("index.html#narzedzia");</script>
 </head>
-<body>
-<div class="sun" aria-hidden="true"></div><div class="glint" aria-hidden="true"></div>
-<header>
-  <a class="mark" href="index.html">Adrian Wojtasik</a>
-  <nav aria-label="Podstrony">
-    <a href="index.html">Start</a>
-    <a href="index.html#portfolio">Portfolio</a>
-    <a href="index.html#o-mnie">O mnie</a>
-    <a href="narzedzia.html" aria-current="page">Narzędzia</a>
-    <a href="index.html#uslugi">Czym się zajmuję</a>
-    <a href="galeria.html">Galeria</a>
-  </nav>
-</header>
-<main>
-  <div class="eyebrow">03 · Narzędzia</div>
-  <h1>Z czego korzystam</h1>
-  <p class="lede">Modele językowe podpinam przez API, a ich odpowiedzi sprawdzam walidatorami. Resztę stosu dobieram do skali projektu.</p>
-  <div class="groups">
-    <div><h2>AI</h2><ul>
-      <li><b>Claude</b><span>przez OpenRouter, w Eyelingo i prototypach</span></li>
-      <li><b>ElevenLabs</b><span>synteza mowy</span></li>
-      <li><b>Asystenci AI do kodu</b><span>praca metodą spec-and-verify</span></li>
-    </ul></div>
-    <div><h2>Dane i zaplecze</h2><ul>
-      <li><b>Supabase</b><span>PostgreSQL, RLS, Edge Functions, region EU</span></li>
-      <li><b>Stripe</b><span>płatności</span></li>
-    </ul></div>
-    <div><h2>Interfejs</h2><ul>
-      <li><b>Next.js i React</b><span>App Router, komponenty serwerowe</span></li>
-      <li><b>TypeScript, Tailwind CSS</b></li>
-      <li><b>Three.js / WebGL</b><span>sceny 3D, jak ta strona</span></li>
-    </ul></div>
-    <div><h2>Desktop i skrypty</h2><ul>
-      <li><b>Python</b><span>skrypty weryfikujące, narzędzia</span></li>
-      <li><b>PyQt6</b><span>aplikacja desktopowa Eyelingo</span></li>
-      <li><b>GitHub</b><span>kod i publikacja stron</span></li>
-    </ul></div>
-  </div>
-  <p class="note">Szkic listy do uzupełnienia.</p>
-  <a class="back" href="index.html">← Wróć do horyzontu</a>
-</main>
-</body>
+<body><a href="index.html#narzedzia">Przejdź dalej</a></body>
 </html>
