@@ -2768,7 +2768,7 @@ function initGL(){
   canvas.addEventListener("pointerdown", e => { if (mode === "rain") dragY = e.clientY; });
   canvas.addEventListener("pointermove", e => { if (mode !== "rain" || dragY === null || !(e.buttons & 1)) return; galMove((dragY - e.clientY) * 0.03); dragY = e.clientY; });
   addEventListener("pointerup", () => { dragY = null; });
-  function galWheel(dy, dm){ if (mode !== "rain") return; galMove((dm === 1 ? dy * 16 : dy) * 0.012); }
+  function galWheel(dy, dm){ if (mode !== "rain") return; galMove(-(dm === 1 ? dy * 16 : dy) * 0.012); }   // wheel up walks forward
   function rainPoke(){}
   function galleryClick(){
     const h = ray.intersectObjects(picMeshes.filter(m => m.parent.visible), false)[0];
@@ -2884,7 +2884,7 @@ function initGL(){
     const cLand = smooth(0.42, 0.62, p), camY = camera.position.y;
     let cT = 0, cRate = 60;
     if (mode === "landing"){ cT = cLand; cRate = 10; }
-    else if (mode === "toRing") cT = cloudFrom * (1 - smooth(0.35, 0.9, trK));
+    else if (mode === "toRing") cT = cloudFrom * Math.pow(1 - smooth(0.04, 0.52, trK), 2.2);   // thins out from the first moment of the turn, gone by its middle
     else if (mode === "toLand") cT = cLand * smooth(0.35, 0.95, trK);
     else if (mode === "toDeep"){ cT = camY > 0.05 ? cloudFrom : 0; if (camY <= 0.05) cRate = 1e4; }
     else if (mode === "fromDeep"){ cT = camY > 0.05 ? cLand : 0; cRate = camY > 0.05 ? 5 : 1e4; }
