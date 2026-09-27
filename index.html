@@ -342,9 +342,9 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
 .drop-nav.is-back .drop-btn{animation:dropBack .5s cubic-bezier(.3,1.6,.5,1) both}
 @keyframes dropBack{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
 @media (prefers-reduced-motion:reduce){.drop-btn{animation:none}}
-/* the soft blur that covers the swap out of the upside-down view */
-#dipVeil{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;visibility:hidden;--tint:.5;
-  -webkit-backdrop-filter:blur(18px) saturate(.85);backdrop-filter:blur(18px) saturate(.85);background:rgba(8,18,26,var(--tint))}
+/* landing words: smoke on the way down, droplets on the way up */
+#txtDrops{position:fixed;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+.fx-drops,.fx-drops *{text-shadow:none!important}
 
 /* ---------- Narzędzia above the clouds, Galeria under the rain ---------- */
 html.in-tools,html.in-tools body,html.in-rain,html.in-rain body{overflow:hidden}
@@ -380,7 +380,6 @@ html:not(.in-rain) .gal-caption{display:none}
 </style>
 
 <canvas id="scene" aria-hidden="true"></canvas>
-<div id="dipVeil" aria-hidden="true"></div>
 <button class="sun-btn" id="sunBtn" type="button" aria-label="Zamień słońce w księżyc" hidden></button>
 <div class="track" id="track" aria-hidden="true"></div>
 
@@ -572,6 +571,8 @@ html:not(.in-rain) .gal-caption{display:none}
   <button class="sky-back" type="button" id="rainBack">↑ Wróć nad chmury</button>
 </section>
 <div class="gal-caption" id="galCaption" aria-live="polite"></div>
+<svg id="fxDefs" width="0" height="0" style="position:absolute;width:0;height:0" aria-hidden="true" focusable="false"></svg>
+<canvas id="txtDrops" aria-hidden="true"></canvas>
 
 <div class="fade" id="fade" aria-hidden="true"></div>
 
@@ -945,20 +946,22 @@ function leave(href, i){
 addEventListener("pageshow", () => { leaving = false; fadeEl.classList.remove("is-on"); });
 
 /* landing ⇄ portfolio live in one scene */
-/* ---- no barrel rolls. While the view is upside down (clouds on top), the water is treated as if it
-   lay below the bottom edge of the screen, whatever physics says: the camera only tilts down (up, for
-   the clouds of "Narzędzia"), a brief soft blur covers the swap to the real upright view, and the
-   section's own animation carries on from there. Coming back, the same in reverse. ---- */
-let unwind = null;                 // the tilt: { kind:"in"|"out", dir:+1 water / -1 clouds, t0, dur, a, k, from, to, go }
-let dipCutT = -1;                  // when the last swap happened (performance.now), for the blur to clear
-function withUnwind(dir, go){
+/* ---- the passage through the clouds. While the view is upside down, the clouds at the top of the
+   screen really lie between the camera and the sea. Entering a section, the camera flies into them;
+   inside, where there is nothing but fog, it quietly rights itself, and it comes out below the clouds
+   (above them, for "Narzędzia"), upright, where the section's own animation takes over.
+   Coming back, the same path in reverse. No roll is ever seen against the horizon. ---- */
+let unwind = null;                 // { kind:"in"|"out", dir:+1 water / −1 above the clouds, i: the drop clicked, t0, dur, k, go, from, to }
+const PASS_MS = d => d > 0 ? 1150 : 760;
+function withUnwind(dir, i, go){
   if (mode !== "landing" || unwind) return;
   if (!gl || reduce || !isInv(p)) return go();
-  unwind = { kind:"in", dir, t0:performance.now(), dur:560, a:null, k:0, from:p, to:p, go };
+  unwind = { kind:"in", dir, i, t0:performance.now(), dur:PASS_MS(dir), k:0, go, from:p, to:p };
 }
+function passOut(dir, now){ return { kind:"out", dir, i:-1, t0:now, dur:PASS_MS(dir), k:0, from:p, to:p }; }
 function enterPortfolio(push){
   if (mode !== "landing" || unwind) return;
-  if (gl) return withUnwind(1, () => gl.toRing(push));
+  if (gl) return withUnwind(1, 0, () => gl.toRing(push));
   else { mode = "ring"; htmlEl.classList.add("in-port"); if (push !== false) try { history.pushState(null, "", "#portfolio"); } catch (_) {} }
 }
 function goLanding(push){
@@ -968,7 +971,7 @@ function goLanding(push){
 }
 function enterDeep(push){
   if (mode !== "landing" || unwind) return;
-  if (gl) return withUnwind(1, () => gl.toDeep(push));
+  if (gl) return withUnwind(1, 3, () => gl.toDeep(push));
   else { mode = "deep"; htmlEl.classList.add("in-depth", "sea-on"); if (push !== false) try { history.pushState(null, "", "#uslugi"); } catch (_) {} }
 }
 function surface(push){
@@ -979,7 +982,7 @@ function surface(push){
 $("surfaceBtn").addEventListener("click", () => surface());
 function enterPart(push){
   if (mode !== "landing" || unwind) return;
-  if (gl) return withUnwind(1, () => gl.toPart(push));
+  if (gl) return withUnwind(1, 1, () => gl.toPart(push));
   else { mode = "part"; htmlEl.classList.add("in-part", "part-on", "part-flat"); if (push !== false) try { history.pushState(null, "", "#o-mnie"); } catch (_) {} }
 }
 function closePart(push){
@@ -990,7 +993,7 @@ function closePart(push){
 $("partBack").addEventListener("click", () => closePart());
 function enterTools(push){
   if (mode !== "landing" || unwind) return;
-  if (gl) return withUnwind(-1, () => gl.toTools(push));
+  if (gl) return withUnwind(-1, 2, () => gl.toTools(push));
   else { mode = "tools"; htmlEl.classList.add("in-tools", "tools-on"); if (push !== false) try { history.pushState(null, "", "#narzedzia"); } catch (_) {} }
 }
 function closeTools(push){
@@ -1000,7 +1003,7 @@ function closeTools(push){
 }
 function enterRain(push){
   if (mode !== "landing" || unwind) return;
-  if (gl) return withUnwind(1, () => gl.toRain(push));
+  if (gl) return withUnwind(1, 4, () => gl.toRain(push));
   else { mode = "rain"; htmlEl.classList.add("in-rain", "rain-on"); if (push !== false) try { history.pushState(null, "", "#galeria"); } catch (_) {} }
 }
 function closeRain(push){
@@ -1048,25 +1051,158 @@ addEventListener("popstate", () => {
 /* overlay: hero, stage panels, gauge — all fade with landVis while the portfolio is on screen */
 const heroEl = $("hero"), hintEl = $("hint"), markEl = $("mark"), gFill = $("gFill"), gRead = $("gRead");
 let lastDeg = -1;
+/* ---- words into smoke, droplets into words ----
+   Scrolling down, a text that leaves turns into smoke that drifts up and thins out.
+   Scrolling back up, it first comes back as droplets that quickly run together into the letters.
+   Both are driven by the scroll itself (a = 0 fully there … 1 gone); which one plays depends on the
+   side the text was on when the fade began. */
+const fxEls = [heroEl, ...lPanels.filter(el => +el.dataset.c < 1)];
+const fxDefs = $("fxDefs"), fxCan = $("txtDrops"), fxCtx = fxCan.getContext("2d");
+fxDefs.innerHTML = fxEls.map((_, i) => `
+  <filter id="fxS${i}" x="-25%" y="-160%" width="150%" height="280%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="${(0.022 + i * 0.002).toFixed(3)} 0.008" numOctaves="2" seed="${7 + i * 13}" result="n"/>
+    <feComponentTransfer in="n" result="nb"><feFuncG type="linear" slope="0.75" intercept="0.4"/></feComponentTransfer>
+    <feDisplacementMap in="SourceGraphic" in2="nb" scale="0" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feGaussianBlur in="d" stdDeviation="0 0" result="s1"/>
+    <feGaussianBlur in="d" stdDeviation="0 0" result="b2"/>
+    <feOffset in="b2" dy="0" result="o2"/>
+    <feColorMatrix in="o2" type="matrix" values="1 0 0 0 0.06  0 1 0 0 0.06  0 0 1 0 0.06  0 0 0 0.55 0" result="s2"/>
+    <feGaussianBlur in="d" stdDeviation="0 0" result="b3"/>
+    <feOffset in="b3" dy="0" result="o3"/>
+    <feColorMatrix in="o3" type="matrix" values="1 0 0 0 0.12  0 1 0 0 0.12  0 0 1 0 0.12  0 0 0 0.3 0" result="s3"/>
+    <feMerge result="m"><feMergeNode in="s3"/><feMergeNode in="s2"/><feMergeNode in="s1"/></feMerge>
+    <feColorMatrix in="m" type="saturate" values="1"/>
+  </filter>
+  <filter id="fxG${i}" x="-10%" y="-40%" width="120%" height="180%" color-interpolation-filters="sRGB">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b"/>
+    <feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -7.5" result="g"/>
+    <feComposite in="g" in2="SourceGraphic" operator="arithmetic" k1="0" k2="1" k3="0" k4="0"/>
+  </filter>`).join("");
+const fx = fxEls.map((el, i) => {
+  const S = $("fxS" + i), G = $("fxG" + i);
+  return { el, i, kids:Array.from(el.children), side:null, mode:null, a:-1, pts:null, filt:"",
+    disp:S.querySelector("feDisplacementMap"), blurs:S.querySelectorAll("feGaussianBlur"), offs:S.querySelectorAll("feOffset"),
+    sat:S.querySelector('feColorMatrix[type="saturate"]'),
+    gBlur:G.querySelector("feGaussianBlur"), gComp:G.querySelector("feComposite") };
+});
+let fxDpr = 1, fxDrawn = false;
+function fxResize(){ fxDpr = Math.min(2, devicePixelRatio || 1); fxCan.width = Math.round(innerWidth * fxDpr); fxCan.height = Math.round(innerHeight * fxDpr); fxDrawn = true; }
+fxResize(); addEventListener("resize", () => { fxResize(); fx.forEach(s => { s.pts = null; }); });
+/* one glass bead, drawn once and stamped */
+const bead = (() => {
+  const S = 64, c = document.createElement("canvas"); c.width = c.height = S; const g = c.getContext("2d");
+  let gr = g.createRadialGradient(S * 0.5, S * 0.56, S * 0.05, S * 0.5, S * 0.5, S * 0.48);
+  gr.addColorStop(0, "rgba(227,178,106,0.30)"); gr.addColorStop(0.6, "rgba(200,214,212,0.22)"); gr.addColorStop(0.86, "rgba(230,236,232,0.55)"); gr.addColorStop(1, "rgba(230,236,232,0)");
+  g.fillStyle = gr; g.beginPath(); g.arc(S / 2, S / 2, S * 0.48, 0, Math.PI * 2); g.fill();
+  gr = g.createRadialGradient(S * 0.36, S * 0.33, 0, S * 0.36, S * 0.33, S * 0.16);
+  gr.addColorStop(0, "rgba(255,252,244,0.95)"); gr.addColorStop(1, "rgba(255,252,244,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, S, S);
+  return c;
+})();
+/* where the letters are: one droplet every character or two, relative to the text block */
+function fxPoints(s){
+  const r0 = s.el.getBoundingClientRect(), pts = [], rg = document.createRange();
+  const w = document.createTreeWalker(s.el, NodeFilter.SHOW_TEXT);
+  let n;
+  while ((n = w.nextNode())){
+    const t = n.nodeValue; if (!t.trim()) continue;
+    const fs = parseFloat(getComputedStyle(n.parentElement).fontSize) || 16;
+    const step = fs > 30 ? 1 : 2;
+    for (let k = 0; k < t.length; k += step){
+      if (t[k] === " " || t[k] === "\n") continue;
+      rg.setStart(n, k); rg.setEnd(n, k + 1);
+      const b = rg.getBoundingClientRect(); if (!b.width) continue;
+      pts.push({ x:b.left + b.width / 2 - r0.left, y:b.top + b.height * 0.56 - r0.top, r:Math.max(1.8, Math.min(7.5, fs * 0.16)) * (0.7 + Math.random() * 0.6),
+                 t:Math.random() * 0.3, dx:(Math.random() - 0.5) * 8, dy:-(4 + Math.random() * 12) });
+    }
+  }
+  while (pts.length > 260) pts.splice(Math.floor(Math.random() * pts.length), 1);
+  return pts;
+}
+function setKidsFilter(s, f){ if (s.filt === f) return; s.filt = f; s.kids.forEach(k => { k.style.filter = f; }); s.el.classList.toggle("fx-drops", f.indexOf("fxG") >= 0); }
+function textFx(i, a, op, dy, base, L){
+  const s = fx[i], el = s.el;
+  let o = op, lift = 0;
+  const live = !reduce && L > 0.98 && mode === "landing";
+  if (!live || a <= 0.001 || a >= 0.999){
+    if (a <= 0.001) s.side = "on"; else if (a >= 0.999) s.side = "off";
+    s.mode = null; setKidsFilter(s, "");
+  } else {
+    if (!s.mode) s.mode = s.side === "off" ? "drops" : "smoke";
+    if (s.mode === "smoke"){
+      /* the letters are lifted apart by a rising, vertically streaked turbulence and thin out */
+      if (Math.abs(a - s.a) > 0.002){
+        /* three layers: the dissolving letters, and two ever softer wisps trailing above them */
+        s.disp.setAttribute("scale", (80 * Math.pow(a, 1.1)).toFixed(1));
+        s.blurs[0].setAttribute("stdDeviation", `${(a * 1.6).toFixed(2)} ${(a * 5).toFixed(2)}`);
+        s.blurs[1].setAttribute("stdDeviation", `${(a * 3.5).toFixed(2)} ${(a * 13).toFixed(2)}`);
+        s.blurs[2].setAttribute("stdDeviation", `${(a * 6).toFixed(2)} ${(a * 22).toFixed(2)}`);
+        s.offs[0].setAttribute("dy", (-a * 26).toFixed(1));
+        s.offs[1].setAttribute("dy", (-a * 58).toFixed(1));
+        s.sat.setAttribute("values", (1 - 0.8 * a).toFixed(2));
+      }
+      setKidsFilter(s, `url(#fxS${i})`);
+      o = L * (1 - sm(0.12, 1, a));
+      lift = -a * 30;
+    } else {
+      /* droplets first, then they run together: a liquid blur that sharpens into the letters */
+      const b = 1 - a, m = sm(0.62, 0.96, b);
+      if (Math.abs(a - s.a) > 0.002){
+        s.gBlur.setAttribute("stdDeviation", ((1 - sm(0.3, 0.92, b)) * 5).toFixed(2));
+        s.gComp.setAttribute("k2", (1 - m).toFixed(3)); s.gComp.setAttribute("k3", m.toFixed(3));
+      }
+      setKidsFilter(s, `url(#fxG${i})`);
+      o = L * sm(0.3, 0.72, b);
+      if (!s.pts) s.pts = fxPoints(s);
+    }
+  }
+  s.a = a;
+  el.style.opacity = o.toFixed(3);
+  el.style.transform = `translate3d(0,calc(${base} + ${(dy + lift).toFixed(1)}px),0)`;
+}
+function fxDraw(){
+  const any = fx.some(s => s.mode === "drops" && s.pts);
+  if (!any && !fxDrawn) return;
+  fxCtx.setTransform(fxDpr, 0, 0, fxDpr, 0, 0);
+  fxCtx.clearRect(0, 0, innerWidth, innerHeight);
+  fxDrawn = false;
+  fx.forEach(s => {
+    if (s.mode !== "drops" || !s.pts) return;
+    const R = s.el.getBoundingClientRect(), b = 1 - s.a, melt = 1 - sm(0.42, 0.86, b);
+    if (melt <= 0) return;
+    s.pts.forEach(pt => {
+      const k = clamp01((b - pt.t) / 0.24); if (k <= 0) return;
+      const g = 1 + 2.2 * Math.pow(k - 1, 3) + 1.2 * Math.pow(k - 1, 2);     // a little overshoot as it beads up
+      const e = 1 - Math.pow(1 - k, 3);
+      const rr = pt.r * g * (0.3 + 0.7 * melt);
+      const x = R.left + pt.x + pt.dx * (1 - e), y = R.top + pt.y + pt.dy * (1 - e);
+      fxCtx.globalAlpha = Math.min(1, k * 2.5) * melt;
+      fxCtx.drawImage(bead, x - rr, y - rr, rr * 2, rr * 2);
+    });
+    fxDrawn = true;
+  });
+  fxCtx.globalAlpha = 1;
+}
 function updateOverlay(){
   const L = landVis;
   if (L < 0.002 && mode !== "landing" && updateOverlay.off) return;
   updateOverlay.off = L < 0.002;
   const heroOp = 1 - sm(0.015, 0.08, p);
-  heroEl.style.opacity = (heroOp * L).toFixed(3);
-  heroEl.style.transform = `translate3d(0,${(-p * 260).toFixed(1)}px,0)`;
+  textFx(0, 1 - heroOp, heroOp * L, -p * 260, "0px", L);
   hintEl.style.opacity = ((1 - sm(0.005, 0.04, p)) * L).toFixed(3);
   markEl.style.opacity = ((1 - heroOp) * L).toFixed(3);
   markEl.classList.toggle("is-on", heroOp < 0.5 && L > 0.5);
   gauge.style.opacity = L.toFixed(3);
-  lPanels.forEach(el => {
+  lPanels.forEach((el, pi) => {
     const c = +el.dataset.c, d = p - c;
     const op = (c >= 1 ? sm(0.885, 0.94, p) : 1 - sm(0.055, 0.1, Math.abs(d))) * L;
-    el.style.opacity = op.toFixed(3);
-    el.style.transform = `translate3d(0,calc(${innerWidth > 760 ? "-50%" : "0px"} + ${(-d * 180).toFixed(1)}px),0)`;
+    /* only the band past the panel (scrolled beyond it) turns to smoke / gathers from droplets */
+    if (c < 1) textFx(pi + 1, d > 0 ? sm(0.055, 0.1, d) : 0, op, -d * 180, innerWidth > 760 ? "-50%" : "0px", L);
+    else { el.style.opacity = op.toFixed(3); el.style.transform = `translate3d(0,calc(${innerWidth > 760 ? "-50%" : "0px"} + ${(-d * 180).toFixed(1)}px),0)`; }
     el.classList.toggle("is-on", op > 0.5);
     el.setAttribute("aria-hidden", op > 0.5 ? "false" : "true");
   });
+  fxDraw();
   let on = 0; STAGES.forEach((s, i) => { if (Math.abs(p - s.c) < Math.abs(p - STAGES[on].c)) on = i; });
   ticks.forEach((b, i) => { b.classList.toggle("is-on", i === on); b.classList.toggle("is-past", STAGES[i].c <= p + 0.001); });
   gFill.style.height = (p * 100).toFixed(2) + "%";
@@ -1408,6 +1544,7 @@ function initGL(){
   U.uCloudLayer = { value:new T.Vector2(0.2, 3.9) };
   U.uCloud = { value:0 };
   U.uCloudGap = { value:0 };
+  U.uFill = { value:new T.Vector3(0, 0, 0) };
 
   /* raymarch through the cloud slab; returns in-scattered light (rgb) and transmittance (a) */
   const CLOUDS = `
@@ -1416,6 +1553,12 @@ function initGL(){
     uniform vec4 uFlowDom;
     uniform vec2 uCloudLayer;
     uniform float uCloud, uCloudGap;
+    uniform vec3 uFill;       /* x, z, strength: a cloud gathered around the camera while it flies through */
+    float fillAt(vec3 x, float h){
+      if (uFill.z < 0.001) return 0.0;
+      vec2 dd = x.xz - uFill.xy;
+      return uFill.z * exp(-dot(dd, dd) * 0.012) * smoothstep(0.0, 0.08, h) * (1.0 - smoothstep(0.92, 1.0, h));
+    }
     vec3 flowAt(vec2 xz){
       vec2 uv = (xz - uFlowDom.xy) / uFlowDom.zw;
       if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) return vec3(0.0);
@@ -1431,7 +1574,8 @@ function initGL(){
       /* flat base, rounded domed top */
       float prof = smoothstep(0.0, 0.1, h) * (1.0 - smoothstep(topH * 0.58, topH, h));
       float base = prof * cov;
-      if (base < 0.02) return 0.0;
+      float fog = fillAt(x, h);
+      if (base < 0.02) return fog;
       #ifdef CLOUD3D
       vec3 q = vec3(xz.x, x.y * 1.25, xz.y);
       float w = texture(uWorley, q * 0.072 + vec3(uTime * 0.0035, 0.0, uTime * 0.0012)).r;
@@ -1443,7 +1587,7 @@ function initGL(){
       float d = base - (1.0 - w) * (0.24 + 0.3 * h) - (1.0 - w2) * 0.1;
       d = d * 2.7 - (1.0 - uCloud) * 2.3;           /* forming / dissolving: the densest cores come first */
       d *= 1.0 - 0.96 * fl.z;                        /* the narrow cut left by the cursor */
-      return clamp(d, 0.0, 1.0);
+      return clamp(max(d, fog), 0.0, 1.0);
     }
     float hgPh(float mu, float g){ float g2 = g * g; return (1.0 - g2) / (12.566 * pow(1.0 + g2 - 2.0 * g * mu, 1.5)); }
     vec4 cloudMarch(vec3 ro, vec3 rd, float tMax, vec2 seed, vec3 fogc, vec2 fogR){
@@ -1463,6 +1607,10 @@ function initGL(){
       vec3 L = normalize(vec3(uSunDir.x, max(uSunDir.y, 0.14), uSunDir.z));
       float mu = dot(rd, uSunDir);
       float phase = mix(hgPh(mu, 0.6), hgPh(mu, -0.2), 0.35) * 12.566;
+      /* deep inside the gathered cloud the light has no direction: nothing hints at which way is up */
+      float hCam = clamp((ro.y - uCloudLayer.x) / (uCloudLayer.y - uCloudLayer.x), 0.0, 1.0);
+      float iso = fillAt(ro, hCam);
+      phase = mix(phase, 1.0, iso);
       vec3 skyUp = sky(vec3(0.0, 1.0, 0.0));
       vec3 acc = vec3(0.0); float Tr = 1.0;
       for (int i = 0; i < STEPS; i++){
@@ -1471,7 +1619,7 @@ function initGL(){
         float d = cloudDens(x, fl, 0.0);
         if (d > 0.004){
           float ld = cloudDens(x + L * 0.45, fl, 1.0) + cloudDens(x + L * 1.3, fl, 1.0) * 0.8;
-          float h = clamp((x.y - uCloudLayer.x) / (uCloudLayer.y - uCloudLayer.x), 0.0, 1.0);
+          float h = mix(clamp((x.y - uCloudLayer.x) / (uCloudLayer.y - uCloudLayer.x), 0.0, 1.0), hCam, iso);
           float sunT = exp(-ld * 1.35);
           float powder = 1.0 - exp(-d * 1.6);
           vec3 sunC = uLight * sunT * powder * phase * 1.25;
@@ -1629,15 +1777,6 @@ function initGL(){
       vec3 R = reflect(-V, N); R.y = abs(R.y);
       float st = starField(R, uTime) * uStars * (1.0 - 0.5 * uPort);
       vec3 refl = sky(R) + mix(uLight, uPearl, 0.5) * 0.03 * smoothstep(0.5, 1.0, R.y) + uPearl * st * 0.9;
-      if (uCloud > 0.001 && cameraPosition.y < uCloudLayer.x && R.y > 0.015){
-        /* the deck overhead mirrored in the water: coverage looked up where the reflected ray meets its base */
-        float tc = (uCloudLayer.x + 0.6 - vWorld.y) / R.y;
-        vec2 xc = vWorld.xz + R.xz * tc - flowAt(vWorld.xz + R.xz * tc).xy;
-        vec2 cc = texture2D(uCov, xc * 0.0105 + vec2(uTime * 0.0011, uTime * 0.0004)).rg;
-        float cv = smoothstep(0.3, 0.62, cc.r * 0.72 + cc.g * 0.28) * smoothstep(0.0, 0.25, uCloud) * exp(-tc * 0.012);
-        vec3 cb = uDeep * 2.2 + uTide * 0.5 + uLight * 0.22;
-        refl = mix(refl, mix(cb, sky(normalize(vec3(R.x, 0.02, R.z))), smoothstep(40.0, 160.0, tc)), cv * 0.85);
-      }
       vec3 body = mix(uDeep, uTide, clamp(w.x * 4.0 + 0.25, 0.0, 1.0) * 0.4);
       /* light wandering through the water body: seen best from straight above */
       float c1 = fbm(p * 0.45 + vec2(uTime * 0.04, -uTime * 0.025) + w.yz * 1.6);
@@ -2029,77 +2168,72 @@ function initGL(){
     Pland.q.copy(qYaw).multiply(qPitch).multiply(qPar);
     Pland.p.copy(LAND_POS); Pland.p.y += Math.sin(elapsed * 0.4) * 0.04;
     if (reduce || !isInv(p)) return Pland;
-    if (mode === "landing"){
-      /* tilting down (or up) out of the upside-down view, or back into it */
-      if (unwind){
-        if (unwind.a === null){ unwind.a = dipAngle(Pland.q, unwind.dir); unwind.dur = 240 + unwind.a * 430; }
-        const k = unwind.k, e = unwind.kind === "in" ? k * k * (1.6 - 0.6 * k) : 1 - Math.pow(1 - k, 2.2);
-        const ang = unwind.a * (unwind.kind === "in" ? e : 1 - e);
-        Pland.q.multiply(qDip.setFromAxisAngle(XA, -unwind.dir * ang));
-      }
-      return Pland;
-    }
-    /* every other caller wants the landing as a destination: give the upright view of the water
-       (or of the cloud tops) that the swap leads into */
-    return uprightOf(Pland, (mode === "tools" || mode === "fromTools") ? -1 : 1);
+    /* any other caller wants the landing as a destination: the upright spot where the passage begins */
+    if (mode !== "landing") return belowPose(Pland, (mode === "tools" || mode === "fromTools") ? -1 : 1);
+    if (unwind) passPose(Pland);
+    return Pland;
   }
-  const qDip = new T.Quaternion(), fDip = new T.Vector3();
-  const dipE = () => camera.fov * Math.PI / 360 + 0.14;      // far enough that the horizon has left the frame
-  /* how far to tilt: until the view looks at +E (the sky — "the water") or −E (the clouds) */
-  function dipAngle(q, dir){
-    fDip.set(0, 0, -1).applyQuaternion(q);
-    const e0 = Math.asin(Math.max(-1, Math.min(1, fDip.y))), E = dipE();
-    return Math.max(0.2, Math.min(0.95, dir > 0 ? E - e0 : e0 + E));
+  /* ---- the passage through the clouds (see withUnwind) ---- */
+  const PASS_Y = d => d > 0 ? 3.2 : 1.9;            // below the lifted deck / inside the low one
+  const PASS_PITCH = d => d > 0 ? -0.62 : -0.34;
+  const qPA = new T.Quaternion(), qPB = new T.Quaternion(), qPt = new T.Quaternion();
+  /* upright, facing where the upside-down view was facing */
+  function uprightQ(dir, out){
+    const psi = yawOf(p) + Math.PI;                 // an upside-down view at yaw ψ faces the heading of ψ + π upright
+    qYaw.setFromAxisAngle(UP, psi); qPitch.setFromAxisAngle(XA, PASS_PITCH(dir));
+    return out.copy(qYaw).multiply(qPitch);
   }
-  /* the upright pose on the other side of the swap: same heading, looking down at −E */
-  function uprightOf(P, dir){
-    const a = dipAngle(P.q, dir);
-    qDip.copy(P.q).multiply(qTmpD.setFromAxisAngle(XA, -dir * a));
-    fDip.set(0, 0, -1).applyQuaternion(qDip);
-    const psi = Math.atan2(-fDip.x, -fDip.z);
-    qYaw.setFromAxisAngle(UP, psi); qPitch.setFromAxisAngle(XA, -dipE());
-    P.q.copy(qYaw).multiply(qPitch);
+  function belowPose(P, dir){
+    P.p.set(LAND_POS.x, PASS_Y(dir), LAND_POS.z);
+    uprightQ(dir, P.q);
     return P;
   }
-  const qTmpD = new T.Quaternion();
-  /* the swap itself: the camera jumps to the upright view, the drops keep their place on screen */
-  function dipCut(dir, go){
-    landPose(); uprightOf(Pland, dir);
-    camera.position.copy(Pland.p); camera.quaternion.copy(Pland.q); camera.updateMatrixWorld();
-    ldrops.forEach((b, i) => { if (b.mesh.visible && !b.fall){ slotLocal(i, b.mesh.position).applyMatrix4(camera.matrixWorld); b.glow.position.copy(b.mesh.position); } });
-    if (dir > 0){ cloudMix = 0; U.uCloud.value = 0; }       // looking down at the water now: no cloud sea in between
-    go();
-    if (dir > 0 && rv && mode === "toRain") rv.dip = true;
+  /* timing: gentle start and stop; the water passage lingers inside the cloud */
+  const hermite = (x0, x1, y0, y1, m0, m1, x) => {
+    const h = x1 - x0, t = (x - x0) / h, t2 = t * t, t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * y0 + (t3 - 2 * t2 + t) * h * m0 + (-2 * t3 + 3 * t2) * y1 + (t3 - t2) * h * m1;
+  };
+  function passDepth(dir, s){                      // 0 = the landing spot, 1 = below / inside the clouds
+    if (dir < 0) return 1 - Math.pow(1 - smooth(0, 1, s), 1.8);
+    if (s < 0.3) return hermite(0, 0.3, 0, 0.3, 0, 0.8, s);
+    if (s < 0.72) return hermite(0.3, 0.72, 0.3, 0.62, 0.8, 0.8, s);
+    return hermite(0.72, 1, 0.62, 1, 0.8, 0, s);
   }
-  /* soft blur over the canvas while the swap happens */
-  const dipVeil = document.getElementById("dipVeil");
-  let veilOp = -1;
-  function updateDipVeil(){
-    let v = 0, tint = 0.5;
-    if (unwind && mode === "landing" && isInv(p)){
-      v = unwind.kind === "in" ? smooth(0.5, 1, unwind.k) : 1 - smooth(0, 0.55, unwind.k);
-      if (unwind.dir < 0) tint = 0.12;
-    }
-    if (dipCutT >= 0){
-      const s = (performance.now() - dipCutT) / 1000;
-      v = Math.max(v, 1 - smooth(0, 0.42, s));
-      if (s > 0.5) dipCutT = -1;
-      if (mode === "toTools") tint = 0.12;
-    }
-    if (!reduce && mode !== "landing" && isInv(p) && RET.includes(mode)){
-      /* arriving at the upright view on the way back: blur in as the camera settles into it */
-      landPose();
-      const ang = camera.quaternion.angleTo(Pland.q) + camera.position.distanceTo(Pland.p) * 0.08;
-      v = Math.max(v, 1 - smooth(0.05, 0.42, ang));
-      if (mode === "fromTools") tint = 0.12;
-    }
-    if (Math.abs(v - veilOp) < 0.004) return;
-    veilOp = v;
-    dipVeil.style.opacity = v.toFixed(3);
-    dipVeil.style.visibility = v > 0.004 ? "visible" : "hidden";
-    dipVeil.style.setProperty("--tint", tint);
+  /* where the cloud layer is while the passage runs: over water it rises past the camera */
+  function passLayerK(){ if (!unwind || unwind.dir < 0) return 0; const s = unwind.kind === "in" ? unwind.k : 1 - unwind.k; return passDepth(1, s); }
+  function passPose(P){
+    const u = unwind, dir = u.dir;
+    const s = u.kind === "in" ? u.k : 1 - u.k;      // the way back is the same path run backwards
+    const e = passDepth(dir, s);
+    const y = LAND_POS.y + (PASS_Y(dir) - LAND_POS.y) * e;
+    const kL = dir > 0 ? e : 0;
+    const bot = LAYER_SEA.x + (LAYER_CEIL.x - LAYER_SEA.x) * kL, top = LAYER_SEA.y + (LAYER_CEIL.y - LAYER_SEA.y) * kL;
+    const h = (y - bot) / (top - bot);
+    /* the upside-down view leans a little into the clouds before entering them */
+    const lean = u.kind === "in" ? smooth(0, 0.3, u.k) : 1 - smooth(0.72, 1, u.k);
+    qPA.copy(P.q).multiply(qPt.setFromAxisAngle(XA, 0.3 * lean));
+    uprightQ(dir, qPB);
+    /* righting itself only while deep in the fog */
+    const r = smooth(0.88, dir > 0 ? 0.2 : 0.47, h);
+    P.q.slerpQuaternions(qPA, qPB, r);
+    P.p.y = y + Math.sin(elapsed * 0.4) * 0.04 * (1 - e);
   }
-  const RET = ["toLand", "fromDeep", "fromPart", "fromTools", "fromRain"];
+  /* a cloud gathers around the camera so the fog inside is always thick */
+  let fillK = 0, fillFadeT = -1, ceilHold = false;
+  function passFill(){
+    let f = 0;
+    if (unwind && mode === "landing" && isInv(p)) f = unwind.kind === "in" ? smooth(0.02, 0.22, unwind.k) : 1 - smooth(0.8, 1, unwind.k);
+    else if (mode === "fromTools" && isInv(p) && tsv) f = smooth(0.35, 0.8, (elapsed - tsv.t0) / TOOLS_OUT);
+    if (fillFadeT >= 0){ const a = elapsed - fillFadeT; f = Math.max(f, 1 - smooth(0, 0.9, a)); if (a > 0.9) fillFadeT = -1; }
+    fillK = f;
+    U.uFill.value.set(LAND_POS.x, LAND_POS.z, f);
+  }
+  /* the passage is over: hand over to the section, from exactly where the camera is */
+  function passEnd(u){
+    fillFadeT = elapsed;
+    if (u.dir > 0) ceilHold = true;                 // the clouds stay overhead as a ceiling while they fade
+    u.go();
+  }
   let cloudMix = 0, cloudFrom = 0;
   /* the cursor is where an air current starts: its path is pushed into the flow field over the clouds */
   const tHit = new T.Vector3(), tPlane = new T.Plane(new T.Vector3(0, 1, 0), -1.6);
@@ -2186,7 +2320,9 @@ function initGL(){
         U.uDrops.value[di].set(F.P.x, y, F.P.z, 0.6);
         return;
       }
-      const want = live && (p >= EMERGE[i] || (unwind && Math.max(unwind.from, unwind.to) >= EMERGE[i]));
+      /* flying into the clouds only the drop that was clicked stays; on the way back they all hang on,
+         a steady mark on the glass while the world turns behind them */
+      const want = live && p >= EMERGE[i] && (!unwind || unwind.kind === "out" || unwind.i === i);
       if (want && !b.on){ b.on = true; b.justRose = true; }
       if (!want && b.on) b.on = false;
       /* springy growth: overshoots a little, then settles */
@@ -2848,6 +2984,7 @@ function initGL(){
     if (t >= RAIN_OUT){ mode = "landing"; htmlEl.classList.remove("in-rain"); rv = null; U.uMirror.value.w = 0; }
     return Pr;
   }
+  const RET_W = ["toLand", "fromDeep", "fromPart", "fromRain"];
   /* where the cloud layer sits and what shows beneath it, per mode */
   function cloudLayerUpdate(){
     const L = U.uCloudLayer.value;
@@ -2856,6 +2993,13 @@ function initGL(){
     if (mode === "toRain"){ k = smooth(0.3, 0.75, t / RAIN_IN); gap = cloudMix * (1 - smooth(0.4, 0.72, t / RAIN_IN)); }
     else if (mode === "rain"){ k = 1; gap = 0; }
     else if (mode === "fromRain"){ k = 1 - smooth(0.25, 0.7, t / RAIN_OUT); gap = cloudMix * smooth(0.3, 0.6, t / RAIN_OUT); }
+    /* after (and before) a passage through the clouds over water, the deck hangs overhead as a ceiling */
+    if (RET_W.includes(mode) && isInv(p)) ceilHold = true;
+    else if (mode === "landing" && !unwind) ceilHold = false;
+    else if (!RET_W.includes(mode) && mode !== "landing" && cloudMix < 0.004) ceilHold = false;
+    if (mode === "toTools" || mode === "tools" || mode === "fromTools") ceilHold = false;
+    k = Math.max(k, passLayerK(), ceilHold ? 1 : 0);
+    gap *= 1 - k;
     L.set(LAYER_SEA.x + (LAYER_CEIL.x - LAYER_SEA.x) * k, LAYER_SEA.y + (LAYER_CEIL.y - LAYER_SEA.y) * k);
     U.uCloudGap.value = gap;
   }
@@ -2980,7 +3124,7 @@ function initGL(){
        under the surface, or while the camera sweeps across */
     const cLand = cloudOf(p), camY = camera.position.y;
     let cT = 0, cRate = 60;
-    if (mode === "landing"){ cT = cLand; cRate = 10; if (unwind && unwind.snap){ unwind.snap = false; if (unwind.dir > 0) cloudMix = cLand; } }
+    if (mode === "landing"){ cT = unwind ? Math.max(cLand, 0.4) : cLand; cRate = 10; }
     else if (mode === "toRing") cT = cloudFrom * Math.pow(1 - smooth(0.04, 0.52, trK), 2.2);   // thins out from the first moment of the turn, gone by its middle
     else if (mode === "toLand") cT = cLand * smooth(0.35, 0.95, trK);
     else if (mode === "toDeep"){ cT = camY > 0.05 ? cloudFrom : 0; if (camY <= 0.05) cRate = 1e4; }
@@ -2991,13 +3135,10 @@ function initGL(){
     else if (mode === "tools" || mode === "toRain" || mode === "rain"){ cT = 1; if (mode === "toRain") cRate = 8; }
     else if (mode === "fromTools") cT = 1 + (cloudOf(pT) - 1) * smooth(0.3, 1.0, tsv ? (elapsed - tsv.t0) / TOOLS_OUT : 1);
     else if (mode === "fromRain") cT = 1 + (cloudOf(pT) - 1) * smooth(0.6, 1.0, rv ? (elapsed - rv.t0) / RAIN_OUT : 1);
-    if (mode === "toRain" && rv && rv.dip) cT = smooth(0.62, 0.95, (elapsed - rv.t0) / RAIN_IN);   // the ceiling gathers only once it is overhead
-    /* heading back to an upside-down landing: the water stays clear until the swap */
-    if (!reduce && isInv(pT) && (mode === "toLand" || mode === "fromDeep" || mode === "fromPart" || mode === "fromRain")){ cT = 0; cRate = 8; }
     cloudMix += (cT - cloudMix) * (1 - Math.exp(-realDt * cRate));
     U.uCloud.value = cloudMix < 0.002 ? 0 : cloudMix;
+    passFill();
     cloudLayerUpdate();
-    updateDipVeil();
     if (flow && U.uCloud.value > 0.05){ flow.step(realDt); U.uFlow.value = flow.tex(); }
     setLowRes(U.uCloud.value > 0.02);
     const vis = ringVis;
@@ -3238,7 +3379,7 @@ function initGL(){
     try { renderer.compile(scene, camera); } catch (_) {}
     hid.forEach(o => { o.visible = false; });
   }
-  return { update, back, swap, targetScale, toggleCel, toRing, toLand, toDeep, fromDeep, toPart, fromPart, toTools, fromTools, toRain, fromRain, galWheel, dipCut, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
+  return { update, back, swap, targetScale, toggleCel, toRing, toLand, toDeep, fromDeep, toPart, fromPart, toTools, fromTools, toRain, fromRain, galWheel, passEnd, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
 }
 
 /* fallback without WebGL: open content directly */
@@ -3255,12 +3396,12 @@ function frame(now){
   const rawDt = Math.min(0.5, Math.max(0, (now - last) / 1000)); last = now;
   const realDt = Math.min(0.05, rawDt);
   if (unwind){
-    /* the tilt out of (or back into) the upside-down view; the swap happens at its end */
+    /* the passage through the clouds; the section's own animation starts when it ends */
     const k = Math.min(1, (now - unwind.t0) / unwind.dur); unwind.k = k;
-    if (k >= 1){ const u = unwind; unwind = null; if (u.kind === "in"){ dipCutT = now; if (gl) gl.dipCut(u.dir, u.go); else u.go(); } }
+    if (k >= 1){ const u = unwind; unwind = null; if (u.kind === "in"){ if (gl) gl.passEnd(u); else u.go(); } }
   } else if (mode === "landing"){
-    /* just back from a section into an upside-down view: arrive tilted, then settle up into it */
-    if (prevMode !== "landing" && gl && !reduce && isInv(p)) unwind = { kind:"out", dir:prevMode === "fromTools" ? -1 : 1, t0:now, dur:600, a:null, k:0, from:p, to:p, snap:true };
+    /* just back from a section into an upside-down view: the way back leads up through the clouds */
+    if (prevMode !== "landing" && gl && !reduce && isInv(p)) unwind = passOut(prevMode === "fromTools" ? -1 : 1, now);
     p += (pT - p) * (1 - Math.exp(-rawDt * (reduce ? 30 : 3.6))); if (Math.abs(pT - p) < 1e-5) p = pT;
   }
   prevMode = mode;
