@@ -792,6 +792,9 @@ const fadeEl = $("fade");
 let leaving = false;
 function leave(href, i){
   if (leaving) return;
+  /* in-scene sections never fade to black */
+  if (href === "#portfolio") return enterPortfolio();
+  if (href === "#uslugi") return enterDeep();
   leaving = true;
   if (gl && i >= 0) gl.pulse(i);
   setTimeout(() => fadeEl.classList.add("is-on"), reduce ? 0 : 160);
@@ -1529,7 +1532,7 @@ function initGL(){
     if (mode === "landing"){
       if (Math.hypot(e.clientX - d0.x, e.clientY - d0.y) > 8) return;
       const h = ray.intersectObjects(lHits, false)[0];
-      if (h){ const i = h.object.userData.li; if (ldrops[i].grow > 0.5){ if (i === 0) toRing(); else leave(lLinks[i].getAttribute("href"), i); return; } }
+      if (h){ const i = h.object.userData.li; if (ldrops[i].grow > 0.5){ const a = lLinks[i]; if (a.hasAttribute("data-port")) toRing(); else if (a.hasAttribute("data-deep")) toDeep(); else leave(a.getAttribute("href"), i); return; } }
     }
     if (mode === "ring"){
       const h = ray.intersectObjects(pickables, false)[0];
