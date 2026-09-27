@@ -362,9 +362,11 @@ html:not(.tools-on) .tool-cloud{opacity:0!important}
 .tool-cloud h3{margin:0 0 7px;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern)}
 .tool-cloud ul{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:16px;line-height:1.25}
 .tool-cloud li span{display:block;font-size:12px;color:#B9C7C5;letter-spacing:.01em}
-.lens-label{position:fixed;left:0;top:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .25s;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--pearl);text-shadow:0 1px 8px #000;white-space:nowrap}
-html:not(.in-rain) .lens-label{display:none}
+.gal-caption{position:fixed;left:0;top:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .35s ease;font-family:var(--display);font-size:26px;
+  color:var(--pearl);text-shadow:0 1px 12px rgba(0,0,0,.9);white-space:nowrap}
+.gal-caption span{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--lantern);vertical-align:middle;margin-right:8px}
+html.gal-focus.in-rain .gal-caption{opacity:1;transition-delay:.45s}
+html:not(.in-rain) .gal-caption{display:none}
 @media (max-width:760px){
   .tool-cloud{max-width:150px}
   .tool-cloud ul{font-size:13px}
@@ -563,10 +565,10 @@ html:not(.in-rain) .lens-label{display:none}
 <section class="sky-panel rain-panel" id="rainPanel" aria-labelledby="rainTitle">
   <div class="eyebrow">05 · Galeria</div>
   <h2 id="rainTitle">Galeria</h2>
-  <p>Kliknij spadającą kroplę, żeby obejrzeć kadr. Na razie są tu kadry poglądowe, zdjęcia pojawią się wkrótce.</p>
+  <p>Przewijaj, żeby iść wzdłuż kadrów. Ruch kursora obraca spojrzenie, a kliknięcie przywołuje obraz bliżej. Na razie kadry poglądowe, zdjęcia pojawią się wkrótce.</p>
   <button class="sky-back" type="button" id="rainBack">↑ Wróć nad chmury</button>
 </section>
-<div class="lens-label" id="lensLabel" aria-hidden="true"></div>
+<div class="gal-caption" id="galCaption" aria-live="polite"></div>
 
 <div class="fade" id="fade" aria-hidden="true"></div>
 
@@ -821,6 +823,7 @@ const snap = () => {
   else targetRot = (lastDir > 0 ? Math.ceil(f) : Math.floor(f)) * STEP;
 };
 window.addEventListener("wheel", e => {
+  if (mode === "rain"){ e.preventDefault(); if (gl) gl.galWheel(e.deltaY, e.deltaMode); return; }
   if (["landing", "toDeep", "deep", "fromDeep", "toPart", "part", "fromPart", "toTools", "tools", "fromTools", "toRain", "rain", "fromRain"].includes(mode)) return;
   if (e.target.closest && e.target.closest(".veil-card,.lightbox")) return;
   e.preventDefault();
@@ -840,6 +843,10 @@ window.addEventListener("keydown", e => {
     const inCard = document.activeElement && document.activeElement.closest && document.activeElement.closest(".veil-card");
     if (!inCard && e.key === "ArrowRight") dropStep($("veilNext"), 1);
     if (!inCard && e.key === "ArrowLeft") dropStep($("veilPrev"), -1);
+    return;
+  }
+  if (mode === "rain" && gl){
+    if (e.key === "ArrowUp" || e.key === "ArrowDown"){ e.preventDefault(); gl.galWheel(e.key === "ArrowUp" ? -160 : 160, 0); }
     return;
   }
   if (mode !== "ring") return;
@@ -1319,7 +1326,7 @@ function initGL(){
       void main(){ float L = texture2D(uCurl, vUv - vec2(uTx.x, 0.0)).x, R = texture2D(uCurl, vUv + vec2(uTx.x, 0.0)).x;
         float B = texture2D(uCurl, vUv - vec2(0.0, uTx.y)).x, Tt = texture2D(uCurl, vUv + vec2(0.0, uTx.y)).x, C = texture2D(uCurl, vUv).x;
         vec2 f = 0.5 * vec2(abs(Tt) - abs(B), abs(R) - abs(L)); f /= length(f) + 1e-4; f *= uEps * C * vec2(1.0, -1.0);
-        vec4 v = texture2D(uVel, vUv); gl_FragColor = vec4(v.xy + f * uDt, 0.0, 1.0); }`, { uVel:{ value:null }, uCurl:{ value:null }, uEps:{ value:14 }, uDt:{ value:0 } });
+        vec4 v = texture2D(uVel, vUv); gl_FragColor = vec4(v.xy + f * uDt, 0.0, 1.0); }`, { uVel:{ value:null }, uCurl:{ value:null }, uEps:{ value:2.5 }, uDt:{ value:0 } });
     const divM = M(`uniform sampler2D uVel;
       void main(){ float L = texture2D(uVel, vUv - vec2(uTx.x, 0.0)).x, R = texture2D(uVel, vUv + vec2(uTx.x, 0.0)).x;
         float B = texture2D(uVel, vUv - vec2(0.0, uTx.y)).y, Tt = texture2D(uVel, vUv + vec2(0.0, uTx.y)).y;
@@ -1335,7 +1342,7 @@ function initGL(){
     /* the cloud is carried by the air, then slowly settles back; the cut left by the cursor heals */
     const dispM = M(`uniform sampler2D uD, uVel; uniform float uDt;
       void main(){ vec4 d = texture2D(uD, vUv); vec2 v = texture2D(uVel, vUv).xy;
-        vec2 xy = d.xy * exp(-uDt * 0.35) + v * uDt * 0.85;
+        vec2 xy = d.xy * exp(-uDt * 0.22) + v * uDt * 0.6;
         gl_FragColor = vec4(clamp(xy, vec2(-6.0), vec2(6.0)), d.z * exp(-uDt * 0.55), 1.0); }`, { uD:{ value:null }, uVel:{ value:null }, uDt:{ value:0 } });
     const clearM = M(`uniform sampler2D uSrc; uniform float uK; void main(){ gl_FragColor = texture2D(uSrc, vUv) * uK; }`, { uSrc:{ value:null }, uK:{ value:0.8 } });
     const run = (m, target) => { quad.material = m; renderer.setRenderTarget(target); renderer.render(scn, cam); };
@@ -1351,16 +1358,14 @@ function initGL(){
         if (idle > 12) return;                       // nothing stirred for a while: everything has settled
         dt = Math.min(dt, 1 / 30);
         const prevRT = renderer.getRenderTarget(), prevAC = renderer.autoClear; renderer.autoClear = false;
-        advect.uniforms.uVel.value = vel.a.texture; advect.uniforms.uSrc.value = vel.a.texture; advect.uniforms.uDt.value = dt; advect.uniforms.uDiss.value = Math.exp(-dt * 0.8);
+        advect.uniforms.uVel.value = vel.a.texture; advect.uniforms.uSrc.value = vel.a.texture; advect.uniforms.uDt.value = dt; advect.uniforms.uDiss.value = Math.exp(-dt * 1.3);
         run(advect, vel.b); vel.swap();
         const uv = (x, z) => [(x - FLOW_DOM.x) / FLOW_DOM.z, (z - FLOW_DOM.y) / FLOW_DOM.w];
         queue.forEach(([ax, az, bx, bz, vx, vz]) => {
           const A = uv(ax, az), B = uv(bx, bz);
           splat.uniforms.uA.value.set(A[0], A[1]); splat.uniforms.uB.value.set(B[0], B[1]);
-          splat.uniforms.uSrc.value = vel.a.texture; splat.uniforms.uMode.value = 0; splat.uniforms.uR.value = 0.9;
+          splat.uniforms.uSrc.value = vel.a.texture; splat.uniforms.uMode.value = 0; splat.uniforms.uR.value = 4.5;
           splat.uniforms.uVal.value.set(vx, vz, 0); run(splat, vel.b); vel.swap();
-          splat.uniforms.uSrc.value = disp.a.texture; splat.uniforms.uMode.value = 1; splat.uniforms.uR.value = 0.06;
-          splat.uniforms.uVal.value.set(0, 0, 1); run(splat, disp.b); disp.swap();
         });
         queue.length = 0;
         curlM.uniforms.uVel.value = vel.a.texture; run(curlM, crl);
@@ -1382,7 +1387,7 @@ function initGL(){
   if (GL2) U.uWorley = { value:worleyTex };
   U.uFlow = { value:flow ? flow.tex() : blankFlow };
   U.uFlowDom = { value:FLOW_DOM };
-  U.uCloudLayer = { value:new T.Vector2(0.2, 3.2) };
+  U.uCloudLayer = { value:new T.Vector2(0.2, 3.9) };
   U.uCloud = { value:0 };
   U.uCloudGap = { value:0 };
 
@@ -1403,10 +1408,10 @@ function initGL(){
       if (h < 0.0 || h > 1.0) return 0.0;
       vec2 xz = x.xz - fl.xy;
       vec2 c = texture2D(uCov, xz * 0.0105 + vec2(uTime * 0.0011, uTime * 0.0004)).rg;
-      float cov = smoothstep(0.36, 0.7, c.r * 0.72 + c.g * 0.28);
-      float topH = 0.3 + 0.7 * cov;
+      float cov = smoothstep(0.27, 0.6, c.r * 0.72 + c.g * 0.28);
+      float topH = 0.42 + 0.58 * cov;
       /* flat base, rounded domed top */
-      float prof = smoothstep(0.0, 0.08, h) * (1.0 - smoothstep(topH * 0.72, topH, h));
+      float prof = smoothstep(0.0, 0.1, h) * (1.0 - smoothstep(topH * 0.58, topH, h));
       float base = prof * cov;
       if (base < 0.02) return 0.0;
       #ifdef CLOUD3D
@@ -1417,8 +1422,8 @@ function initGL(){
       float w = texture2D(uCov, xz * 0.05 + vec2(x.y * 0.04)).b;
       float w2 = 0.62;
       #endif
-      float d = base - (1.0 - w) * (0.3 + 0.35 * h) - (1.0 - w2) * 0.16;
-      d = d * 3.4 - (1.0 - uCloud) * 2.6;           /* forming / dissolving: the densest cores come first */
+      float d = base - (1.0 - w) * (0.24 + 0.3 * h) - (1.0 - w2) * 0.1;
+      d = d * 2.7 - (1.0 - uCloud) * 2.3;           /* forming / dissolving: the densest cores come first */
       d *= 1.0 - 0.96 * fl.z;                        /* the narrow cut left by the cursor */
       return clamp(d, 0.0, 1.0);
     }
@@ -1450,12 +1455,12 @@ function initGL(){
           float ld = cloudDens(x + L * 0.45, fl, 1.0) + cloudDens(x + L * 1.3, fl, 1.0) * 0.8;
           float h = clamp((x.y - uCloudLayer.x) / (uCloudLayer.y - uCloudLayer.x), 0.0, 1.0);
           float sunT = exp(-ld * 1.35);
-          float powder = 1.0 - exp(-d * 2.2);
+          float powder = 1.0 - exp(-d * 1.6);
           vec3 sunC = uLight * sunT * powder * phase * 1.25;
           vec3 amb = mix(uDeep * 2.2 + uTide * 0.35, uTide * 1.5 + uHorizon * 0.9 + skyUp * 2.0, pow(h, 0.8));
           vec3 S = sunC + amb;
           S = mix(S, fogc, smoothstep(fogR.x, fogR.y + 30.0, t));
-          float a = 1.0 - exp(-d * dt * 1.7);
+          float a = 1.0 - exp(-d * dt * 1.35);
           acc += Tr * S * a;
           Tr *= 1.0 - a;
           if (Tr < 0.03) break;
@@ -1969,14 +1974,13 @@ function initGL(){
     }
     if (mode === "rain"){
       if (Math.hypot(e.clientX - d0.x, e.clientY - d0.y) > 8) return;
-      const hl = ray.intersectObjects(lensHits, false)[0];
-      if (hl){ catchLens(hl.object.userData.lens); return; }
+      if (galleryClick()) return;
     }
     if (mode === "ring"){
       const h = ray.intersectObjects(pickables, false)[0];
       if (h){ request(h.object.userData.screen ? active : h.object.userData.i); return; }
     }
-    if (mode === "ring" || mode === "content" || mode === "landing"){
+    if (mode === "ring" || mode === "content" || mode === "landing" || mode === "rain"){
       const o = ray.ray.origin, d = ray.ray.direction;
       if (d.y < 0){ const t = -o.y / d.y; addRipple(o.x + d.x * t, o.z + d.z * t, 0.06, 6.5); addRipple(o.x + d.x * t, o.z + d.z * t, 0.045, 3.6); }
     }
@@ -2016,9 +2020,9 @@ function initGL(){
       const dt = Math.max(now - aLast.t, 1 / 120), dx = tHit.x - aLast.x, dz = tHit.z - aLast.z, d = Math.hypot(dx, dz);
       if (d < 0.05) return;
       if (d < 6 && now - aLast.t < 0.25){
-        let vx = dx / dt, vz = dz / dt; const vl = Math.hypot(vx, vz), cap = 14;
+        let vx = dx / dt, vz = dz / dt; const vl = Math.hypot(vx, vz), cap = 7;
         if (vl > cap){ vx *= cap / vl; vz *= cap / vl; }
-        flow.push(aLast.x, aLast.z, tHit.x, tHit.z, vx * 0.9, vz * 0.9);
+        flow.push(aLast.x, aLast.z, tHit.x, tHit.z, vx * 0.28, vz * 0.28);   // a gentle pull, not a gust
       }
     }
     aLast = { x:tHit.x, z:tHit.z, t:now };
@@ -2611,102 +2615,96 @@ function initGL(){
   function Ptools_M(){ return PtM.compose(Ptools.p, Ptools.q, ONE3); }
 
 
-  /* ================= GALERIA: "Deszcz" =================
-     the drop falls into the clouds; the camera goes down through them and they lift into a ceiling;
-     below it, it rains — and some of the drops fall slowly, each one a lens holding a photograph */
-  const RAIN_IN = reduce ? 0.45 : 1.3, RAIN_OUT = reduce ? 0.45 : 1.2;
+  /* ================= GALERIA: a corridor of pictures over still water =================
+     the drop falls into the clouds; the camera goes down through them and they lift away overhead.
+     Below: calm water and two rows of pictures running off to the horizon. Scroll walks forward and back,
+     the cursor turns the head a little, a click brings a picture over on a gust of wind */
+  const RAIN_IN = reduce ? 0.45 : 1.35, RAIN_OUT = reduce ? 0.45 : 1.2;
   const RAIN_I = 4;
-  const LAYER_SEA = new T.Vector2(0.2, 3.2), LAYER_CEIL = new T.Vector2(4.4, 8.4);
+  const LAYER_SEA = new T.Vector2(0.2, 3.9), LAYER_CEIL = new T.Vector2(6.2, 10.6);
+  const GAL_X = LAND_POS.x, GAL_Z0 = LAND_POS.z - 2, EYE_Y = 1.6;
+  const G_PER = 12, G_SPACE = 4.2, G_ROW = 3.3, G_W = 2.3, G_H = 2.3 * 900 / 720, G_BASE = 0.32, G_TURN = 0.5;
+  const GAL_LEN = (G_PER - 1) * G_SPACE + 4;
   const Prain = pose(), Pr = pose();
-  {
-    const eye = new T.Vector3(LAND_POS.x, 1.6, LAND_POS.z - 2);
-    look(Prain, eye, eye.clone().add(new T.Vector3(0, Math.tan(0.06) * 10, -10)), UP);
-  }
   let rv = null;
+  let galZ = 0, galZT = 0, yawS = 0, pitchS = 0;
+  const qY = new T.Quaternion(), qX = new T.Quaternion();
+  function galPose(z, yaw, pitch, out){
+    out.p.set(GAL_X, EYE_Y, GAL_Z0 + z);
+    qY.setFromAxisAngle(UP, yaw); qX.setFromAxisAngle(XA, 0.035 + pitch);
+    out.q.copy(qY).multiply(qX);
+    return out;
+  }
+  galPose(0, 0, 0, Prain);
 
-  /* rain streaks: positions live in the shader, only time and wind change */
-  const RC = 2400;
-  const rainGeo = (() => {
-    const pos = new Float32Array(RC * 2 * 3), seed = new Float32Array(RC * 2 * 3), end = new Float32Array(RC * 2);
-    let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
-    for (let i = 0; i < RC; i++){
-      const a = rnd(), b = rnd(), c = rnd();
-      for (let e = 0; e < 2; e++){ const o = i * 2 + e; seed[o * 3] = a; seed[o * 3 + 1] = b; seed[o * 3 + 2] = c; end[o] = e; }
-    }
-    const g = new T.BufferGeometry();
-    g.setAttribute("position", new T.BufferAttribute(pos, 3));
-    g.setAttribute("aSeed", new T.BufferAttribute(seed, 3));
-    g.setAttribute("aEnd", new T.BufferAttribute(end, 1));
-    return g;
-  })();
-  const rainMat = new T.ShaderMaterial({
-    uniforms:{ uTime:U.uTime, uCenter:{ value:new T.Vector3() }, uWind:{ value:new T.Vector2() }, uAlpha:{ value:0 }, uCol:{ value:new T.Color() } },
-    transparent:true, depthWrite:false, blending:T.AdditiveBlending,
-    vertexShader:`
-      uniform float uTime; uniform vec3 uCenter; uniform vec2 uWind;
-      attribute vec3 aSeed; attribute float aEnd;
-      varying float vA;
-      void main(){
-        float sp = 8.5 + aSeed.x * 3.0;
-        float y = mod(aSeed.y * 6.2 - uTime * sp, 6.2) - 0.3;
-        vec3 p = vec3(uCenter.x + (aSeed.x - 0.5) * 26.0, y, uCenter.z + 3.0 - aSeed.z * 32.0);
-        p.xz += uWind * (y - 3.0) * 0.12;
-        p += aEnd * vec3(uWind.x * 0.05, 0.42, uWind.y * 0.05);
-        vA = (0.35 + 0.65 * aEnd) * smoothstep(-0.3, 0.2, y);
-        gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
-      }`,
-    fragmentShader:`uniform float uAlpha; uniform vec3 uCol; varying float vA;
-      void main(){ gl_FragColor = vec4(uCol * vA * uAlpha, 1.0); }`
-  });
-  const rain = new T.LineSegments(rainGeo, rainMat); rain.frustumCulled = false; rain.visible = false; scene.add(rain);
-
-  /* lens drops: a photograph seen through a falling drop */
-  const lensMat = (tex) => new T.ShaderMaterial({
-    uniforms:{ uTex:{ value:tex }, uAlpha:{ value:0 }, uHover:{ value:0 }, uLight:U.uLight, uHorizon:U.uHorizon, uSunDir:U.uSunDir },
-    transparent:true,
-    vertexShader:`varying vec3 vN; varying vec3 vV;
-      void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = -mv.xyz; gl_Position = projectionMatrix * mv; }`,
-    fragmentShader:`uniform sampler2D uTex; uniform float uAlpha, uHover; uniform vec3 uLight, uHorizon, uSunDir;
-      varying vec3 vN; varying vec3 vV;
-      void main(){
-        vec3 N = normalize(vN), V = normalize(vV);
-        float nz = max(dot(N, V), 0.0);
-        /* spherical lens: magnified in the middle, squeezed and flipped towards the rim */
-        vec2 uv = 0.5 + N.xy * vec2(0.46, 0.42) * (0.75 + 0.35 * (1.0 - nz));
-        vec3 img = pow(texture2D(uTex, uv).rgb, vec3(0.85)) * (1.15 + 0.35 * uHover);
-        float fres = pow(1.0 - nz, 3.0);
-        vec3 col = mix(img, uHorizon * 1.6 + uLight * 0.12, fres * 0.75);
-        vec3 K = normalize(vec3(-0.45, 0.6, 0.65));
-        col += vec3(1.0) * pow(max(dot(reflect(-V, N), K), 0.0), 90.0) * 0.9;
-        col += uLight * pow(1.0 - nz, 5.0) * (0.35 + 0.5 * uHover);
-        gl_FragColor = vec4(col, uAlpha * (0.9 + 0.1 * nz));
+  /* the pictures (for now: studies painted in the browser, made one at a time) */
+  const blankPic = new T.DataTexture(new Uint8Array([20, 40, 48, 255]), 1, 1); blankPic.needsUpdate = true;
+  const picTex = PHOTOS.map(() => null);
+  function picTexture(k){
+    if (!picTex[k]){ const t = new T.CanvasTexture(studyCanvas(k)); t.encoding = T.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); picTex[k] = t; }
+    return picTex[k];
+  }
+  const picGeo = new T.PlaneGeometry(G_W, G_H), frameGeo = new T.PlaneGeometry(G_W + 0.08, G_H + 0.08);
+  const reflMatFor = tex => new T.ShaderMaterial({
+    uniforms:{ uTex:{ value:tex }, uA:{ value:0 } }, transparent:true, depthTest:false, depthWrite:false, side:T.DoubleSide,
+    vertexShader:`varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader:`uniform sampler2D uTex; uniform float uA; varying vec2 vUv;
+      void main(){ vec3 c = texture2D(uTex, vUv).rgb;
+        float f = (1.0 - smoothstep(0.0, 0.6, vUv.y)) * uA * 0.34;
+        gl_FragColor = vec4(c * 0.75, f);
         #include <encodings_fragment>
       }`
   });
-  const blankLens = new T.DataTexture(new Uint8Array([20, 40, 48, 255]), 1, 1); blankLens.needsUpdate = true;
-  const lensTex = PHOTOS.map(() => null);
-  function lensTexture(k){
-    if (!lensTex[k]){ const c = studyCanvas(k); const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; lensTex[k] = t; }
-    return lensTex[k];
+  const pics = [];
+  for (let side = -1; side <= 1; side += 2) for (let i = 0; i < G_PER; i++){
+    const k = (i * 2 + (side > 0 ? 1 : 0)) % PHOTOS.length;
+    const grp = new T.Group(); grp.visible = false; scene.add(grp);
+    const frame = new T.Mesh(frameGeo, new T.MeshBasicMaterial({ color:0x1b2a2e, transparent:true, opacity:0 })); frame.position.z = -0.01; grp.add(frame);
+    const mat = new T.MeshBasicMaterial({ map:blankPic, transparent:true, opacity:0, toneMapped:false });
+    const pic = new T.Mesh(picGeo, mat); pic.userData.pic = pics.length; grp.add(pic);
+    const refl = new T.Mesh(picGeo, reflMatFor(blankPic)); refl.renderOrder = 3; refl.visible = false; scene.add(refl);
+    const z = -8 - i * G_SPACE - (side > 0 ? G_SPACE / 2 : 0);
+    const home = { p:new T.Vector3(GAL_X + side * G_ROW, G_BASE + G_H / 2, GAL_Z0 + z), q:new T.Quaternion().setFromAxisAngle(UP, -side * (Math.PI / 2 - G_TURN)) };
+    pics.push({ grp, pic, mat, frame, refl, k, side, home, rise:0, focus:0, cur:{ p:home.p.clone(), q:home.q.clone() } });
   }
-  const LN_COUNT = 7;
-  const lensGeo = new T.SphereGeometry(1, 48, 36);
-  const lensHit = new T.SphereGeometry(1.25, 10, 8);
-  const lenses = Array.from({ length:LN_COUNT }, (_, i) => {
-    const mat = lensMat(blankLens);
-    const mesh = new T.Mesh(lensGeo, mat); mesh.visible = false; mesh.renderOrder = 2; scene.add(mesh);
-    const hit = new T.Mesh(lensHit, new T.MeshBasicMaterial()); hit.visible = false; hit.userData.lens = i; mesh.add(hit);
-    return { mesh, mat, hit, k:i % PHOTOS.length, x:-3.2 + i * (6.4 / (LN_COUNT - 1)), z:-3.6 - ((i * 5) % 7) * 0.6, y:0, sp:0.32 + ((i * 3) % 5) * 0.05, r:0.3 + ((i * 7) % 4) * 0.04, vx:0, hov:0, caught:0 };
-  });
-  const lensHits = lenses.map(l => l.hit);
-  let lensHovered = -1, nextPhoto = LN_COUNT, rainGen = 0, ripT = 0;
-  const lensLab = $("lensLabel");
-  function resetLens(l, top){
-    l.k = nextPhoto++ % PHOTOS.length;
-    l.mat.uniforms.uTex.value = lensTex[l.k] || blankLens;
-    l.y = top ? 3.9 + Math.random() * 0.8 : 0.4 + Math.random() * 3.4;
-    l.vx = 0; l.caught = 0;
+  const picMeshes = pics.map(p => p.pic);
+  let genI = 0, genBusy = false;
+  function genNext(){
+    if (genI >= PHOTOS.length) return;
+    const k = genI++;
+    const t = picTexture(k);
+    pics.forEach(p => { if (p.k === k){ p.mat.map = t; p.mat.needsUpdate = true; p.refl.material.uniforms.uTex.value = t; } });
   }
+
+  /* the picture brought over by the wind */
+  let focus = null;                 // { i, t0, dir:+1 bringing / −1 returning, from, to }
+  const Pfoc = pose(), fT1 = new T.Vector3(), fCtl = new T.Vector3();
+  const capEl = $("galCaption");
+  const gust = Array.from({ length:7 }, () => { const s = new T.Sprite(new T.SpriteMaterial({ map:puffTex, transparent:true, depthWrite:false, opacity:0 })); s.visible = false; scene.add(s); return s; });
+  function focusPose(){
+    galPose(galZ, 0, 0, Pfoc);
+    Pfoc.p.addScaledVector(new T.Vector3(0, 0, -1), 4.4); Pfoc.p.y = EYE_Y + 0.08;
+    return Pfoc;
+  }
+  function bring(i){
+    if (focus && focus.dir > 0 && focus.i === i) return release();
+    if (focus && focus.i !== i) release(true);
+    const p = pics[i];
+    focusPose();
+    focus = { i, t0:elapsed, dir:1, from:{ p:p.cur.p.clone(), q:p.cur.q.clone() }, to:{ p:Pfoc.p.clone(), q:Pfoc.q.clone() } };
+    fCtl.copy(focus.from.p).lerp(focus.to.p, 0.5); fCtl.y += 1.1; fCtl.x += -p.side * 0.6;
+    focus.ctl = fCtl.clone();
+    gust.forEach((g, k) => { g.userData.t = elapsed + k * 0.05; });
+    if (capEl){ capEl.innerHTML = `<span>${String(p.k + 1).padStart(2, "0")}</span> ${PHOTOS[p.k]}`; htmlEl.classList.add("gal-focus"); }
+  }
+  function release(instant){
+    if (!focus || focus.dir < 0) return;
+    const p = pics[focus.i];
+    if (instant){ p.focus = 0; p.cur.p.copy(p.home.p); p.cur.q.copy(p.home.q); focus = null; htmlEl.classList.remove("gal-focus"); return; }
+    focus = { i:focus.i, t0:elapsed, dir:-1, from:{ p:p.cur.p.clone(), q:p.cur.q.clone() }, to:{ p:p.home.p.clone(), q:p.home.q.clone() }, ctl:focus.ctl };
+    htmlEl.classList.remove("gal-focus");
+  }
+
   function toRain(push){
     if (mode !== "landing") return;
     const b = ldrops[RAIN_I];
@@ -2715,22 +2713,31 @@ function initGL(){
     b.fall = { t0:elapsed, P, g:2 * P.y / 0.3 / 0.3, hit:false };
     ldrops.forEach(d => { d.on = false; });
     cloudFrom = cloudMix;
-    rv = { t0:elapsed, from:capture(), mid:new T.Vector3(LAND_POS.x, 3.4, LAND_POS.z - 1.2), shown:false };
-    lenses.forEach(l => resetLens(l, false));
+    galZ = galZT = 0; yawS = pitchS = 0;
+    galPose(0, 0, 0, Prain);
+    rv = { t0:elapsed, from:capture(), mid:new T.Vector3(GAL_X, 3.6, LAND_POS.z - 0.5), shown:false };
     mode = "toRain"; htmlEl.classList.add("in-rain");
     if (push !== false) try { history.pushState(null, "", "#galeria"); } catch (_) {}
   }
   function fromRain(push){
     if (mode !== "rain") return;
-    if (!lb.hidden) closeLightbox();
-    rv = { t0:elapsed, from:capture(), mid:new T.Vector3(LAND_POS.x, 3.4, LAND_POS.z - 1.2) };
+    release(true);
+    rv = { t0:elapsed, from:capture(), mid:new T.Vector3(GAL_X, 3.6, GAL_Z0 + galZ + 1.5) };
     mode = "fromRain"; htmlEl.classList.remove("rain-on");
     if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {}
   }
-  if (mode === "rain"){ rv = { t0:0, from:{ p:Prain.p.clone(), q:Prain.q.clone() }, mid:new T.Vector3(), shown:true }; lenses.forEach(l => resetLens(l, false)); }
+  if (mode === "rain"){ rv = { t0:0, from:{ p:Prain.p.clone(), q:Prain.q.clone() }, mid:new T.Vector3(), shown:true }; }
   function rainCamera(){
     const t = rv ? elapsed - rv.t0 : 0;
-    if (mode === "rain"){ Pr.p.copy(Prain.p); Pr.p.y += Math.sin(elapsed * 0.4) * 0.02; Pr.q.copy(Prain.q); return Pr; }
+    if (mode === "rain"){
+      /* scroll walks, the cursor turns the head */
+      galZ += (galZT - galZ) * (1 - Math.exp(-lastRealDt * 3.2));
+      const yT = focus && focus.dir > 0 ? 0 : (ndc.x > 5 ? 0 : -ndc.x * 0.42), pT2 = focus && focus.dir > 0 ? 0 : (ndc.x > 5 ? 0 : ndc.y * 0.06);
+      yawS += (yT - yawS) * (1 - Math.exp(-lastRealDt * 2.5)); pitchS += (pT2 - pitchS) * (1 - Math.exp(-lastRealDt * 2.5));
+      galPose(galZ, yawS, pitchS, Pr);
+      Pr.p.y += Math.sin(elapsed * 0.4) * 0.015;
+      return Pr;
+    }
     if (mode === "toRain"){
       qbez(rv.from.p, rv.mid, Prain.p, ease((t - 0.1) / (RAIN_IN - 0.1)), Pr.p);
       Pr.q.slerpQuaternions(rv.from.q, Prain.q, ease((t - 0.12) / (RAIN_IN - 0.15)));
@@ -2741,7 +2748,7 @@ function initGL(){
     landPose();
     qbez(rv.from.p, rv.mid, Pland.p, ease(t / RAIN_OUT), Pr.p);
     Pr.q.slerpQuaternions(rv.from.q, Pland.q, ease((t - 0.05) / (RAIN_OUT - 0.1)));
-    if (t >= RAIN_OUT){ mode = "landing"; htmlEl.classList.remove("in-rain"); rv = null; }
+    if (t >= RAIN_OUT){ mode = "landing"; htmlEl.classList.remove("in-rain"); rv = null; U.uMirror.value.w = 0; }
     return Pr;
   }
   /* where the cloud layer sits and what shows beneath it, per mode */
@@ -2755,95 +2762,90 @@ function initGL(){
     L.set(LAYER_SEA.x + (LAYER_CEIL.x - LAYER_SEA.x) * k, LAYER_SEA.y + (LAYER_CEIL.y - LAYER_SEA.y) * k);
     U.uCloudGap.value = gap;
   }
-  /* the cursor's wind: tilts the rain and nudges the lenses */
-  let rPoke = null, windX = 0;
-  function rainPoke(){
-    const now = elapsed, sx = ndc.x, sy = ndc.y;
-    if (rPoke){
-      const dt = Math.max(now - rPoke.t, 1 / 120);
-      if (dt < 0.25){
-        const vx = (sx - rPoke.x) / dt;
-        windX += vx * Math.min(1, dt * 5) * 2.2;
-        lenses.forEach(l => {
-          if (!l.mesh.visible) return;
-          tmpV.copy(l.mesh.position).project(camera);
-          const d = Math.hypot(tmpV.x - sx, (tmpV.y - sy) / aspect);
-          if (d < 0.25) l.vx += vx * (1 - d / 0.25) * Math.min(1, dt * 6) * 1.4;
-        });
-      }
-    }
-    rPoke = { x:sx, y:sy, t:now };
+  /* wheel / drag / keys move along the corridor */
+  function galMove(d){ galZT = Math.max(-GAL_LEN, Math.min(0, galZT - d)); }
+  let dragY = null;
+  canvas.addEventListener("pointerdown", e => { if (mode === "rain") dragY = e.clientY; });
+  canvas.addEventListener("pointermove", e => { if (mode !== "rain" || dragY === null || !(e.buttons & 1)) return; galMove((dragY - e.clientY) * 0.03); dragY = e.clientY; });
+  addEventListener("pointerup", () => { dragY = null; });
+  function galWheel(dy, dm){ if (mode !== "rain") return; galMove((dm === 1 ? dy * 16 : dy) * 0.012); }
+  function rainPoke(){}
+  function galleryClick(){
+    const h = ray.intersectObjects(picMeshes.filter(m => m.parent.visible), false)[0];
+    if (h){ bring(h.object.userData.pic); return true; }
+    if (focus && focus.dir > 0){ release(); return true; }
+    return false;
   }
-  function catchLens(i){
-    const l = lenses[i];
-    if (l.caught) return;
-    l.caught = elapsed;
-    setTimeout(() => { if (mode === "rain") openLightbox(l.k); }, reduce ? 0 : 380);
-  }
+  let lastRealDt = 1 / 60;
   function updateRainFx(realDt, dt){
+    lastRealDt = realDt;
     const active = mode === "toRain" || mode === "rain" || mode === "fromRain";
     const t = rv ? elapsed - rv.t0 : 0;
-    /* photographs are painted a few at a time, not all at once */
-    if ((active || (mode === "landing" && p > 0.8)) && rainGen < PHOTOS.length){ lensTexture(rainGen); lenses.forEach(l => { if (l.k === rainGen) l.mat.uniforms.uTex.value = lensTex[rainGen]; }); rainGen++; }
-    let ra = 0, la = 0;
-    if (mode === "toRain"){ ra = smooth(0.55, 1.0, t / RAIN_IN); la = smooth(0.75, 1.0, t / RAIN_IN); }
-    else if (mode === "rain"){ ra = 1; la = 1; }
-    else if (mode === "fromRain"){ ra = 1 - smooth(0, 0.4, t / RAIN_OUT); la = 1 - smooth(0, 0.25, t / RAIN_OUT); }
-    rain.visible = ra > 0.01;
-    windX *= Math.exp(-realDt * 1.2); windX = Math.max(-4, Math.min(4, windX));
-    if (rain.visible){
-      rainMat.uniforms.uAlpha.value = ra * 0.5;
-      rainMat.uniforms.uCenter.value.copy(camera.position);
-      rainMat.uniforms.uWind.value.set(windX * 3 - 0.6, 0);
-      rainMat.uniforms.uCol.value.copy(Lcol).multiplyScalar(0.25).add(new T.Color(0.28, 0.34, 0.36));
-      if (!reduce && elapsed > ripT){
-        tmpV.set((Math.random() - 0.5) * 9, 0, -1.5 - Math.random() * 10).applyQuaternion(Prain.q).add(Prain.p);
-        addRipple(tmpV.x, tmpV.z, 0.012 + Math.random() * 0.01, 9 + Math.random() * 3);
-        ripT = elapsed + 0.035;
-      }
+    if (active && genI < PHOTOS.length) genNext();
+    else if (mode === "landing" && p > 0.7 && genI < PHOTOS.length && !genBusy){
+      genBusy = true;
+      (window.requestIdleCallback || (f => setTimeout(f, 60)))(() => { genNext(); genBusy = false; }, { timeout:600 });
     }
-    /* hover */
-    lensHovered = -1;
-    if (mode === "rain"){
-      ray.setFromCamera(ndc, camera);
-      const h = ray.intersectObjects(lensHits.filter((_, i) => lenses[i].mesh.visible), false)[0];
-      if (h) lensHovered = h.object.userData.lens;
-    }
-    const camRr = camR.setFromMatrixColumn(Prain_M(), 0);
-    lenses.forEach((l, i) => {
-      l.mesh.visible = la > 0.01;
-      if (!l.mesh.visible) return;
-      l.hov += ((lensHovered === i ? 1 : 0) - l.hov) * (1 - Math.exp(-realDt * 8));
-      const slow = lensHovered === i ? 0.25 : 1;
-      if (l.caught){
-        const a = Math.min(1, (elapsed - l.caught) / 0.38);
-        l.mesh.position.lerp(tmpV.set(0, 0, -1.6).applyMatrix4(Prain_M()), 1 - Math.exp(-realDt * 9));
-        l.mesh.scale.setScalar(l.r * (1 + a * 0.6));
-        l.mat.uniforms.uAlpha.value = la * (1 - smooth(0.7, 1, a) * (lb.hidden ? 0 : 1));
-        if (a >= 1 && lb.hidden && elapsed - l.caught > 0.6) resetLens(l, true);
-        return;
-      }
-      l.y -= l.sp * slow * dt;
-      l.vx *= Math.exp(-realDt * 1.5);
-      l.x += (l.vx + windX * 0.15) * dt;
-      if (l.x > 4.2) l.x -= 8.4; if (l.x < -4.2) l.x += 8.4;
-      if (l.y < -0.35) resetLens(l, true);
-      l.mesh.position.set(l.x, l.y - Prain.p.y, l.z).applyMatrix4(Prain_M());
-      const st = 1 + Math.min(0.12, l.sp * 0.2);
-      l.mesh.scale.set(l.r / Math.sqrt(st), l.r * st, l.r / Math.sqrt(st));
-      l.mesh.rotation.set(0, 0, 0);
-      l.mat.uniforms.uHover.value = l.hov;
-      l.mat.uniforms.uAlpha.value = la * smooth(-0.35, 0.1, l.y) * smooth(4.8, 4.2, l.y);
+    /* still water under the gallery, fading in and out with the visit */
+    let calm = 0;
+    if (mode === "toRain") calm = smooth(0.45, 1, t / RAIN_IN);
+    else if (mode === "rain") calm = 1;
+    else if (mode === "fromRain") calm = 1 - smooth(0, 0.6, t / RAIN_OUT);
+    if (active) U.uMirror.value.set(GAL_X, GAL_Z0 - 20, 90, 0.82 * calm);
+    /* the pictures rise out of the water, nearest first */
+    let riseT = 0;
+    if (mode === "toRain") riseT = (t - RAIN_IN * 0.55) / 0.7;
+    else if (mode === "rain") riseT = 99;
+    else if (mode === "fromRain") riseT = 1 - t / 0.55;
+    const camP = camera.position;
+    pics.forEach((pc, i) => {
+      const order = (pc.home.p.z - (GAL_Z0 - 8)) / -40;
+      const r = active ? (mode === "fromRain" ? smooth(0, 1, riseT) : easeOut(riseT - order * 0.35)) : 0;
+      pc.rise = r;
+      const vis = r > 0.005;
+      pc.grp.visible = vis; pc.refl.visible = vis;
+      if (!vis) return;
+      /* wind-blown picture */
+      if (focus && focus.i === i){
+        const a = Math.min(1, (elapsed - focus.t0) / (focus.dir > 0 ? 0.9 : 0.75));
+        const e = ease(a);
+        if (focus.dir > 0){ focusPose(); focus.to.p.copy(Pfoc.p); focus.to.q.copy(Pfoc.q); }
+        qbez(focus.from.p, focus.ctl, focus.to.p, e, pc.cur.p);
+        pc.cur.q.slerpQuaternions(focus.from.q, focus.to.q, e);
+        const flutter = Math.sin(a * Math.PI) * 0.22 * Math.sin(elapsed * 9 + i);
+        qX.setFromAxisAngle(new T.Vector3(0, 0, 1), flutter); pc.cur.q.multiply(qX);
+        pc.focus = focus.dir > 0 ? e : 1 - e;
+        if (a >= 1 && focus.dir < 0){ focus = null; pc.cur.p.copy(pc.home.p); pc.cur.q.copy(pc.home.q); pc.focus = 0; }
+      } else { pc.cur.p.copy(pc.home.p); pc.cur.q.copy(pc.home.q); }
+      pc.grp.position.copy(pc.cur.p); pc.grp.position.y -= (1 - r) * (G_H + G_BASE + 0.2);
+      pc.grp.quaternion.copy(pc.cur.q);
+      pc.grp.scale.setScalar(1 + pc.focus * -0.12);
+      const dist = pc.grp.position.distanceTo(camP);
+      const fade = (1 - smooth(26, 62, dist)) * smooth(0, 0.35, r);
+      pc.mat.opacity = fade; pc.frame.material.opacity = fade * 0.9;
+      pc.mat.color.setScalar(0.92 + 0.08 * pc.focus);
+      /* its mirror image on the still water */
+      pc.refl.position.copy(pc.grp.position); pc.refl.position.y = -pc.grp.position.y;
+      pc.refl.quaternion.copy(pc.grp.quaternion); pc.refl.scale.set(pc.grp.scale.x, -pc.grp.scale.y, 1);
+      pc.refl.material.uniforms.uA.value = fade * (1 - pc.focus) * calm;
     });
-    canvas.classList.toggle("is-hover", canvas.classList.contains("is-hover") || lensHovered >= 0);
-    if (lensLab){
-      if (lensHovered >= 0){
-        const l = lenses[lensHovered];
-        tmpV.copy(l.mesh.position).project(camera);
-        lensLab.textContent = `${String(l.k + 1).padStart(2, "0")} · ${PHOTOS[l.k]}`;
-        lensLab.style.transform = `translate3d(${((tmpV.x * 0.5 + 0.5) * W).toFixed(1)}px,${((-tmpV.y * 0.5 + 0.5) * H + 34).toFixed(1)}px,0) translate(-50%,0)`;
-        lensLab.style.opacity = "1";
-      } else lensLab.style.opacity = "0";
+    /* the gust: a few wisps along the picture's path, and rings on the water beneath it */
+    gust.forEach((g, k) => {
+      if (!focus || !g.userData.t){ g.visible = false; return; }
+      const a = (elapsed - g.userData.t) / 0.8;
+      if (a < 0 || a > 1){ g.visible = false; if (a > 1) g.userData.t = 0; return; }
+      g.visible = true;
+      qbez(focus.from.p, focus.ctl, focus.to.p, Math.min(1, a * 1.1), g.position);
+      g.position.y -= 0.6 + k * 0.08;
+      const s = 0.5 + a * 1.6; g.scale.set(s * 1.6, s * 0.7, 1);
+      g.material.opacity = 0.22 * Math.sin(Math.PI * a);
+      g.material.color.copy(Lcol).multiplyScalar(0.4).add(new T.Color(0.5, 0.55, 0.58));
+      if (k % 3 === 0 && !g.userData.rip && a > 0.3){ g.userData.rip = true; addRipple(g.position.x, g.position.z, 0.035, 5); }
+      if (a < 0.3) g.userData.rip = false;
+    });
+    if (capEl && focus && focus.dir > 0){
+      tmpV.copy(pics[focus.i].grp.position); tmpV.y -= G_H * 0.5 * 0.88 + 0.12; tmpV.project(camera);
+      capEl.style.transform = `translate3d(${((tmpV.x * 0.5 + 0.5) * W).toFixed(1)}px,${((-tmpV.y * 0.5 + 0.5) * H).toFixed(1)}px,0) translate(-50%,0)`;
     }
   }
   const PrM = new T.Matrix4();
@@ -3135,7 +3137,7 @@ function initGL(){
     try { renderer.compile(scene, camera); } catch (_) {}
     hid.forEach(o => { o.visible = false; });
   }
-  return { update, back, swap, targetScale, toggleCel, toRing, toLand, toDeep, fromDeep, toPart, fromPart, toTools, fromTools, toRain, fromRain, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
+  return { update, back, swap, targetScale, toggleCel, toRing, toLand, toDeep, fromDeep, toPart, fromPart, toTools, fromTools, toRain, fromRain, galWheel, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
 }
 
 /* fallback without WebGL: open content directly */
