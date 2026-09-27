@@ -253,6 +253,39 @@ html.in-port .drop-link,html.in-port .panel,html.in-port .panel *,html.in-port .
 html.in-port body.no-gl .drops{display:none}
 html:not(.in-port) body.no-gl .labels{display:none}
 
+/* ---------- under the surface: services ---------- */
+html.in-depth,html.in-depth body{overflow:hidden}
+html.in-depth .drop-link,html.in-depth .panel,html.in-depth .panel *,html.in-depth .gauge,html.in-depth .gauge *,html.in-depth .mark{pointer-events:none!important}
+.deep{position:fixed;inset:0;z-index:4;display:flex;align-items:center;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .8s ease,visibility 0s .8s;
+  padding:calc(env(safe-area-inset-top,0px) + 56px) var(--gut) calc(env(safe-area-inset-bottom,0px) + 36px)}
+html.sea-on .deep{opacity:1;visibility:visible;transition:opacity .9s ease}
+.deep-mist{position:absolute;left:0;top:0;bottom:0;width:min(900px,100%);pointer-events:none;
+  background:radial-gradient(60% 70% at 30% 55%,rgba(3,12,17,.62),rgba(3,12,17,.3) 55%,rgba(3,12,17,0))}
+.deep-card{position:relative;width:min(660px,100%);max-height:100%;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:16px;padding-block:22px;
+  text-shadow:0 1px 16px rgba(2,8,12,.85);transform:translateY(22px);transition:transform 1.2s cubic-bezier(.2,.8,.2,1);
+  -webkit-mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(transparent,#000 22px,#000 calc(100% - 26px),transparent)}
+html.sea-on .deep-card{transform:none;pointer-events:auto}
+.deep-card .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern)}
+.deep-card h2{font-family:var(--display);font-weight:400;font-size:clamp(44px,6vw,80px);line-height:.95;margin:-4px 0 2px;text-wrap:balance}
+.deep-card .lede{margin:0;max-width:56ch;font-size:17.5px;line-height:1.55;color:var(--pearl)}
+.svc{display:grid;grid-template-columns:1fr 1fr;gap:20px 30px;padding-top:16px;border-top:1px solid var(--line)}
+.svc h3{margin:0 0 10px;font-family:var(--mono);font-weight:400;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist)}
+.svc ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+.svc b{display:block;font-weight:500}
+.svc span{font-size:13.5px;color:#A9BDBD}
+.deep-foot{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-top:6px}
+.deep-mail{font-size:14px;color:#C9D4D1}
+.deep-mail code{font-family:var(--mono);user-select:all}
+.surface{display:inline-flex;align-items:center;gap:10px;height:38px;padding:0 18px;border-radius:19px;border:1px solid var(--line-strong);background:rgba(4,14,20,.35);font-size:13.5px;transition:border-color .25s,color .25s}
+.surface:hover{border-color:var(--lantern);color:var(--lantern)}
+.surface svg{width:13px;height:13px}
+@media (max-width:760px){
+  .deep{align-items:flex-end}
+  .svc{grid-template-columns:1fr;gap:16px}
+  .deep-card .lede{font-size:16px}
+  .deep-mist{width:100%;background:linear-gradient(transparent,rgba(3,12,17,.6) 30%,rgba(3,12,17,.7))}
+}
+
 </style>
 </head>
 <body>
@@ -273,7 +306,7 @@ html:not(.in-port) body.no-gl .labels{display:none}
   <a class="drop-link" href="#portfolio" data-port data-i="0"><span class="n">01</span><span class="t">Portfolio</span><small>Projekty i case studies</small></a>
   <a class="drop-link" href="o-mnie.html" data-i="1"><span class="n">02</span><span class="t">O mnie</span><small>Kim jestem i jak pracuję</small></a>
   <a class="drop-link" href="narzedzia.html" data-i="2"><span class="n">03</span><span class="t">Narzędzia</span><small>Z czego korzystam na co dzień</small></a>
-  <a class="drop-link" href="uslugi.html" data-i="3"><span class="n">04</span><span class="t">Co potrafię</span><small>Dla firm i klientów indywidualnych</small></a>
+  <a class="drop-link" href="#uslugi" data-deep data-i="3"><span class="n">04</span><span class="t">Czym się zajmuję</span><small>Usługi dla firm i osób prywatnych</small></a>
 </nav>
 
 <section class="panel" data-c="0.2" aria-labelledby="p1">
@@ -300,13 +333,13 @@ html:not(.in-port) body.no-gl .labels{display:none}
 </section>
 
 <section class="panel" data-c="0.8" aria-labelledby="p4">
-  <div class="eyebrow">04 · Co potrafię</div>
-  <h2 id="p4">Co mogę dla Ciebie zbudować</h2>
+  <div class="eyebrow">04 · Czym się zajmuję</div>
+  <h2 id="p4">Moje usługi</h2>
   <div class="two">
     <div><h3>Dla firm</h3><ul><li>Automatyzacje procesów z AI</li><li>Integracje modeli z Twoimi systemami</li><li>Prototypy i MVP produktów AI</li></ul></div>
     <div><h3>Dla osób prywatnych</h3><ul><li>Strona wizytówka lub portfolio</li><li>Asystent AI do codziennych zadań</li><li>Mała aplikacja na zamówienie</li></ul></div>
   </div>
-  <a class="go" href="uslugi.html">Zobacz szczegóły <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+  <a class="go" href="#uslugi" data-deep>Zanurz się w szczegóły <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
 </section>
 
 <section class="panel" data-c="1" aria-labelledby="p5">
@@ -379,6 +412,33 @@ html:not(.in-port) body.no-gl .labels{display:none}
     <button class="round" type="button" id="lbNext" aria-label="Następne zdjęcie"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m5 2 5 5-5 5"/></svg></button>
   </div>
 </div>
+<section class="deep" id="deep" aria-labelledby="deepTitle">
+  <div class="deep-mist" aria-hidden="true"></div>
+  <article class="deep-card">
+    <div class="eyebrow">04 · Usługi</div>
+    <h2 id="deepTitle">Czym się zajmuję</h2>
+    <p class="lede">Projektuję i buduję rozwiązania oparte na AI dla firm i osób prywatnych. Zaczynam od rozmowy i specyfikacji: co ma działać, jak sprawdzimy, że działa, i ile będzie kosztować w utrzymaniu.</p>
+    <div class="svc">
+      <div><h3>Dla firm</h3><ul>
+        <li><b>Automatyzacje procesów z AI</b><span>Mniej ręcznej pracy przy powtarzalnych zadaniach.</span></li>
+        <li><b>Integracje modeli językowych</b><span>Z Twoimi systemami: API, bazy danych, CRM.</span></li>
+        <li><b>Prototypy i MVP produktów AI</b><span>Od specyfikacji do działającej wersji.</span></li>
+        <li><b>Ocena pomysłu przed wdrożeniem</b><span>Wykonalność, architektura, koszty modeli.</span></li>
+      </ul></div>
+      <div><h3>Dla osób prywatnych</h3><ul>
+        <li><b>Strona wizytówka lub portfolio</b><span>Także z interaktywną sceną 3D, jak ta.</span></li>
+        <li><b>Asystent AI do codziennych zadań</b><span>Dopasowany do tego, jak pracujesz.</span></li>
+        <li><b>Mała aplikacja na zamówienie</b><span>Narzędzie do jednej konkretnej rzeczy.</span></li>
+        <li><b>Konsultacje</b><span>Jak używać AI we własnej pracy lub firmie.</span></li>
+      </ul></div>
+    </div>
+    <div class="deep-foot">
+      <span class="deep-mail">Napisz: <code>eyeamadrian@gmail.com</code></span>
+      <button class="surface" type="button" id="surfaceBtn"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 12V2M3 6l4-4 4 4"/></svg>Wynurz się</button>
+    </div>
+  </article>
+</section>
+
 <div class="fade" id="fade" aria-hidden="true"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
@@ -475,7 +535,7 @@ const DROPS = [
 const N = DROPS.length, STEP = Math.PI * 2 / N;
 const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
 let rot = 0, targetRot = 0, active = 0, pendingDive = -1;
-let mode = location.hash === "#portfolio" ? "ring" : "landing";           // ring | dive | content | swap | return
+let mode = location.hash === "#portfolio" ? "ring" : location.hash === "#uslugi" ? "deep" : "landing";           // ring | dive | content | swap | return
 let contentIdx = -1, elapsed = 0;
 const mod = (a, n) => ((a % n) + n) % n;
 const $ = id => document.getElementById(id);
@@ -639,7 +699,7 @@ const snap = () => {
   else targetRot = (lastDir > 0 ? Math.ceil(f) : Math.floor(f)) * STEP;
 };
 window.addEventListener("wheel", e => {
-  if (mode === "landing") return;
+  if (mode === "landing" || mode === "toDeep" || mode === "deep" || mode === "fromDeep") return;
   if (e.target.closest && e.target.closest(".veil-card,.lightbox")) return;
   e.preventDefault();
   let d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
@@ -652,7 +712,7 @@ window.addEventListener("wheel", e => {
 }, { passive:false });
 
 window.addEventListener("keydown", e => {
-  if (e.key === "Escape"){ if (!lb.hidden) closeLightbox(); else back(); return; }
+  if (e.key === "Escape"){ if (!lb.hidden) closeLightbox(); else if (mode === "deep") surface(); else back(); return; }
   if (!lb.hidden){ if (e.key === "ArrowLeft") showPhoto(lbIdx - 1); if (e.key === "ArrowRight") showPhoto(lbIdx + 1); return; }
   if (mode === "content"){
     const inCard = document.activeElement && document.activeElement.closest && document.activeElement.closest(".veil-card");
@@ -668,13 +728,14 @@ window.addEventListener("keydown", e => {
 
 /* ================= LANDING (scroll page) ================= */
 const htmlEl = document.documentElement;
-if (mode !== "landing") htmlEl.classList.add("in-port");
+if (mode === "ring") htmlEl.classList.add("in-port");
+if (mode === "deep") htmlEl.classList.add("in-depth", "sea-on");
 const STAGES = [
   { c:0,   name:"Horyzont" },
   { c:0.2, name:"Portfolio" },
   { c:0.4, name:"O mnie" },
   { c:0.6, name:"Narzędzia" },
-  { c:0.8, name:"Co potrafię" },
+  { c:0.8, name:"Czym się zajmuję" },
   { c:1,   name:"Kontakt" }
 ];
 const EMERGE = [0.12, 0.32, 0.52, 0.72];     // scroll progress at which each drop rises
@@ -689,7 +750,7 @@ const PHI0 = 0.12;
 const tiltOf = q => PHI0 + (Math.PI - 2 * PHI0) * smr(0.03, 0.97, q);
 const yawOf  = q => Math.PI * smr(0.36, 0.64, q);
 
-let pT = 0, p = 0, pPrev = 0, pVel = 0, landVis = mode === "landing" ? 1 : 0;
+let pT = 0, p = mode === "deep" ? 0.8 : 0, pPrev = p, pVel = 0, landVis = mode === "landing" ? 1 : 0;
 function readScroll(){
   if (mode !== "landing") return;
   const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
@@ -697,7 +758,8 @@ function readScroll(){
 }
 addEventListener("scroll", readScroll, { passive:true });
 addEventListener("resize", readScroll);
-readScroll(); p = pT;
+readScroll(); if (mode === "landing") p = pT;
+if (mode === "deep"){ pT = p; requestAnimationFrame(() => { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); scrollTo(0, p * max); }); }
 function scrollToP(t){
   const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
   scrollTo({ top:t * max, behavior: reduce ? "auto" : "smooth" });
@@ -748,23 +810,39 @@ function goLanding(push){
   if (gl) gl.toLand(push);
   else { mode = "landing"; htmlEl.classList.remove("in-port"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
 }
+function enterDeep(push){
+  if (mode !== "landing") return;
+  if (gl) gl.toDeep(push);
+  else { mode = "deep"; htmlEl.classList.add("in-depth", "sea-on"); if (push !== false) try { history.pushState(null, "", "#uslugi"); } catch (_) {} }
+}
+function surface(push){
+  if (mode !== "deep") return;
+  if (gl) gl.fromDeep(push);
+  else { mode = "landing"; htmlEl.classList.remove("in-depth", "sea-on"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
+}
+$("surfaceBtn").addEventListener("click", () => surface());
 const plain = e => !(e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1);
 lLinks.forEach((a, i) => a.addEventListener("click", e => {
   if (!plain(e)) return;
   e.preventDefault();
-  if (a.hasAttribute("data-port")) enterPortfolio(); else leave(a.getAttribute("href"), i);
+  if (a.hasAttribute("data-port")) enterPortfolio();
+  else if (a.hasAttribute("data-deep")) enterDeep();
+  else leave(a.getAttribute("href"), i);
 }));
 document.querySelectorAll(".panel .go").forEach(a => a.addEventListener("click", e => {
   if (!plain(e)) return;
   e.preventDefault();
   if (a.hasAttribute("data-port")) return enterPortfolio();
+  if (a.hasAttribute("data-deep")) return enterDeep();
   leave(a.getAttribute("href"), lLinks.findIndex(l => l.getAttribute("href") === a.getAttribute("href")));
 }));
 ["homeLink", "brandHome"].forEach(id => { const el = $(id); if (el) el.addEventListener("click", e => { e.preventDefault(); goLanding(); }); });
 addEventListener("popstate", () => {
-  const port = location.hash === "#portfolio";
-  if (port && mode === "landing") enterPortfolio(false);
-  else if (!port && mode === "ring") goLanding(false);
+  const h = location.hash;
+  if (h === "#portfolio" && mode === "landing") enterPortfolio(false);
+  else if (h === "#uslugi" && mode === "landing") enterDeep(false);
+  else if (h !== "#portfolio" && mode === "ring") goLanding(false);
+  else if (h !== "#uslugi" && mode === "deep") surface(false);
 });
 
 /* overlay: hero, stage panels, gauge — all fade with landVis while the portfolio is on screen */
@@ -839,7 +917,7 @@ function initGL(){
     uSunCol:{ value:sunC }, uMoonCol:{ value:moonC }, uCel:{ value:0 },
     uDeep:{ value:C("#041017") }, uTide:{ value:C("#1A4250") }, uPearl:{ value:C("#E6ECE8") },
     uStars:{ value:1 }, uSpin:{ value:0 }, uDrag:{ value:0 },
-    uPort:{ value: mode === "landing" ? 0 : 1 }, uOcean:{ value: mode === "landing" ? 1 : 0.25 }, uFog:{ value:new T.Vector2(16, 150) }
+    uPort:{ value: mode === "ring" ? 1 : 0 }, uOcean:{ value: mode === "ring" ? 0.25 : 1 }, uFog:{ value:new T.Vector2(16, 150) }, uUnder:{ value:0 }
   };
 
   const SKY = `
@@ -972,7 +1050,7 @@ function initGL(){
     uniforms:U, side:T.BackSide, depthWrite:false,
     vertexShader:`varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
     fragmentShader:`
-      uniform float uTime, uStars, uCel; uniform vec3 uPearl, uSunRight, uSunUp, uSunCol, uMoonCol;
+      uniform float uTime, uStars, uCel, uUnder; uniform vec3 uPearl, uSunRight, uSunUp, uSunCol, uMoonCol, uDeep, uTide;
       varying vec3 vDir;
       ${SKY}
       ${NOISE}
@@ -1018,6 +1096,17 @@ function initGL(){
       }
       void main(){
         vec3 d = normalize(vDir);
+        if (uUnder > 0.5){
+          /* under water: the depths below, a teal haze towards the surface, faint shafts of light */
+          vec3 haze = mix(uDeep, uTide, 0.45);
+          vec3 cu = mix(uDeep * 0.35, haze, smoothstep(-0.9, 0.05, d.y));
+          float az = atan(d.x, d.z);
+          float sh = pow(vnoise(vec2(az * 9.0 + uTime * 0.08, 3.0)), 3.0) * smoothstep(-0.35, 0.1, d.y);
+          cu += uLight * sh * 0.05;
+          gl_FragColor = vec4(cu, 1.0);
+          #include <encodings_fragment>
+          return;
+        }
         vec4 ce = celestial(d);
         vec3 c = sky(d) * (1.0 - ce.w) + ce.rgb;
         vec3 p = d * 230.0; vec3 i = floor(p); vec3 f = fract(p) - 0.5; float r = hash13(i);
@@ -1045,7 +1134,7 @@ function initGL(){
     ${WAVES}
     ${SKY}
     ${NOISE}
-    uniform float uRingVis, uStars;
+    uniform float uRingVis, uStars, uUnder;
     uniform vec2 uFog;
     uniform vec3 uDeep, uTide, uPearl;
     varying vec3 vWorld;
@@ -1063,6 +1152,28 @@ function initGL(){
       vec2 g = w.yz + microGrad(swirl(p)) * exp(-dist * 0.045);
       vec3 N = normalize(vec3(-g.x, 1.0, -g.y));
       vec3 V = normalize(cameraPosition - vWorld);
+      if (uUnder > 0.5){
+        /* the surface seen from below: sky only inside Snell's window, total internal reflection outside */
+        vec3 Nw = normalize(vec3(-g.x * 0.45, 1.0, -g.y * 0.45));
+        vec3 Tr = refract(-V, -Nw, 1.333);
+        vec3 haze = mix(uDeep, uTide, 0.45);
+        vec3 tir = mix(uDeep * 0.45, uTide * 0.5, 0.35 + 0.3 * clamp(w.x * 5.0, -1.0, 1.0));
+        vec3 cu = tir; float trn = 0.0;
+        if (dot(Tr, Tr) > 1e-4){
+          Tr = normalize(Tr);
+          vec3 sk = sky(Tr);
+          float m = max(dot(Tr, uSunDir), 0.0);
+          sk += uLight * (pow(m, 1400.0) * 2.6 + pow(m, 90.0) * 0.4) + uPearl * starField(Tr, uTime) * 0.7 * uStars;
+          trn = smoothstep(0.0, 0.12, Tr.y);
+          cu = mix(tir, sk * 1.6, trn);
+        }
+        float c2 = fbm(p * 0.9 + vec2(uTime * 0.05, -uTime * 0.035) + w.yz * 2.0);
+        cu += mix(uLight, uPearl, 0.5) * pow(1.0 - abs(c2 * 2.0 - 1.0), 7.0) * 0.09 * (1.0 - trn * 0.6);
+        cu = mix(cu, haze, 1.0 - exp(-dist * 0.07));
+        gl_FragColor = vec4(cu, 1.0);
+        #include <encodings_fragment>
+        return;
+      }
       float ndv = max(dot(N, V), 0.0);
       float fres = 0.02 + 0.98 * pow(1.0 - ndv, 5.0);
       vec3 R = reflect(-V, N); R.y = abs(R.y);
@@ -1117,7 +1228,7 @@ function initGL(){
     g.setIndex(idx);
     return g;
   })();
-  const water = new T.Mesh(waterGeo, new T.ShaderMaterial({ uniforms:U, vertexShader:waterVS, fragmentShader:waterFS }));
+  const water = new T.Mesh(waterGeo, new T.ShaderMaterial({ uniforms:U, vertexShader:waterVS, fragmentShader:waterFS, side:T.DoubleSide }));
   water.frustumCulled = false; water.position.set(0, 0, 3.2); scene.add(water);
 
   /* ---- environment maps (sun → moon steps) for the glass water ---- */
@@ -1318,7 +1429,7 @@ function initGL(){
   const blend = (A, B, k) => { Pcam.p.lerpVectors(A.p, B.p, k); Pcam.q.slerpQuaternions(A.q, B.q, k); return Pcam; };
   const TOP_H = 2.3;
 
-  let seq = null, ringVis = mode === "landing" ? 0 : 1;
+  let seq = null, ringVis = mode === "ring" ? 1 : 0;
   const capture = () => ({ p:camera.position.clone(), q:camera.quaternion.clone() });
 
   function startFall(from, isSwap){
@@ -1492,6 +1603,23 @@ function initGL(){
       lHovered = hh ? hh.object.userData.li : -1;
     } else lHovered = -1;
     ldrops.forEach((b, i) => {
+      /* the "Czym się zajmuję" drop falling into the sea at the start of the dive */
+      if (b.fall){
+        const F = b.fall, t = elapsed - F.t0, y = F.P.y - 0.5 * F.g * t * t, di = N + 1 + i;
+        b.a.style.opacity = "0"; b.a.style.pointerEvents = "none"; b.a.tabIndex = -1;
+        if (y <= 0.02){
+          if (!F.hit){ F.hit = true; splashIn(F.P.x, F.P.z, 0.9); }
+          b.mesh.visible = b.glow.visible = false; U.uDrops.value[di].w = 0;
+          if (mode === "landing"){ b.fall = null; b.grow = 0; b.gv = 0; }
+          return;
+        }
+        const st = Math.min(0.35, F.g * t * 0.02);
+        b.mesh.position.set(F.P.x, y, F.P.z);
+        b.mesh.scale.set(LBALL_R * (1 - st * 0.3), LBALL_R * (1 + st), LBALL_R * (1 - st * 0.3));
+        b.mesh.visible = b.glow.visible = true; b.glow.position.copy(b.mesh.position);
+        U.uDrops.value[di].set(F.P.x, y, F.P.z, 0.6);
+        return;
+      }
       const want = live && p >= EMERGE[i];
       if (want && !b.on){ b.on = true; b.justRose = true; }
       if (!want && b.on) b.on = false;
@@ -1558,7 +1686,7 @@ function initGL(){
      and the eight settle into the ring; "Start" plays the same path backwards */
   const TR_DUR = reduce ? 0.35 : 0.95;
   const SPLIT = [0, 0.34, 0.26, 0.34, 0.16, 0.34, 0.26, 0.34];   // binary cascade: 4 first, then 2 & 6, then the odd ones
-  let tr = null, portMix = mode === "landing" ? 0 : 1;
+  let tr = null, portMix = mode === "ring" ? 1 : 0;
   const bz = new T.Vector3(), bzL = new T.Vector3(), OUTV = new T.Vector3();
   function bez(P, t, out){
     const u = 1 - t;
@@ -1621,12 +1749,12 @@ function initGL(){
       /* each split leaves both halves ringing for a moment */
       const since = Math.max(0, f - SPLIT[i]);
       const uu = b.mat.userData.u;
-      uu.uA2.value = reduce ? 0 : 0.14 * Math.exp(-since * 7) * Math.cos(since * 70) * (i === 0 ? 0.6 : 1);
-      uu.uA3.value = 0; uu.uFlat.value = 0;
-      b.mat.emissiveIntensity = 0.03;
-      b.glow.visible = vis; b.glow.position.copy(bz);
-      const gs = Math.max(s * 4.4, 1e-4); b.glow.scale.set(gs, gs, 1); b.glow.material.opacity = 0.18;
-      U.uDrops.value[i].set(bz.x, bz.y, bz.z, vis ? 0.5 : 0);
+      uu.uA2.value += reduce ? 0 : 0.14 * Math.exp(-since * 7) * Math.cos(since * 70) * (i === 0 ? 0.6 : 1);
+      /* glow, emission and light on the water keep the ring's own values (set just before),
+         so nothing switches on or off when the transition hands over to the ring */
+      b.glow.position.copy(bz);
+      if (!vis) b.glow.visible = false;
+      const Dw = U.uDrops.value[i]; Dw.set(bz.x, bz.y, bz.z, vis ? Dw.w : 0);
     });
     if (!reduce && tr.dir > 0 && elapsed > tr.wake && bzL.y < 3){ addRipple(bzL.x, bzL.z, 0.03, 7); tr.wake = elapsed + 0.06; }
     if (k >= 1){
@@ -1637,6 +1765,110 @@ function initGL(){
         balls.forEach(b => { b.mesh.visible = false; b.glow.visible = false; });
       }
       tr = null;
+    }
+  }
+
+
+  /* ================= DIVE: "Czym się zajmuję" lies under the surface =================
+     the drop falls into the sea, the camera follows it down and rolls upright on the way,
+     then looks up at the surface from below: Snell's window, the sun at its rim, caustics, bubbles */
+  const DIVE_IN = reduce ? 0.4 : 1.35, DIVE_OUT = reduce ? 0.4 : 1.1;
+  const DEEP_I = 3;                                   // index of the "Czym się zajmuję" drop
+  const DEEP_PITCH = 0.7;                             // looking 40° up at the surface
+  let dv = null;
+  const Punder = pose(), Ptmp = pose();
+  function deepPose(I){
+    const eye = new T.Vector3(I.x, -3.0, I.z + 3.0);
+    look(Punder, eye, eye.clone().add(new T.Vector3(0, Math.sin(DEEP_PITCH), -Math.cos(DEEP_PITCH))), UP);
+  }
+  function qbez(A, B, Cc, u, out){ const v = 1 - u; return out.set(0, 0, 0).addScaledVector(A, v * v).addScaledVector(B, 2 * u * v).addScaledVector(Cc, u * u); }
+  function splashIn(x, z, S){
+    U.uImpact.value.set(x, z, elapsed, S);
+    addRipple(x, z, 0.08 * S, 9.5); addRipple(x, z, 0.14 * S, 3.6); addRipple(x, z, 0.06 * S, 5.5);
+    ejectSplash(x, z, S * 0.8);
+  }
+
+  /* bubbles, only under water */
+  const BC = 150, bPos = new Float32Array(BC * 3), bSpd = new Float32Array(BC);
+  const bGeo = new T.BufferGeometry(); bGeo.setAttribute("position", new T.BufferAttribute(bPos, 3));
+  const bubMat = new T.PointsMaterial({ size:0.05, map:glowTex, color:C("#CFE6E2"), transparent:true, opacity:0, blending:T.AdditiveBlending, depthWrite:false });
+  const bubbles = new T.Points(bGeo, bubMat); bubbles.frustumCulled = false; bubbles.visible = false; scene.add(bubbles);
+  function seedBubbles(I){
+    for (let i = 0; i < BC; i++){
+      bPos[i * 3] = I.x + (Math.random() - 0.5) * 7;
+      bPos[i * 3 + 1] = -0.2 - Math.random() * 6.5;
+      bPos[i * 3 + 2] = I.z + 1.5 - Math.random() * 7;
+      bSpd[i] = 0.25 + Math.random() * 0.7;
+    }
+    bGeo.attributes.position.needsUpdate = true;
+  }
+
+  function toDeep(push){
+    if (mode !== "landing") return;
+    const b = ldrops[DEEP_I];
+    const P = b.mesh.visible ? b.mesh.position.clone() : slotLocal(DEEP_I, new T.Vector3()).applyMatrix4(camera.matrixWorld);
+    if (P.y < 0.6) P.y = 0.6;
+    const I = new T.Vector3(P.x, 0, P.z);
+    deepPose(I);
+    const fallT = reduce ? 0.12 : 0.34;
+    b.fall = { t0:elapsed, P, g:2 * P.y / (fallT * fallT), hit:false };
+    ldrops.forEach(d => { d.on = false; });
+    dv = { t0:elapsed, from:capture(), I, mid:new T.Vector3(I.x, 1.0, I.z + 3.0), shown:false, up:false };
+    seedBubbles(I);
+    mode = "toDeep"; htmlEl.classList.add("in-depth");
+    if (push !== false) try { history.pushState(null, "", "#uslugi"); } catch (_) {}
+  }
+  function fromDeep(push){
+    if (mode !== "deep") return;
+    dv = { t0:elapsed, from:capture(), I:dv.I, mid:dv.mid, up:false };
+    mode = "fromDeep"; htmlEl.classList.remove("sea-on");
+    if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {}
+  }
+  /* opening straight into the deep (link with #uslugi) */
+  if (mode === "deep"){
+    const I = new T.Vector3(LAND_POS.x + 0.8, 0, LAND_POS.z - 4.5);
+    deepPose(I);
+    dv = { t0:0, from:{ p:Punder.p.clone(), q:Punder.q.clone() }, I, mid:new T.Vector3(I.x, 1.0, I.z + 3.0), shown:true, up:false };
+    seedBubbles(I);
+  }
+  function deepCamera(){
+    if (mode === "deep"){
+      Ptmp.p.copy(Punder.p);
+      Ptmp.p.x += Math.sin(elapsed * 0.31) * 0.06; Ptmp.p.y += Math.sin(elapsed * 0.47) * 0.05;
+      Ptmp.q.copy(Punder.q);
+      return Ptmp;
+    }
+    const t = elapsed - dv.t0;
+    if (mode === "toDeep"){
+      const kP = ease((t - 0.08) / (DIVE_IN - 0.08)), kQ = ease((t - 0.1) / (DIVE_IN - 0.1));
+      qbez(dv.from.p, dv.mid, Punder.p, kP, Ptmp.p);
+      Ptmp.q.slerpQuaternions(dv.from.q, Punder.q, kQ);
+      if (!dv.shown && t > DIVE_IN * 0.78){ dv.shown = true; htmlEl.classList.add("sea-on"); }
+      if (t >= DIVE_IN) mode = "deep";
+      return Ptmp;
+    }
+    /* fromDeep: the same curve back up to wherever the landing camera is */
+    landPose();
+    const kP = ease(t / DIVE_OUT), kQ = ease(t / (DIVE_OUT * 0.92));
+    qbez(dv.from.p, dv.mid, Pland.p, kP, Ptmp.p);
+    Ptmp.q.slerpQuaternions(dv.from.q, Pland.q, kQ);
+    if (!dv.up && Ptmp.p.y > 0){ dv.up = true; splashIn(Ptmp.p.x, Ptmp.p.z - 0.6, 0.5); }
+    if (t >= DIVE_OUT){ mode = "landing"; htmlEl.classList.remove("in-depth"); dv = null; }
+    return Ptmp;
+  }
+  function updateDeepFx(realDt, dt){
+    const under = camera.position.y < 0.0;
+    U.uUnder.value = under ? 1 : 0;
+    const want = under ? 0.5 : 0;
+    bubMat.opacity += (want - bubMat.opacity) * (1 - Math.exp(-realDt * (under ? 3 : 12)));
+    bubbles.visible = bubMat.opacity > 0.01;
+    if (bubbles.visible && dv){
+      for (let i = 0; i < BC; i++){
+        bPos[i * 3 + 1] += bSpd[i] * dt;
+        bPos[i * 3] += Math.sin(elapsed * 2.3 + i) * 0.0025;
+        if (bPos[i * 3 + 1] > -0.06){ bPos[i * 3 + 1] = -6.5; bPos[i * 3] = dv.I.x + (Math.random() - 0.5) * 7; bPos[i * 3 + 2] = dv.I.z + 1.5 - Math.random() * 7; }
+      }
+      bGeo.attributes.position.needsUpdate = true;
     }
   }
 
@@ -1660,12 +1892,13 @@ function initGL(){
     if (mode === "content" || mode === "swap") rv = 0;
     else if (mode === "dive" && seq.impactT !== null && elapsed - seq.impactT > 1.0) rv = 0;
     else if (mode === "return" && elapsed - seq.t0 < 0.7) rv = 0;
-    if (mode === "landing" || mode === "toLand") rv = 0;
+    const sea = mode === "landing" || mode === "toDeep" || mode === "deep" || mode === "fromDeep";
+    if (sea || mode === "toLand") rv = 0;
     ringVis += (rv - ringVis) * (1 - Math.exp(-realDt * 2.2));
     const trK = tr ? Math.min(1, Math.max(0, (elapsed - tr.t0) / TR_DUR)) : 0;
     if (mode === "toRing") ringVis = smooth(0.5, 1, trK);
     else if (mode === "toLand") ringVis = 1 - smooth(0, 0.45, trK);
-    portMix = mode === "landing" ? 0 : mode === "toRing" ? ease(trK) : mode === "toLand" ? 1 - ease(trK) : 1;
+    portMix = sea ? 0 : mode === "toRing" ? ease(trK) : mode === "toLand" ? 1 - ease(trK) : 1;
     U.uPort.value = portMix; U.uOcean.value = 1 - 0.75 * portMix;
     U.uFog.value.set(16 - 6 * portMix, 150 - 86 * portMix);
     const vis = ringVis;
@@ -1735,7 +1968,9 @@ function initGL(){
       tv.set(x, y - s - 0.1, z).project(camera);
       const lab = labels[i];
       let occl = 0;
-      const op = mode === "ring" && !isA && !b.gone && !occl ? smooth(-0.2, 0.55, Math.cos(a)) * grow : 0;
+      const opT = mode === "ring" && !isA && !b.gone && !occl ? smooth(-0.2, 0.55, Math.cos(a)) * grow : 0;
+      b.lop = (b.lop || 0) + (opT - (b.lop || 0)) * (1 - Math.exp(-realDt * 7));
+      const op = b.lop < 0.002 ? 0 : b.lop;
       lab.style.opacity = op.toFixed(3);
       lab.style.pointerEvents = op > 0.3 ? "auto" : "none";
       lab.tabIndex = op > 0.3 ? 0 : -1;
@@ -1823,6 +2058,8 @@ function initGL(){
       ringPose(); blend(tr.from, Pring, ease((trK - 0.1) / 0.9)); camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
     } else if (mode === "toLand"){
       blend(tr.from, tr.to, ease(trK)); camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
+    } else if (mode === "toDeep" || mode === "deep" || mode === "fromDeep"){
+      const P = deepCamera(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
     } else if (mode === "ring"){
       const P = ringPose(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
     } else if (mode === "dive"){
@@ -1863,6 +2100,7 @@ function initGL(){
     camera.updateMatrixWorld();
     skyMesh.position.copy(camera.position);
     updateLandingDrops(realDt);
+    updateDeepFx(realDt, dt);
 
     /* keep the invisible hit target over the sun disc */
     if (mode === "ring" || mode === "landing"){
@@ -1891,7 +2129,7 @@ function initGL(){
     try { renderer.compile(scene, camera); } catch (_) {}
     hid.forEach(o => { o.visible = false; });
   }
-  return { update, back, swap, targetScale, toggleCel, toRing, toLand, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
+  return { update, back, swap, targetScale, toggleCel, toRing, toLand, toDeep, fromDeep, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
 }
 
 /* fallback without WebGL: open content directly */
