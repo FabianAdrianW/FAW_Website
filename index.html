@@ -24,18 +24,136 @@
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
   --gut:clamp(16px,3vw,40px);
 }
+html,body{min-height:100%}
 [hidden]{display:none!important}
-html{background:var(--abyss)}
 body{margin:0;background:var(--abyss);color:var(--pearl);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
-a{color:inherit}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit}
 :focus-visible{outline:1.5px solid var(--lantern);outline-offset:3px;border-radius:4px}
 
 #scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;background:var(--abyss)}
 #scene.is-hover{cursor:pointer}
-.track{height:640vh;pointer-events:none}
-.track i{display:block;height:0}
 
+/* ---------- sphere labels ---------- */
+.labels{position:fixed;inset:0;pointer-events:none;z-index:1;transition:opacity .5s}
+.drop-label{position:absolute;left:0;top:0;pointer-events:auto;white-space:nowrap;text-shadow:0 1px 12px rgba(0,0,0,.95);font-size:13px;font-weight:500;letter-spacing:.03em;color:#C9D4D1;padding:4px 8px;will-change:transform,opacity;transition:color .3s}
+.drop-label:hover{color:#fff}
+.no-gl .labels{inset:auto 0 30% 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 18px;padding-inline:var(--gut)}
+.no-gl .drop-label{position:static;transform:none!important;opacity:1!important}
+.is-deep .labels{opacity:0}
+.is-deep .labels .drop-label{pointer-events:none}
+
+.brand h1 a.home{color:inherit;text-decoration:none;transition:color .3s}
+.brand h1 a.home:hover{color:var(--lantern)}
+.topnav .home-link{font-size:13px;letter-spacing:.06em;color:var(--lantern);padding:4px 0;text-decoration:none;margin-right:6px}
+.topnav .home-link:hover{color:var(--pearl)}
+/* ---------- ring UI ---------- */
+.ui{position:fixed;inset:0;z-index:2;pointer-events:none;display:grid;grid-template-rows:auto 1fr auto;transition:opacity .7s;
+  padding:calc(env(safe-area-inset-top,0px) + clamp(18px,3.2vw,38px)) var(--gut) calc(env(safe-area-inset-bottom,0px) + clamp(18px,3.4vw,36px))}
+.ui > *{min-width:0}
+.is-deep .ui{opacity:0}
+.is-deep .ui *{pointer-events:none!important}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+.brand{pointer-events:auto;max-width:34rem}
+.brand h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,6.2vw,92px);line-height:.95;letter-spacing:.005em;margin:0;text-wrap:balance}
+.brand .role{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern);margin:14px 0 0}
+.brand .intro{color:var(--mist);margin:10px 0 0;max-width:36ch}
+.topnav{pointer-events:auto;display:flex;gap:4px 22px;flex-wrap:wrap;justify-content:flex-end;padding-top:10px}
+.topnav button{font-size:13px;letter-spacing:.06em;color:var(--mist);padding:4px 0;position:relative;transition:color .25s}
+.topnav button::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--lantern);transform:scaleX(0);transform-origin:left;transition:transform .35s}
+.topnav button:hover,.topnav button.is-on{color:var(--pearl)}
+.topnav button.is-on::after,.topnav button:hover::after{transform:scaleX(1)}
+
+.caption{pointer-events:auto;justify-self:center;width:min(640px,100%);text-align:center;display:grid;grid-template-rows:16px auto 3.3em;row-gap:10px}
+.caption .meta,.caption .row,.caption p{transition:opacity .4s,transform .4s}
+.caption .meta{font-family:var(--mono);font-size:10.5px;line-height:16px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.caption .row{display:grid;grid-template-columns:38px minmax(0,1fr) 38px;align-items:center;column-gap:14px}
+.caption h2{margin:0;min-width:0;display:flex;justify-content:center}
+.cap-title{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--display);font-weight:400;font-size:clamp(30px,3.8vw,52px);line-height:1.15;letter-spacing:.01em;padding:0 4px 3px;background-image:linear-gradient(var(--lantern),var(--lantern));background-size:0 1px;background-repeat:no-repeat;background-position:50% 100%;transition:background-size .45s}
+.cap-title:hover{background-size:100% 1px}
+.caption p{margin:0 auto;color:var(--mist);max-width:40ch;line-height:1.65;height:3.3em;overflow:hidden;text-wrap:balance}
+.caption.swap .meta,.caption.swap .cap-title,.caption.swap p{opacity:0}
+.cap-title{transition:opacity .35s,background-size .45s}
+.sun-btn{position:fixed;left:0;top:0;z-index:3;border-radius:50%;cursor:pointer;background:none;transition:box-shadow .5s}
+.sun-btn:hover{box-shadow:0 0 0 1px rgba(255,255,255,.14),0 0 46px 10px rgba(255,255,255,.05)}
+.is-deep .sun-btn{opacity:0;pointer-events:none}
+.round{width:38px;height:38px;flex:none;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;transition:border-color .25s,background .25s}
+.round:hover{border-color:var(--lantern);background:rgba(255,255,255,.05)}
+.round svg{width:14px;height:14px}
+
+/* ---------- veil: content floating above the water ---------- */
+.veil{position:fixed;inset:0;z-index:4;pointer-events:none;display:grid;place-items:center;
+  padding:calc(env(safe-area-inset-top,0px) + 70px) var(--gut) calc(env(safe-area-inset-bottom,0px) + 84px);
+  opacity:0;transition:opacity 1.1s ease}
+.veil.is-on{opacity:1}
+.mist{position:absolute;left:50%;top:50%;width:min(1180px,160vw);height:min(1000px,130vh);transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(closest-side,rgba(196,219,216,.15),rgba(196,219,216,.07) 55%,rgba(196,219,216,0) 100%);
+  -webkit-mask-image:radial-gradient(closest-side,#000 40%,transparent 100%);mask-image:radial-gradient(closest-side,#000 40%,transparent 100%)}
+.mist i{position:absolute;border-radius:50%;background:rgba(214,232,229,.11);filter:blur(46px);animation:drift 22s ease-in-out infinite alternate}
+.mist i:nth-child(1){left:18%;top:22%;width:38%;height:30%}
+.mist i:nth-child(2){left:44%;top:44%;width:42%;height:34%;animation-duration:27s;animation-delay:-8s}
+.mist i:nth-child(3){left:26%;top:58%;width:30%;height:22%;animation-duration:31s;animation-delay:-15s;background:rgba(227,178,106,.06)}
+@keyframes drift{from{transform:translate(-4%,-3%) scale(1)}to{transform:translate(5%,4%) scale(1.12)}}
+.veil-card{position:relative;pointer-events:auto;width:min(680px,100%);max-height:100%;overflow-y:auto;overscroll-behavior:contain;
+  padding-block:26px;display:flex;flex-direction:column;gap:18px;text-shadow:0 1px 16px rgba(3,8,11,.75);
+  -webkit-mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 30px),transparent);
+  transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.8,.2,1),filter .9s ease;animation:hover 9s ease-in-out infinite alternate}
+.veil-card.out{opacity:0;transform:translateY(16px) scale(.985);filter:blur(8px)}
+@keyframes hover{from{translate:0 -4px}to{translate:0 5px}}
+.veil-card .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern)}
+.veil-card h2{font-family:var(--display);font-weight:400;font-size:clamp(42px,6vw,76px);line-height:.95;margin:-6px 0 4px;text-wrap:balance}
+.veil-card p{margin:0;max-width:62ch;line-height:1.7;color:#D3DDDA}
+.veil-card p.lede{font-size:18.5px;color:var(--pearl);line-height:1.55}
+.veil-card p.note{font-size:13px;color:var(--mist)}
+.facts{display:grid;grid-template-columns:minmax(90px,150px) 1fr;gap:10px 22px;margin:4px 0 0;padding:16px 0 0;border-top:1px solid var(--line)}
+.facts dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist);padding-top:3px}
+.facts dd{margin:0}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.links a{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 16px;border-radius:18px;border:1px solid var(--line-strong);background:rgba(4,10,14,.25);text-decoration:none;font-size:13.5px;transition:border-color .25s,color .25s}
+.links a:hover{border-color:var(--lantern);color:var(--lantern)}
+.links a span{font-family:var(--mono);font-size:11px;color:var(--mist)}
+.flow{list-style:none;margin:0;padding:0;display:grid;counter-reset:f}
+.flow li{counter-increment:f;display:grid;grid-template-columns:34px 1fr;gap:14px;padding:10px 0;position:relative}
+.flow li::before{content:counter(f);width:26px;height:26px;border-radius:50%;border:1px solid var(--lantern);color:var(--lantern);font-family:var(--mono);font-size:11px;display:grid;place-items:center;background:rgba(10,24,32,.8);position:relative;z-index:1}
+.flow li:not(:last-child)::after{content:"";position:absolute;left:13px;top:36px;bottom:-10px;width:1px;background:var(--line-strong)}
+.flow b{font-weight:600;display:block}
+.flow span{color:var(--mist);font-size:14px}
+.mail{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.mail code{font-family:var(--mono);font-size:clamp(15px,2.4vw,20px);user-select:all;word-break:break-all}
+.chip-btn{height:32px;padding:0 14px;border-radius:16px;border:1px solid var(--line-strong);font-size:12.5px;color:var(--mist);transition:border-color .25s,color .25s}
+.chip-btn:hover{border-color:var(--lantern);color:var(--lantern)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.gallery button{display:flex;flex-direction:column;gap:6px;text-align:left}
+.gallery img{width:100%;max-width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--tarn);transition:transform .4s,border-color .3s}
+.gallery button:hover img{transform:translateY(-3px);border-color:var(--lantern)}
+.gallery small{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+.veil-close{position:fixed;top:calc(env(safe-area-inset-top,0px) + 18px);right:var(--gut);pointer-events:auto}
+.veil-nav{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);display:flex;justify-content:space-between;gap:16px;padding-inline:var(--gut);pointer-events:none}
+.veil-nav button{pointer-events:auto;display:flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.04em;color:var(--mist);transition:color .25s;min-width:0;text-shadow:0 1px 10px #000}
+.veil-nav button:hover{color:var(--pearl)}
+.veil-nav button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.veil-nav svg{width:13px;height:13px;flex:none}
+.veil:not(.is-on) *{pointer-events:none!important}
+
+/* ---------- lightbox ---------- */
+.lightbox{position:fixed;inset:0;z-index:6;background:rgba(2,5,8,.92);display:grid;grid-template-rows:auto 1fr auto;gap:12px;
+  padding:calc(env(safe-area-inset-top,0px) + 16px) var(--gut) calc(env(safe-area-inset-bottom,0px) + 18px)}
+.lightbox .lb-top{display:flex;justify-content:flex-end}
+.lightbox figure{margin:0;min-height:0;display:grid;place-items:center}
+.lightbox img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain}
+.lightbox .lb-nav{display:flex;justify-content:center;align-items:center;gap:18px}
+.lightbox .lb-cap{font-family:var(--display);font-size:24px;min-width:12ch;text-align:center}
+
+@media (max-width:760px){
+  .brand .intro,.topnav{display:none}
+  .caption p{font-size:14px}
+  .facts{grid-template-columns:1fr;gap:2px}
+  .facts dd{margin-bottom:10px}
+  .veil-card p.lede{font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){
+  .veil-card,.mist i{animation:none}
+}
 /* ---------- small brand, top-left ---------- */
 .mark{position:fixed;z-index:3;left:var(--gut);top:calc(env(safe-area-inset-top,0px) + clamp(16px,2.6vw,30px));
   font-family:var(--display);font-size:22px;letter-spacing:.02em;text-decoration:none;opacity:0;pointer-events:none;transition:color .25s;text-shadow:0 1px 12px rgba(0,0,0,.9)}
@@ -79,13 +197,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   background:rgba(4,10,14,.3);text-decoration:none;font-size:13.5px;letter-spacing:.02em;transition:border-color .25s,color .25s}
 .go:hover{border-color:var(--lantern);color:var(--lantern)}
 .go svg{width:13px;height:13px}
-.mail{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
-.mail code{font-family:var(--mono);font-size:clamp(15px,1.8vw,19px);user-select:all;word-break:break-all}
-.chip-btn{height:32px;padding:0 14px;border-radius:16px;border:1px solid var(--line-strong);font-size:12.5px;color:var(--mist);transition:border-color .25s,color .25s}
-.chip-btn:hover{border-color:var(--lantern);color:var(--lantern)}
-.links{display:flex;flex-wrap:wrap;gap:8px 18px}
-.links a{font-size:14px;text-decoration:none;color:#D3DDDA;border-bottom:1px solid var(--line-strong);padding-bottom:2px;transition:color .25s,border-color .25s}
-.links a:hover{color:var(--lantern);border-color:var(--lantern)}
+.l-links{display:flex;flex-wrap:wrap;gap:8px 18px}
+.l-links a{font-size:14px;text-decoration:none;color:#D3DDDA;border-bottom:1px solid var(--line-strong);padding-bottom:2px;transition:color .25s,border-color .25s}
+.l-links a:hover{color:var(--lantern);border-color:var(--lantern)}
 .up{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);align-self:flex-start;transition:color .25s}
 .up:hover{color:var(--pearl)}
 
@@ -101,8 +215,6 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .gauge .read{position:absolute;top:calc(100% + 14px);right:0;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--mist);white-space:nowrap;text-align:right;line-height:1.5;font-variant-numeric:tabular-nums}
 .gauge .read b{display:block;font-weight:500;font-size:13px;color:var(--pearl);letter-spacing:.06em}
 
-.sun-btn{position:fixed;left:0;top:0;z-index:2;border-radius:50%;background:none;transition:box-shadow .5s}
-.sun-btn:hover{box-shadow:0 0 0 1px rgba(255,255,255,.14),0 0 46px 10px rgba(255,255,255,.05)}
 
 .fade{position:fixed;inset:0;z-index:9;background:var(--abyss);opacity:0;pointer-events:none;transition:opacity .55s ease}
 .fade.is-on{opacity:1;pointer-events:auto}
@@ -128,12 +240,25 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   .no-gl .drops{top:90px;bottom:auto;transform:none}
 }
 @media (prefers-reduced-motion:reduce){ .hint span{animation:none} }
+/* ---------- landing ⇄ portfolio in one scene ---------- */
+.track{height:640vh;pointer-events:none}
+html.in-port,html.in-port body{overflow:hidden}
+html.in-port #scene{touch-action:none}
+html:not(.in-port) .ui{opacity:0}
+html:not(.in-port) .ui *{pointer-events:none!important}
+html:not(.in-port) .labels{opacity:0}
+html:not(.in-port) .labels .drop-label{pointer-events:none!important}
+html.in-port .ui{transition:opacity .6s .35s}
+html.in-port .drop-link,html.in-port .panel,html.in-port .panel *,html.in-port .gauge,html.in-port .gauge *,html.in-port .mark{pointer-events:none!important}
+html.in-port body.no-gl .drops{display:none}
+html:not(.in-port) body.no-gl .labels{display:none}
+
 </style>
 </head>
 <body>
 <canvas id="scene" aria-hidden="true"></canvas>
-<div class="track" id="track" aria-hidden="true"></div>
 <button class="sun-btn" id="sunBtn" type="button" aria-label="Zamień słońce w księżyc" hidden></button>
+<div class="track" id="track" aria-hidden="true"></div>
 
 <a class="mark" id="mark" href="#top" aria-label="Wróć na początek">Adrian Wojtasik</a>
 
@@ -145,7 +270,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 <div class="hint" id="hint" aria-hidden="true">Przewiń w dół<span></span></div>
 
 <nav class="drops" id="drops" aria-label="Podstrony">
-  <a class="drop-link" href="portfolio.html" data-i="0"><span class="n">01</span><span class="t">Portfolio</span><small>Projekty i case studies</small></a>
+  <a class="drop-link" href="#portfolio" data-port data-i="0"><span class="n">01</span><span class="t">Portfolio</span><small>Projekty i case studies</small></a>
   <a class="drop-link" href="o-mnie.html" data-i="1"><span class="n">02</span><span class="t">O mnie</span><small>Kim jestem i jak pracuję</small></a>
   <a class="drop-link" href="narzedzia.html" data-i="2"><span class="n">03</span><span class="t">Narzędzia</span><small>Z czego korzystam na co dzień</small></a>
   <a class="drop-link" href="uslugi.html" data-i="3"><span class="n">04</span><span class="t">Co potrafię</span><small>Dla firm i klientów indywidualnych</small></a>
@@ -156,7 +281,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   <h2 id="p1">Projekty</h2>
   <p>Od własnej platformy do nauki języków po koncepcje UX dla sklepów internetowych. Przy każdym projekcie opisuję, co było do rozwiązania i jak sprawdziłem wynik.</p>
   <ul class="chips"><li>Eyelingo</li><li>spec-first</li><li>Fluff Generator</li><li>Nacomi</li><li>Pokémon Hub</li></ul>
-  <a class="go" href="portfolio.html">Otwórz portfolio <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+  <a class="go" href="#portfolio" data-port>Otwórz portfolio <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
 </section>
 
 <section class="panel" data-c="0.4" aria-labelledby="p2">
@@ -188,8 +313,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   <div class="eyebrow">Kontakt</div>
   <h2 id="p5">Napisz do mnie</h2>
   <p>Chętnie porozmawiam o produkcie, automatyzacji albo o tym, jak sprawdzić, czy model robi to, co ma robić.</p>
-  <div class="mail"><code id="mailAddr">eyeamadrian@gmail.com</code><button class="chip-btn" type="button" id="copyMail">Kopiuj adres</button></div>
-  <div class="links">
+  <div class="mail"><code id="lMailAddr">eyeamadrian@gmail.com</code><button class="chip-btn" type="button" id="lCopyMail">Kopiuj adres</button></div>
+  <div class="l-links">
     <a href="https://www.linkedin.com/in/adrian-wojtasik-224a4741a/" target="_blank" rel="noopener">LinkedIn ↗</a>
     <a href="https://github.com/FabianAdrianW" target="_blank" rel="noopener">GitHub ↗</a>
     <a href="https://www.youtube.com/@eyeamadrian" target="_blank" rel="noopener">YouTube ↗</a>
@@ -202,19 +327,348 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
   <div class="read" id="gRead">NACHYLENIE<b>007°</b></div>
 </div>
 
+<div class="labels" id="labels" role="list" aria-label="Kule na pierścieniu"></div>
+
+<div class="ui" id="ui">
+  <div class="top">
+    <header class="brand">
+      <h1><a class="home" href="#start" id="brandHome" title="Wróć na stronę główną">Adrian Wojtasik</a></h1>
+      <p class="role">AI Product Builder · najpierw specyfikacja</p>
+      <p class="intro">Filolog, który buduje produkty AI. Twórca Eyelingo.</p>
+    </header>
+    <nav class="topnav" aria-label="Sekcje">
+      <a class="home-link" href="#start" id="homeLink">← Start</a>
+      <button type="button" data-go="0">Portfolio</button>
+      <button type="button" data-go="5">Galeria</button>
+      <button type="button" data-go="6">O mnie</button>
+      <button type="button" data-go="7">Kontakt</button>
+    </nav>
+  </div>
+  <div></div>
+  <div class="caption" id="caption" aria-live="polite">
+    <div class="meta" id="capMeta"></div>
+    <div class="row">
+      <button class="round" type="button" id="capPrev" aria-label="Poprzednia"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 2 4 7l5 5"/></svg></button>
+      <h2><button class="cap-title" type="button" id="capTitle"></button></h2>
+      <button class="round" type="button" id="capNext" aria-label="Następna"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m5 2 5 5-5 5"/></svg></button>
+    </div>
+    <p id="capLine"></p>
+  </div>
+</div>
+
+<section class="veil" id="veil" role="dialog" aria-labelledby="veilTitle" aria-hidden="true">
+  <div class="mist" aria-hidden="true"><i></i><i></i><i></i></div>
+  <article class="veil-card out" id="veilCard">
+    <div class="meta" id="veilMeta"></div>
+    <h2 id="veilTitle"></h2>
+    <div id="veilBody" style="display:flex;flex-direction:column;gap:18px"></div>
+  </article>
+  <button class="round veil-close" type="button" id="veilClose" aria-label="Wróć do pierścienia"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m3 3 8 8M11 3l-8 8"/></svg></button>
+  <div class="veil-nav">
+    <button type="button" id="veilPrev"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 2 4 7l5 5"/></svg><span></span></button>
+    <button type="button" id="veilNext"><span></span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m5 2 5 5-5 5"/></svg></button>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-label="Podgląd zdjęcia">
+  <div class="lb-top"><button class="round" type="button" id="lbClose" aria-label="Zamknij podgląd"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m3 3 8 8M11 3l-8 8"/></svg></button></div>
+  <figure><img id="lbImg" alt=""></figure>
+  <div class="lb-nav">
+    <button class="round" type="button" id="lbPrev" aria-label="Poprzednie zdjęcie"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 2 4 7l5 5"/></svg></button>
+    <div class="lb-cap" id="lbCap"></div>
+    <button class="round" type="button" id="lbNext" aria-label="Następne zdjęcie"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m5 2 5 5-5 5"/></svg></button>
+  </div>
+</div>
 <div class="fade" id="fade" aria-hidden="true"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
 <script>
 (function(){
 "use strict";
-const $ = id => document.getElementById(id);
-const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-const clamp01 = x => x < 0 ? 0 : x > 1 ? 1 : x;
-const smooth = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
-const smoother = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * t * (t * (t * 6 - 15) + 10); };
 
-/* ================= STAGES ================= */
+/* ================= CONTENT ================= */
+const GH = "https://github.com/FabianAdrianW/";
+const ext = (href, label, note) => `<a href="${href}" target="_blank" rel="noopener">${label}${note ? ` <span>${note}</span>` : ""} ↗</a>`;
+
+const DROPS = [
+  { id:"eyelingo", name:"Eyelingo", kind:"Produkt · założyciel",
+    line:"Nauka słówek kątem oka. Fiszki pojawiają się na ekranie podczas pracy.",
+    body:`
+      <p class="lede">Eyelingo uczy słówek przy okazji pracy. Półprzezroczyste fiszki pojawiają się na skraju ekranu, a powtórki planuje algorytm SM-2.</p>
+      <p>Kiedy jest chwila na naukę wprost, wchodzi Lex, nauczyciel AI, który prowadzi lekcję od rozgrzewki do utrwalenia. Do swobodnej rozmowy jest Alex. Bez punktów, serii i rankingów: grywalizację usunąłem świadomie.</p>
+      <p>Projekt zaczął się jako narzędzie badawcze do mojej pracy magisterskiej o uwadze peryferyjnej w nauce języka.</p>
+      <dl class="facts">
+        <dt>Rola</dt><dd>Założyciel, projektant i jedyny developer</dd>
+        <dt>Warstwy</dt><dd>Aplikacja desktopowa (PyQt6), aplikacja webowa, PWA offline-first</dd>
+        <dt>Zaplecze</dt><dd>Supabase (region EU, RLS), Edge Functions, Claude przez OpenRouter, ElevenLabs TTS</dd>
+        <dt>Skala</dt><dd>Ok. 56 000 elementów nauki, banki gramatyczne dla 14 języków, A1–C2</dd>
+      </dl>
+      <div class="links">${ext("https://www.eyelingo.app","eyelingo.app")}${ext(GH+"eyelingo","Kod klienta","GitHub")}</div>`},
+  { id:"spec-first", name:"spec-first", kind:"Case study",
+    line:"Jedna reguła prześledzona od klauzuli do zmierzonego wyniku.",
+    body:`
+      <p class="lede">Łatwo powiedzieć, że buduję produkty AI od specyfikacji. Trudniej to udowodnić.</p>
+      <p>To repozytorium bierze jedną regułę z Eyelingo i prowadzi ją przez cały system, z odnośnikiem do każdej linii kodu, która ją realizuje. Odpowiada na dwa pytania: jak powstrzymać model przed łamaniem zasad produktu i skąd wiadomo, czy mu się to udało.</p>
+      <ol class="flow">
+        <li><div><b>Klauzula</b><span>Reguła zapisana w dokumentach projektu</span></div></li>
+        <li><div><b>Kontrakt promptu</b><span>Reguła przełożona na instrukcję dla modelu</span></div></li>
+        <li><div><b>Walidator</b><span>Sprawdzenie odpowiedzi modelu w trakcie działania</span></div></li>
+        <li><div><b>Fallback</b><span>Ścieżka na wypadek, gdy model złamie regułę</span></div></li>
+        <li><div><b>Pomiar</b><span>Wynik liczony od nowa skryptem verify.py</span></div></li>
+      </ol>
+      <p>Każdą liczbę można odtworzyć samodzielnie. verify.py działa około dwudziestu sekund.</p>
+      <div class="links">${ext(GH+"spec-first","Repozytorium spec-first","GitHub")}</div>`},
+  { id:"fluff", name:"Fluff Generator", kind:"Prototyp · 3D",
+    line:"Własny stworek 3D, który dobiera kosmetyki według nastroju.",
+    body:`
+      <p class="lede">Interaktywny prototyp zakupów dla marki kosmetyków naturalnych. Klient składa w 3D własnego stworka, a ten zostaje z nim na stronie i pomaga dobrać kosmetyki według nastroju.</p>
+      <p>Prototyp powstał metodą spec-and-verify: pisałem specyfikację, diagnozowałem błędy z zachowania interfejsu i weryfikowałem efekt, a kod w dużej części pisał asystent AI pod moim nadzorem.</p>
+      <dl class="facts">
+        <dt>Status</dt><dd>Prototyp koncepcyjny, działa w całości w przeglądarce</dd>
+        <dt>Kontekst</dt><dd>Zadanie rekrutacyjne</dd>
+      </dl>
+      <p class="note">Koncept, nie wdrożenie. Marka Fluff nie brała udziału w jego powstaniu.</p>
+      <div class="links">${ext(GH+"fluffy3dgenerator","Repozytorium","GitHub")}</div>`},
+  { id:"nacomi", name:"Nacomi", kind:"Koncepcja UX/UI",
+    line:"Lista kategorii i karta produktu z przełącznikiem Przed / Po.",
+    body:`
+      <p class="lede">Propozycja układu dwóch kluczowych podstron sklepu nacomi.pl: listy kategorii i karty produktu.</p>
+      <p>Każda strona ma przełącznik Przed / Po. Po lewej mapa problemów obecnej wersji, po prawej propozycja z uzasadnieniem każdej decyzji. Filtry opierają się na realnej potrzebie klienta, na przykład problemie skóry, SPF czy linii produktów, zamiast na atrybutach katalogowych.</p>
+      <p>Oprawa wizualna jest celowo robocza. Przedmiotem propozycji jest układ i logika prowadzenia klienta.</p>
+      <p class="note">Materiał przygotowany z własnej inicjatywy. Nacomi nie brało udziału w jego powstaniu.</p>
+      <div class="links">${ext("https://fabianadrianw.github.io/nacomi_strony/","Zobacz propozycję")}${ext(GH+"nacomi_strony","Repozytorium","GitHub")}</div>`},
+  { id:"poke", name:"Pokémon Hub", kind:"Projekt · Next.js",
+    line:"Cztery widoki na jednym layoucie: galeria, Pokédex, lista i wygaszacz.",
+    body:`
+      <p class="lede">Przeglądarka Pokémonów w czterech widokach: galeria, Pokédex z automatyczną zmianą karty, pełna lista i pełnoekranowy wygaszacz.</p>
+      <p>Projekt do nauki współczesnego stosu React. Chodziło o granicę między komponentami serwerowymi i klienckimi, route handler jako warstwę danych i typowany stan dzielony przez widoki o różnych potrzebach renderowania.</p>
+      <dl class="facts">
+        <dt>Stos</dt><dd>Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4</dd>
+      </dl>
+      <div class="links">${ext(GH+"Poke","Repozytorium","GitHub")}</div>`},
+  { id:"galeria", name:"Galeria", kind:"Zdjęcia",
+    line:"Kadry z wody, światła i nocy.", body:null },
+  { id:"o-mnie", name:"O mnie", kind:"Kim jestem",
+    line:"Filolog angielski, który buduje produkty AI od specyfikacji.",
+    body:`
+      <p class="lede">Jestem filologiem angielskim, który buduje produkty AI. Zaczynam od specyfikacji, a model językowy traktuję jak wykonawcę, którego pracę da się sprawdzić.</p>
+      <p>Uczyłem angielskiego jako korepetytor, prowadziłem własną firmę nieruchomości i przez trzy lata mieszkałem w Holandii. Studiuję Psychologię i Informatykę (Projektowanie Systemów Inteligentnych) w WSB Merito. Z badań do pracy magisterskiej wyrosło Eyelingo.</p>
+      <dl class="facts">
+        <dt>Obszar</dt><dd>AI Product Builder: automatyzacje i zastosowania AI w produkcie</dd>
+        <dt>Metoda</dt><dd>Spec-first: klauzula, kontrakt, walidator, pomiar</dd>
+        <dt>Języki</dt><dd>Polski, angielski, hiszpański, niderlandzki, japoński (podstawy)</dd>
+        <dt>Studia</dt><dd>Filologia angielska; magisterskie: Psychologia i Informatyka, WSB Merito</dd>
+      </dl>`},
+  { id:"kontakt", name:"Kontakt", kind:"Napisz",
+    line:"Mail, LinkedIn i kod na GitHubie.",
+    body:`
+      <p class="lede">Chętnie porozmawiam o produkcie, automatyzacji albo o tym, jak sprawdzić, czy model robi to, co ma robić.</p>
+      <div class="mail"><code id="mailAddr">eyeamadrian@gmail.com</code><button class="chip-btn" type="button" id="copyMail">Kopiuj adres</button></div>
+      <div class="links">
+        ${ext("https://www.linkedin.com/in/adrian-wojtasik-224a4741a/","LinkedIn")}
+        ${ext("https://github.com/FabianAdrianW","GitHub","FabianAdrianW")}
+        ${ext("https://www.youtube.com/@eyeamadrian","YouTube","@eyeamadrian")}
+      </div>`}
+];
+
+/* ================= STATE ================= */
+const N = DROPS.length, STEP = Math.PI * 2 / N;
+const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+let rot = 0, targetRot = 0, active = 0, pendingDive = -1;
+let mode = location.hash === "#portfolio" ? "ring" : "landing";           // ring | dive | content | swap | return
+let contentIdx = -1, elapsed = 0;
+const mod = (a, n) => ((a % n) + n) % n;
+const $ = id => document.getElementById(id);
+const setDeep = on => document.body.classList.toggle("is-deep", on);
+
+/* ================= LABELS ================= */
+const labelsEl = $("labels");
+const labels = DROPS.map((d, i) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "drop-label"; b.setAttribute("role", "listitem");
+  b.textContent = d.name;
+  b.addEventListener("click", () => request(i));
+  labelsEl.appendChild(b);
+  return b;
+});
+
+/* ================= CAPTION ================= */
+const cap = $("caption");
+function renderCaption(instant){
+  const d = DROPS[active];
+  const apply = () => { $("capMeta").textContent = d.kind; $("capTitle").textContent = d.name; $("capLine").textContent = d.line; cap.classList.remove("swap"); };
+  document.querySelectorAll(".topnav button").forEach(b => { const g = +b.dataset.go; b.classList.toggle("is-on", g === 0 ? active < 5 : g === active); });
+  if (instant || reduce) return apply();
+  cap.classList.add("swap"); clearTimeout(renderCaption.t); renderCaption.t = setTimeout(apply, 180);
+}
+$("capTitle").addEventListener("click", () => request(active));
+$("capPrev").addEventListener("click", () => goTo(active - 1));
+$("capNext").addEventListener("click", () => goTo(active + 1));
+document.querySelectorAll(".topnav button").forEach(b => b.addEventListener("click", () => request(+b.dataset.go)));
+
+function goTo(i){
+  if (mode !== "ring") return;
+  i = mod(i, N);
+  const base = -i * STEP, k = Math.round((targetRot - base) / (Math.PI * 2));
+  targetRot = base + k * Math.PI * 2;
+}
+/* bring sphere i to the front, then let it fall */
+function request(i){
+  if (mode !== "ring") return;
+  goTo(i);
+  pendingDive = mod(i, N);
+}
+
+/* ================= VEIL (content over the water) ================= */
+const veil = $("veil"), card = $("veilCard");
+let photoURLs = null;
+function contentHTML(i){
+  const d = DROPS[i];
+  if (d.id !== "galeria") return d.body;
+  if (!photoURLs) photoURLs = PHOTOS.map((_, k) => paintStudy(k));
+  return `<p>Miejsce na zdjęcia. Na razie kadry poglądowe, malowane w przeglądarce tym samym światłem co scena.</p>
+    <div class="gallery">${PHOTOS.map((t, k) => `<button type="button" data-photo="${k}"><img src="${photoURLs[k]}" alt="${t}" width="360" height="450"><small>${String(k+1).padStart(2,"0")} · ${t}</small></button>`).join("")}</div>`;
+}
+function fillVeil(i){
+  contentIdx = i;
+  const d = DROPS[i];
+  $("veilMeta").textContent = d.kind;
+  $("veilTitle").textContent = d.name;
+  $("veilBody").innerHTML = contentHTML(i);
+  card.scrollTop = 0;
+  $("veilPrev").querySelector("span").textContent = DROPS[mod(i - 1, N)].name;
+  $("veilNext").querySelector("span").textContent = DROPS[mod(i + 1, N)].name;
+  card.querySelectorAll("[data-photo]").forEach(b => b.addEventListener("click", () => openLightbox(+b.dataset.photo)));
+  const cp = $("copyMail");
+  if (cp) cp.addEventListener("click", () => {
+    const addr = $("mailAddr").textContent;
+    const done = () => { cp.textContent = "Skopiowano"; setTimeout(() => cp.textContent = "Kopiuj adres", 1800); };
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents($("mailAddr")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); cp.textContent = "Zaznaczono"; };
+    try { navigator.clipboard.writeText(addr).then(done, fallback); } catch (e) { fallback(); }
+  });
+}
+function showVeil(i){
+  fillVeil(i);
+  veil.classList.add("is-on"); veil.setAttribute("aria-hidden", "false");
+  requestAnimationFrame(() => card.classList.remove("out"));
+  setTimeout(() => $("veilClose").focus({ preventScroll:true }), 60);
+}
+function hideCard(){ card.classList.add("out"); }
+function hideVeil(){ card.classList.add("out"); veil.classList.remove("is-on"); veil.setAttribute("aria-hidden", "true"); }
+
+function back(){
+  if (mode !== "content") return;
+  hideVeil();
+  if (gl) gl.back(); else { mode = "ring"; setDeep(false); }
+  $("capTitle").focus({ preventScroll:true });
+}
+function step(dir){
+  if (mode !== "content") return;
+  const j = mod(contentIdx + dir, N);
+  rot = targetRot = -j * STEP; active = j; renderCaption(true);
+  if (gl){ hideCard(); gl.swap(j); }
+  else fillVeil(j);
+}
+$("veilClose").addEventListener("click", back);
+$("veilPrev").addEventListener("click", () => step(-1));
+$("veilNext").addEventListener("click", () => step(1));
+
+/* ================= LIGHTBOX ================= */
+const lb = $("lightbox"); let lbIdx = 0;
+function showPhoto(k){ lbIdx = mod(k, PHOTOS.length); $("lbImg").src = photoURLs[lbIdx]; $("lbImg").alt = PHOTOS[lbIdx]; $("lbCap").textContent = PHOTOS[lbIdx]; }
+function openLightbox(k){ showPhoto(k); lb.hidden = false; $("lbClose").focus({ preventScroll:true }); }
+function closeLightbox(){ lb.hidden = true; }
+$("lbClose").addEventListener("click", closeLightbox);
+$("lbPrev").addEventListener("click", () => showPhoto(lbIdx - 1));
+$("lbNext").addEventListener("click", () => showPhoto(lbIdx + 1));
+lb.addEventListener("click", e => { if (e.target === lb || e.target.tagName === "FIGURE") closeLightbox(); });
+
+function paintStudy(k, asCanvas){
+  const W = 720, H = 900, c = document.createElement("canvas"); c.width = W; c.height = H;
+  const g = c.getContext("2d");
+  let s = 1234 + k * 977; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const hz = H * (0.34 + rnd() * 0.22);
+  const warm = [0.35, 0.9, 0.15, 1, 0.5, 0.25, 0.1, 0.7, 0.3][k];
+  const sky = g.createLinearGradient(0, 0, 0, hz);
+  sky.addColorStop(0, "#03060a"); sky.addColorStop(0.75, "#0d1f27"); sky.addColorStop(1, `rgba(${60+warm*120},${70+warm*60},70,1)`);
+  g.fillStyle = sky; g.fillRect(0, 0, W, hz);
+  const sea = g.createLinearGradient(0, hz, 0, H);
+  sea.addColorStop(0, "#132a31"); sea.addColorStop(0.3, "#08151b"); sea.addColorStop(1, "#030709");
+  g.fillStyle = sea; g.fillRect(0, hz, W, H - hz);
+  for (let i = 0; i < 140; i++){ g.fillStyle = `rgba(230,236,232,${rnd()*0.7})`; g.fillRect(rnd()*W, rnd()*hz*0.8, 1.2, 1.2); }
+  const mx = W * (0.25 + rnd() * 0.5), my = hz * (0.25 + rnd() * 0.45), mr = 14 + rnd() * 22;
+  if (k !== 6){
+    const mg = g.createRadialGradient(mx, my, 0, mx, my, mr * 7);
+    mg.addColorStop(0, `rgba(227,178,106,${0.35+warm*0.3})`); mg.addColorStop(1, "rgba(227,178,106,0)");
+    g.fillStyle = mg; g.fillRect(0, 0, W, H);
+    g.fillStyle = "#f3e2bf"; g.beginPath(); g.arc(mx, my, mr, 0, Math.PI*2); g.fill();
+    g.globalCompositeOperation = "lighter";
+    for (let y = hz + 2; y < H; y += 3 + (y - hz) * 0.02){
+      const t = (y - hz) / (H - hz), wdt = 8 + t * 140 * rnd();
+      g.fillStyle = `rgba(227,178,106,${(0.5 - t*0.4) * rnd() * (0.4+warm*0.6)})`;
+      g.fillRect(mx - wdt/2 + (rnd()-0.5) * t * 120, y, wdt, 1 + t * 2);
+    }
+    g.globalCompositeOperation = "source-over";
+  }
+  const cx = W * (0.3 + rnd() * 0.4), cy = hz + (H - hz) * (0.35 + rnd() * 0.35);
+  const rings = k === 5 ? 3 : 6 + Math.floor(rnd() * 5);
+  for (let i = 1; i <= rings; i++){
+    const r = i * (k === 5 ? 80 : 26 + rnd() * 6);
+    g.strokeStyle = `rgba(230,236,232,${0.42 * (1 - i / (rings + 1))})`; g.lineWidth = 1.2;
+    g.beginPath(); g.ellipse(cx, cy, r, r * 0.2, 0, 0, Math.PI * 2); g.stroke();
+  }
+  if (k % 3 === 2 || k === 0){
+    const dx = cx, dy = cy - 150 - rnd() * 120, r = 20;
+    const bg = g.createRadialGradient(dx - r*0.35, dy - r*0.4, 1, dx, dy, r);
+    bg.addColorStop(0, "rgba(250,240,220,.95)"); bg.addColorStop(0.5, "rgba(150,190,190,.35)"); bg.addColorStop(1, "rgba(227,178,106,.5)");
+    g.fillStyle = bg; g.beginPath(); g.arc(dx, dy, r, 0, Math.PI*2); g.fill();
+  }
+  if (k === 6){ const fg = g.createLinearGradient(0, hz - 120, 0, hz + 160); fg.addColorStop(0, "rgba(140,158,159,0)"); fg.addColorStop(0.5, "rgba(140,158,159,.35)"); fg.addColorStop(1, "rgba(140,158,159,0)"); g.fillStyle = fg; g.fillRect(0, 0, W, H); }
+  const img = g.getImageData(0, 0, W, H), px = img.data;
+  for (let i = 0; i < px.length; i += 4){ const n = (rnd() - 0.5) * 14; px[i] += n; px[i+1] += n; px[i+2] += n; }
+  g.putImageData(img, 0, 0);
+  return asCanvas ? c : c.toDataURL("image/jpeg", 0.86);
+}
+
+/* ================= INPUT ================= */
+let snapT = 0, lastDir = 0;
+/* settle on the next ball in the direction of travel, so one wheel notch always moves one step */
+const snap = () => {
+  const f = targetRot / STEP, base = Math.round(f);
+  if (Math.abs(f - base) < 0.08 || !lastDir) targetRot = base * STEP;
+  else targetRot = (lastDir > 0 ? Math.ceil(f) : Math.floor(f)) * STEP;
+};
+window.addEventListener("wheel", e => {
+  if (mode === "landing") return;
+  if (e.target.closest && e.target.closest(".veil-card,.lightbox")) return;
+  e.preventDefault();
+  let d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+  if (e.deltaMode === 1) d *= 16;
+  if (mode === "content"){ card.scrollTop += d; return; }
+  if (mode !== "ring") return;
+  d = Math.max(-120, Math.min(120, d));
+  targetRot -= d * 0.0024; pendingDive = -1; lastDir = -Math.sign(d);
+  clearTimeout(snapT); snapT = setTimeout(snap, 170);
+}, { passive:false });
+
+window.addEventListener("keydown", e => {
+  if (e.key === "Escape"){ if (!lb.hidden) closeLightbox(); else back(); return; }
+  if (!lb.hidden){ if (e.key === "ArrowLeft") showPhoto(lbIdx - 1); if (e.key === "ArrowRight") showPhoto(lbIdx + 1); return; }
+  if (mode === "content"){
+    const inCard = document.activeElement && document.activeElement.closest && document.activeElement.closest(".veil-card");
+    if (!inCard && e.key === "ArrowRight") step(1);
+    if (!inCard && e.key === "ArrowLeft") step(-1);
+    return;
+  }
+  if (mode !== "ring") return;
+  if (e.key === "ArrowRight" || e.key === "ArrowDown"){ e.preventDefault(); goTo(active + 1); }
+  if (e.key === "ArrowLeft" || e.key === "ArrowUp"){ e.preventDefault(); goTo(active - 1); }
+  if (e.key === "Enter" && (document.activeElement === document.body || !document.activeElement)) request(active);
+});
+
+/* ================= LANDING (scroll page) ================= */
+const htmlEl = document.documentElement;
+if (mode !== "landing") htmlEl.classList.add("in-port");
 const STAGES = [
   { c:0,   name:"Horyzont" },
   { c:0.2, name:"Portfolio" },
@@ -224,18 +678,20 @@ const STAGES = [
   { c:1,   name:"Kontakt" }
 ];
 const EMERGE = [0.12, 0.32, 0.52, 0.72];     // scroll progress at which each drop rises
-const links = Array.from(document.querySelectorAll(".drop-link"));
-const panels = Array.from(document.querySelectorAll(".panel"));
-const ND = links.length;
-
+const lLinks = Array.from(document.querySelectorAll(".drop-link"));
+const lPanels = Array.from(document.querySelectorAll(".panel"));
+const LN = lLinks.length;
+const clamp01 = x => x < 0 ? 0 : x > 1 ? 1 : x;
+const sm = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+const smr = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * t * (t * (t * 6 - 15) + 10); };
 /* camera tilt as a function of scroll: lingers on both horizons, water in between */
 const PHI0 = 0.12;
-const tiltOf = p => PHI0 + (Math.PI - 2 * PHI0) * smoother(0.03, 0.97, p);
-const yawOf  = p => Math.PI * smoother(0.36, 0.64, p);
+const tiltOf = q => PHI0 + (Math.PI - 2 * PHI0) * smr(0.03, 0.97, q);
+const yawOf  = q => Math.PI * smr(0.36, 0.64, q);
 
-/* ================= SCROLL ================= */
-let pT = 0, p = 0, pPrev = 0, pVel = 0;
+let pT = 0, p = 0, pPrev = 0, pVel = 0, landVis = mode === "landing" ? 1 : 0;
 function readScroll(){
+  if (mode !== "landing") return;
   const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
   pT = clamp01(scrollY / max);
 }
@@ -247,9 +703,9 @@ function scrollToP(t){
   scrollTo({ top:t * max, behavior: reduce ? "auto" : "smooth" });
 }
 
-/* ================= GAUGE ================= */
+/* gauge */
 const gauge = $("gauge");
-const ticks = STAGES.map((s, i) => {
+const ticks = STAGES.map(s => {
   const b = document.createElement("button");
   b.type = "button"; b.style.top = (s.c * 100) + "%";
   b.setAttribute("aria-label", s.name); b.title = s.name;
@@ -260,49 +716,74 @@ const ticks = STAGES.map((s, i) => {
 $("toTop").addEventListener("click", () => scrollToP(0));
 $("mark").addEventListener("click", e => { e.preventDefault(); scrollToP(0); });
 
-/* copy mail */
-const cp = $("copyMail");
-cp.addEventListener("click", () => {
-  const addr = $("mailAddr").textContent;
-  const done = () => { cp.textContent = "Skopiowano"; setTimeout(() => cp.textContent = "Kopiuj adres", 1800); };
-  const fallback = () => { const r = document.createRange(); r.selectNodeContents($("mailAddr")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); cp.textContent = "Zaznaczono"; };
+/* copy mail (landing contact panel) */
+const lcp = $("lCopyMail");
+lcp.addEventListener("click", () => {
+  const addr = $("lMailAddr").textContent;
+  const done = () => { lcp.textContent = "Skopiowano"; setTimeout(() => lcp.textContent = "Kopiuj adres", 1800); };
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents($("lMailAddr")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); lcp.textContent = "Zaznaczono"; };
   try { navigator.clipboard.writeText(addr).then(done, fallback); } catch (e) { fallback(); }
 });
 
-/* ================= PAGE TRANSITION ================= */
-const fade = $("fade");
+/* other subpages: short pulse, fade, navigate */
+const fadeEl = $("fade");
 let leaving = false;
 function leave(href, i){
   if (leaving) return;
   leaving = true;
   if (gl && i >= 0) gl.pulse(i);
-  setTimeout(() => fade.classList.add("is-on"), reduce ? 0 : 160);
+  setTimeout(() => fadeEl.classList.add("is-on"), reduce ? 0 : 160);
   setTimeout(() => { location.href = href; }, reduce ? 60 : 720);
 }
-addEventListener("pageshow", () => { leaving = false; fade.classList.remove("is-on"); });
-links.forEach((a, i) => a.addEventListener("click", e => {
-  if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-  e.preventDefault(); leave(a.getAttribute("href"), i);
+addEventListener("pageshow", () => { leaving = false; fadeEl.classList.remove("is-on"); });
+
+/* landing ⇄ portfolio live in one scene */
+function enterPortfolio(push){
+  if (mode !== "landing") return;
+  if (gl) gl.toRing(push);
+  else { mode = "ring"; htmlEl.classList.add("in-port"); if (push !== false) try { history.pushState(null, "", "#portfolio"); } catch (_) {} }
+}
+function goLanding(push){
+  if (mode !== "ring") return;
+  if (gl) gl.toLand(push);
+  else { mode = "landing"; htmlEl.classList.remove("in-port"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
+}
+const plain = e => !(e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1);
+lLinks.forEach((a, i) => a.addEventListener("click", e => {
+  if (!plain(e)) return;
+  e.preventDefault();
+  if (a.hasAttribute("data-port")) enterPortfolio(); else leave(a.getAttribute("href"), i);
 }));
 document.querySelectorAll(".panel .go").forEach(a => a.addEventListener("click", e => {
-  if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+  if (!plain(e)) return;
   e.preventDefault();
-  const i = links.findIndex(l => l.getAttribute("href") === a.getAttribute("href"));
-  leave(a.getAttribute("href"), i);
+  if (a.hasAttribute("data-port")) return enterPortfolio();
+  leave(a.getAttribute("href"), lLinks.findIndex(l => l.getAttribute("href") === a.getAttribute("href")));
 }));
+["homeLink", "brandHome"].forEach(id => { const el = $(id); if (el) el.addEventListener("click", e => { e.preventDefault(); goLanding(); }); });
+addEventListener("popstate", () => {
+  const port = location.hash === "#portfolio";
+  if (port && mode === "landing") enterPortfolio(false);
+  else if (!port && mode === "ring") goLanding(false);
+});
 
-/* ================= OVERLAY UPDATE ================= */
-const hero = $("hero"), hint = $("hint"), mark = $("mark");
+/* overlay: hero, stage panels, gauge — all fade with landVis while the portfolio is on screen */
+const heroEl = $("hero"), hintEl = $("hint"), markEl = $("mark"), gFill = $("gFill"), gRead = $("gRead");
+let lastDeg = -1;
 function updateOverlay(){
-  const heroOp = 1 - smooth(0.015, 0.08, p);
-  hero.style.opacity = heroOp.toFixed(3);
-  hero.style.transform = `translate3d(0,${(-p * 260).toFixed(1)}px,0)`;
-  hint.style.opacity = (1 - smooth(0.005, 0.04, p)).toFixed(3);
-  mark.style.opacity = (1 - heroOp).toFixed(3);
-  mark.classList.toggle("is-on", heroOp < 0.5);
-  panels.forEach(el => {
+  const L = landVis;
+  if (L < 0.002 && mode !== "landing" && updateOverlay.off) return;
+  updateOverlay.off = L < 0.002;
+  const heroOp = 1 - sm(0.015, 0.08, p);
+  heroEl.style.opacity = (heroOp * L).toFixed(3);
+  heroEl.style.transform = `translate3d(0,${(-p * 260).toFixed(1)}px,0)`;
+  hintEl.style.opacity = ((1 - sm(0.005, 0.04, p)) * L).toFixed(3);
+  markEl.style.opacity = ((1 - heroOp) * L).toFixed(3);
+  markEl.classList.toggle("is-on", heroOp < 0.5 && L > 0.5);
+  gauge.style.opacity = L.toFixed(3);
+  lPanels.forEach(el => {
     const c = +el.dataset.c, d = p - c;
-    const op = c >= 1 ? smooth(0.885, 0.94, p) : 1 - smooth(0.055, 0.1, Math.abs(d));
+    const op = (c >= 1 ? sm(0.885, 0.94, p) : 1 - sm(0.055, 0.1, Math.abs(d))) * L;
     el.style.opacity = op.toFixed(3);
     el.style.transform = `translate3d(0,calc(${innerWidth > 760 ? "-50%" : "0px"} + ${(-d * 180).toFixed(1)}px),0)`;
     el.classList.toggle("is-on", op > 0.5);
@@ -310,18 +791,15 @@ function updateOverlay(){
   });
   let on = 0; STAGES.forEach((s, i) => { if (Math.abs(p - s.c) < Math.abs(p - STAGES[on].c)) on = i; });
   ticks.forEach((b, i) => { b.classList.toggle("is-on", i === on); b.classList.toggle("is-past", STAGES[i].c <= p + 0.001); });
-  $("gFill").style.height = (p * 100).toFixed(2) + "%";
+  gFill.style.height = (p * 100).toFixed(2) + "%";
   const deg = Math.round(tiltOf(p) * 180 / Math.PI);
-  $("gRead").innerHTML = `NACHYLENIE<b>${String(deg).padStart(3, "0")}°</b>`;
+  if (deg !== lastDeg){ lastDeg = deg; gRead.innerHTML = `NACHYLENIE<b>${String(deg).padStart(3, "0")}°</b>`; }
 }
 
-/* ================= WEBGL ================= */
-let gl = null;
+/* ================= 3D ================= */
+let gl = null, timeScale = 1;
 try { if (window.THREE) gl = initGL(); } catch (err) { console.warn(err); gl = null; }
-if (!gl){
-  document.body.classList.add("no-gl");
-  document.documentElement.classList.add("no-gl");
-}
+if (!gl) document.body.classList.add("no-gl");
 
 function initGL(){
   const T = THREE;
@@ -335,11 +813,11 @@ function initGL(){
   renderer.setClearColor(0x04070b, 1);
 
   const scene = new T.Scene();
-  const camera = new T.PerspectiveCamera(40, 1, 0.05, 900);
-  const CAM_H = 6.5, NR = 24;
+  const camera = new T.PerspectiveCamera(40, 1, 0.03, 900);
+  const R = 3.6, RING_Y = 1.35, NR = 36, ND = N + 1 + LN, G = 1.4, RELEASE = 0.4;
   const C = h => new T.Color(h);
 
-  /* ---- light: sun ↔ moon (same as the portfolio scene) ---- */
+  /* ---- light: sun ↔ moon ---- */
   const sunC = C("#EDB462"), moonC = C("#C3D5EA");
   const horSun = C("#23454F"), horMoon = C("#18304A"), zenSun = C("#02050A"), zenMoon = C("#030813");
   const Lcol = sunC.clone();
@@ -347,18 +825,21 @@ function initGL(){
   const sunRight = new T.Vector3().crossVectors(sunDir, new T.Vector3(0, 1, 0)).normalize();
   const sunUp = new T.Vector3().crossVectors(sunRight, sunDir).normalize();
   const RD = 0.034;
-  let cel = 0, celTarget = 0, lastMix = -1, elapsed = 0;
+  let cel = 0, celTarget = 0, lastMix = -1;
 
   const U = {
-    uTime:{ value:0 }, uCalm:{ value: reduce ? 0.35 : 1 },
+    uTime:{ value:0 }, uCalm:{ value: reduce ? 0.4 : 1 },
     uRipples:{ value: Array.from({ length:NR }, () => new T.Vector4(0, 0, -99, 0)) },
     uRippleK:{ value: new Array(NR).fill(4.2) },
+    uImpact:{ value:new T.Vector4(0, 0, -99, 0) },
     uDrops:{ value: Array.from({ length:ND }, () => new T.Vector4(0, -50, 0, 0)) },
+    uRingR:{ value:R }, uRingVis:{ value:1 },
     uZenith:{ value:zenSun.clone() }, uHorizon:{ value:horSun.clone() }, uDeepSky:{ value:C("#050C11") },
     uLight:{ value:Lcol }, uSunDir:{ value:sunDir }, uSunRight:{ value:sunRight }, uSunUp:{ value:sunUp },
     uSunCol:{ value:sunC }, uMoonCol:{ value:moonC }, uCel:{ value:0 },
     uDeep:{ value:C("#041017") }, uTide:{ value:C("#1A4250") }, uPearl:{ value:C("#E6ECE8") },
-    uStars:{ value:1 }
+    uStars:{ value:1 }, uSpin:{ value:0 }, uDrag:{ value:0 },
+    uPort:{ value: mode === "landing" ? 0 : 1 }, uOcean:{ value: mode === "landing" ? 1 : 0.25 }, uFog:{ value:new T.Vector2(16, 150) }
   };
 
   const SKY = `
@@ -376,21 +857,19 @@ function initGL(){
     }`;
   const NOISE = `
     float hash21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
-    float hash13(vec3 p){ p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
     float vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
       return mix(mix(hash21(i), hash21(i + vec2(1,0)), f.x), mix(hash21(i + vec2(0,1)), hash21(i + vec2(1,1)), f.x), f.y); }
     float fbm(vec2 p){ float a = 0.5, s = 0.0; for (int i = 0; i < 5; i++){ s += a * vnoise(p); p *= 2.03; a *= 0.5; } return s; }
+    float hash13(vec3 p){ p = fract(p * 0.1031); p += dot(p, p.zyx + 31.32); return fract((p.x + p.y) * p.z); }
     float starField(vec3 d, float t){
       vec3 p = d * 230.0; vec3 i = floor(p); vec3 f = fract(p) - 0.5; float r = hash13(i);
       float st = step(0.991, r) * smoothstep(0.32, 0.0, length(f)) * smoothstep(0.04, 0.4, d.y);
       return st * (0.55 + 0.45 * sin(t * (0.8 + r * 2.5) + r * 60.0));
     }`;
-  /* open-sea swell: a handful of directional waves with deep-water dispersion, plus click / drop ripples */
   const WAVES = `
     #define NR ${NR}
-    uniform float uTime, uCalm;
-    uniform vec4 uRipples[NR];
-    uniform float uRippleK[NR];
+    uniform float uTime, uCalm, uRingR, uOcean, uPort;
+    /* open-sea swell for the landing view: directional waves with deep-water dispersion */
     vec3 dw(vec2 p, vec2 d, float k, float a, float ph0){
       float ph = dot(p, d) * k - uTime * sqrt(9.8 * k) * 0.5 * uCalm + ph0;
       return vec3(a * sin(ph), a * k * cos(ph) * d);
@@ -405,6 +884,42 @@ function initGL(){
       w += dw(p, normalize(vec2(-0.20,-1.0)), 5.40, 0.005, 0.9);
       return w;
     }
+    uniform vec4 uRipples[NR];
+    uniform float uRippleK[NR];
+    uniform vec4 uImpact;
+    #define ND ${ND}
+    uniform vec4 uDrops[ND];
+    uniform float uSpin, uDrag;
+    vec2 rot2(vec2 p, float a){ float c = cos(a), s = sin(a); return vec2(c * p.x - s * p.y, s * p.x + c * p.y); }
+    /* shear: water along the ring is dragged round with it, less the further it lies from the ring */
+    vec2 swirl(vec2 p){
+      float r = length(p);
+      return rot2(p, uDrag * exp(-pow(r - uRingR, 2.0) * 0.16));
+    }
+    /* centrifugal bend: every sphere pushes the wave fronts outward, harder just ahead of it,
+       so the concentric circles bow into arcs that lean with the direction of the spin */
+    vec2 spinWarp(vec2 p){
+      if (abs(uSpin) < 0.002 && abs(uDrag) < 0.002) return p;
+      vec2 q = swirl(p);
+      vec2 off = vec2(0.0);
+      float sp = abs(uSpin), sg = sign(uSpin);
+      for (int i = 0; i < ${N}; i++){
+        vec4 D = uDrops[i];
+        if (D.w <= 0.001) continue;
+        vec2 b = D.xz; vec2 n = b / (length(b) + 1e-4); vec2 t = vec2(n.y, -n.x);
+        vec2 dp = p - b; float g = exp(-dot(dp, dp) * 0.42);
+        float ah = dot(dp, t) * sg * 1.4; ah = ah / (1.0 + abs(ah));
+        off += g * (n * sp * 0.6 * (1.0 + 0.9 * ah) + t * uSpin * 0.28);
+      }
+      return q - off;
+    }
+    vec3 centerWave(vec2 p){
+      float r = length(p) + 1e-4;
+      float k = 1.65;
+      float ph = k * r - 1.05 * uTime * uCalm;
+      float env = 0.075 * exp(-r * 0.07) * smoothstep(0.0, 1.5, r);
+      return vec3(env * sin(ph), (env * k * cos(ph)) * p / r);
+    }
     vec3 rippleWave(vec2 p, vec4 R, float k, inout float crest){
       float age = uTime - R.z;
       if (R.w <= 0.0 || age < 0.0 || age > 14.0) return vec3(0.0);
@@ -417,10 +932,38 @@ function initGL(){
       crest += env * pow(max(s, 0.0), 6.0);
       return vec3(env * s, (env * k * cos(k * x)) * dp / d);
     }
+    vec3 impactWave(vec2 p){
+      float age = uTime - uImpact.z;
+      if (uImpact.w <= 0.0 || age < 0.0 || age > 2.0) return vec3(0.0);
+      float S = uImpact.w;
+      vec2 dp = p - uImpact.xy; float d2 = dot(dp, dp); float d = sqrt(d2) + 1e-4;
+      /* cavity: opens fast, then collapses */
+      float rc = 0.2 + 0.4 * smoothstep(0.0, 0.32, age);
+      float depth = 0.3 * S * smoothstep(0.0, 0.06, age) * (1.0 - smoothstep(0.3, 0.55, age));
+      float g1 = exp(-d2 / (rc * rc));
+      float h = -depth * g1;
+      vec2 gr = -depth * g1 * (-2.0 * dp / (rc * rc));
+      /* crown rim riding the cavity edge */
+      float x = d - rc * 1.18; float cw = 0.035 + 0.05 * age;
+      float crown = 0.1 * S * smoothstep(0.0, 0.08, age) * (1.0 - smoothstep(0.2, 0.5, age));
+      float g2 = exp(-x * x / (cw * cw));
+      h += crown * g2; gr += crown * g2 * (-2.0 * x / (cw * cw)) * dp / d;
+      /* capillary wrinkles on the cavity wall */
+      float cap = 0.006 * S * g1 * smoothstep(0.05, 0.15, age) * (1.0 - smoothstep(0.35, 0.6, age));
+      h += cap * sin(d * 70.0 - age * 40.0);
+      /* base of the Worthington jet */
+      float jb = 0.07 * S * smoothstep(0.42, 0.56, age) * (1.0 - smoothstep(0.95, 1.4, age));
+      float g3 = exp(-d2 / 0.012);
+      h += jb * g3; gr += jb * g3 * (-2.0 * dp / 0.012);
+      return vec3(h, gr);
+    }
+    vec2 gWarp;
     vec3 waves(vec2 p, out float crest){
       crest = 0.0;
-      vec3 w = ocean(p);
-      for (int i = 0; i < NR; i++) w += rippleWave(p, uRipples[i], uRippleK[i], crest);
+      vec2 q = spinWarp(p);
+      gWarp = q;
+      vec3 w = centerWave(q) * mix(0.3, 1.0, uPort) + impactWave(p) + ocean(p) * uOcean;
+      for (int i = 0; i < NR; i++) w += rippleWave(q, uRipples[i], uRippleK[i], crest);
       return w;
     }`;
 
@@ -477,15 +1020,17 @@ function initGL(){
         vec3 d = normalize(vDir);
         vec4 ce = celestial(d);
         vec3 c = sky(d) * (1.0 - ce.w) + ce.rgb;
-        c += uPearl * starField(d, uTime) * (0.55 + 0.6 * smoothstep(0.4, 0.8, uCel)) * uStars;
+        vec3 p = d * 230.0; vec3 i = floor(p); vec3 f = fract(p) - 0.5; float r = hash13(i);
+        float st = step(0.991, r) * smoothstep(0.32, 0.0, length(f)) * smoothstep(0.04, 0.4, d.y);
+        st *= 0.55 + 0.45 * sin(uTime * (0.8 + r * 2.5) + r * 60.0);
+        c += uPearl * st * (0.55 + 0.6 * smoothstep(0.4, 0.8, uCel)) * uStars;
         gl_FragColor = vec4(c, 1.0);
         #include <encodings_fragment>
       }`
   });
-  const skyMesh = new T.Mesh(new T.SphereGeometry(400, 64, 32), skyMat);
-  scene.add(skyMesh);
+  const skyMesh = new T.Mesh(new T.SphereGeometry(300, 64, 32), skyMat); scene.add(skyMesh);
 
-  /* ---- water ---- */
+  /* ---- water: wide surface + fine patch around the impact ---- */
   const waterVS = `
     ${WAVES}
     varying vec3 vWorld;
@@ -500,59 +1045,66 @@ function initGL(){
     ${WAVES}
     ${SKY}
     ${NOISE}
-    uniform float uStars;
+    uniform float uRingVis, uStars;
+    uniform vec2 uFog;
     uniform vec3 uDeep, uTide, uPearl;
-    #define ND ${ND}
-    uniform vec4 uDrops[ND];
     varying vec3 vWorld;
     vec2 microGrad(vec2 p){
       vec2 g = vec2(0.0);
-      vec2 d1 = vec2(0.83, 0.55);  g += d1 * 3.4  * 0.006  * cos(dot(p, d1) * 3.4  + uTime * 0.9);
-      vec2 d2 = vec2(-0.45, 0.89); g += d2 * 5.1  * 0.004  * cos(dot(p, d2) * 5.1  - uTime * 1.2);
-      vec2 d3 = vec2(0.6, -0.8);   g += d3 * 8.3  * 0.0024 * cos(dot(p, d3) * 8.3  + uTime * 1.6);
-      vec2 d4 = vec2(-0.9, -0.4);  g += d4 * 13.0 * 0.0012 * cos(dot(p, d4) * 13.0 - uTime * 2.1);
+      vec2 d1 = vec2(0.83, 0.55); g += d1 * 3.4 * 0.0045 * cos(dot(p, d1) * 3.4 + uTime * 0.9);
+      vec2 d2 = vec2(-0.45, 0.89); g += d2 * 5.1 * 0.003 * cos(dot(p, d2) * 5.1 - uTime * 1.2);
+      vec2 d3 = vec2(0.6, -0.8); g += d3 * 8.3 * 0.0018 * cos(dot(p, d3) * 8.3 + uTime * 1.6);
       return g;
     }
     void main(){
       vec2 p = vWorld.xz;
       float dist = length(cameraPosition - vWorld);
       float crest; vec3 w = waves(p, crest);
-      vec2 g = w.yz * mix(1.0, 0.4, smoothstep(25.0, 110.0, dist)) + microGrad(p) * exp(-dist * 0.05);
+      vec2 g = w.yz + microGrad(swirl(p)) * exp(-dist * 0.045);
       vec3 N = normalize(vec3(-g.x, 1.0, -g.y));
       vec3 V = normalize(cameraPosition - vWorld);
       float ndv = max(dot(N, V), 0.0);
       float fres = 0.02 + 0.98 * pow(1.0 - ndv, 5.0);
       vec3 R = reflect(-V, N); R.y = abs(R.y);
-      float st = starField(R, uTime) * uStars;
-      vec3 refl = sky(R) + uPearl * st * 0.9;
+      float st = starField(R, uTime) * uStars * (1.0 - 0.5 * uPort);
+      vec3 refl = sky(R) + mix(uLight, uPearl, 0.5) * 0.03 * smoothstep(0.5, 1.0, R.y) + uPearl * st * 0.9;
+      vec3 body = mix(uDeep, uTide, clamp(w.x * 4.0 + 0.25, 0.0, 1.0) * 0.4);
       /* light wandering through the water body: seen best from straight above */
       float c1 = fbm(p * 0.45 + vec2(uTime * 0.04, -uTime * 0.025) + w.yz * 1.6);
       float ca = pow(1.0 - abs(c1 * 2.0 - 1.0), 5.0);
-      vec3 body = mix(uDeep, uTide, clamp(w.x * 3.0 + 0.3, 0.0, 1.0) * 0.45);
-      body += mix(uLight, uPearl, 0.45) * ca * 0.028 * exp(-dist * 0.035);
+      body += mix(uLight, uPearl, 0.45) * ca * 0.028 * exp(-dist * 0.035) * (1.0 - 0.6 * uPort);
       vec3 col = mix(body, refl, fres);
       col += uPearl * st * 0.22 * (1.0 - fres);
       vec3 Hs = normalize(uSunDir + V); float nh = max(dot(N, Hs), 0.0);
       col += uLight * (pow(nh, 1400.0) * 3.2 + pow(nh, 160.0) * 0.25);
       vec3 K = normalize(vec3(-0.35, 1.0, 0.55)); float nk = max(dot(N, normalize(K + V)), 0.0);
-      col += uLight * pow(nk, 900.0) * 0.25 + uPearl * pow(nk, 3000.0) * 0.6;
+      col += (uLight * pow(nk, 600.0) * 0.8 + uPearl * pow(nk, 3000.0) * 1.1) * mix(0.3, 1.0, uPort);
+      float r = length(p), rw = length(gWarp);
+      float ph = 1.65 * rw - 1.05 * uTime * uCalm;
+      col += uLight * pow(max(sin(ph), 0.0), 16.0) * exp(-rw * 0.1) * smoothstep(0.3, 2.2, rw) * 0.07 * uPort;
       col += uLight * crest * 0.55;
+      float rr = abs(rw - uRingR);
+      col += uLight * (exp(-rr * rr * 70.0) * 0.05 + exp(-rr * 4.0) * 0.012) * (0.8 + 0.2 * sin(uTime * 0.8)) * uRingVis;
+      col += uLight * exp(-r * r * 1.1) * (0.16 + 0.05 * sin(uTime * 1.05 * uCalm)) * uRingVis;
       for (int i = 0; i < ND; i++){
         vec4 D = uDrops[i];
         if (D.w <= 0.001) continue;
         vec3 L = D.xyz - vWorld; float d2 = dot(L, L); vec3 Ln = L * inversesqrt(d2);
-        float spec = pow(max(dot(N, normalize(Ln + V)), 0.0), 600.0);
-        col += D.w * uPearl * spec * 0.12 / (1.0 + d2 * 0.08);
+        float spec = pow(max(dot(N, normalize(Ln + V)), 0.0), 260.0);
+        float pool = exp(-dot(L.xz, L.xz) * 1.6) / (1.0 + L.y * L.y * 0.9);
+        float pw = i <= ${N} ? 1.0 : 0.0;
+        col += D.w * (uPearl * spec * 0.22 / (1.0 + d2 * 0.12) + uLight * pool * 0.1 * pw);
       }
       vec3 vd = -V;
       vec3 fogc = sky(normalize(vec3(vd.x, 0.015, vd.z)));
-      col = mix(col, fogc, smoothstep(16.0, 150.0, dist));
+      col = mix(col, fogc, smoothstep(uFog.x, uFog.y, dist));
       gl_FragColor = vec4(col, 1.0);
       #include <encodings_fragment>
     }`;
+  /* one polar mesh, exponentially dense towards its centre; the centre sits where the action is */
   const waterGeo = (() => {
     const A = 256, rs = [];
-    for (let r = 0.02; r < 330; r *= 1.0248) rs.push(r);
+    for (let r = 0.008; r < 330; r *= 1.0248) rs.push(r);
     const pos = new Float32Array((1 + rs.length * A) * 3), idx = [];
     rs.forEach((r, i) => { for (let a = 0; a < A; a++){ const t = a / A * Math.PI * 2, o = (1 + i * A + a) * 3; pos[o] = Math.cos(t) * r; pos[o + 2] = Math.sin(t) * r; } });
     for (let a = 0; a < A; a++) idx.push(0, 1 + (a + 1) % A, 1 + a);
@@ -566,9 +1118,9 @@ function initGL(){
     return g;
   })();
   const water = new T.Mesh(waterGeo, new T.ShaderMaterial({ uniforms:U, vertexShader:waterVS, fragmentShader:waterFS }));
-  water.frustumCulled = false; scene.add(water);
+  water.frustumCulled = false; water.position.set(0, 0, 3.2); scene.add(water);
 
-  /* ---- environment maps for the glass drops ---- */
+  /* ---- environment maps (sun → moon steps) for the glass water ---- */
   const pmrem = new T.PMREMGenerator(renderer);
   const envScene = new T.Scene();
   const envLight = { value:new T.Color() }, envCel = { value:0 };
@@ -592,7 +1144,8 @@ function initGL(){
   const dl = new T.DirectionalLight(0xfff1dc, 1.3); dl.position.set(-4, 7, 9); scene.add(dl);
   const dlSun = C("#FFF1DC"), dlMoon = C("#DCE6FF");
 
-  /* ---- water drops: Legendre P2/P3 shape modes ---- */
+  /* ---- water balls: Legendre P2/P3 shape modes + aerodynamic flattening ---- */
+  const waterMats = [];
   function waterMaterial(){
     const m = new T.MeshPhysicalMaterial({
       color:0xffffff, metalness:0, roughness:0.03, transmission:1, thickness:0.9, ior:1.333,
@@ -600,14 +1153,15 @@ function initGL(){
       attenuationColor:C("#A9D4CF"), attenuationDistance:1.6, specularIntensity:1,
       emissive:Lcol.clone(), emissiveIntensity:0
     });
-    const u = { uA2:{ value:0 }, uA3:{ value:0 } };
+    const u = { uA2:{ value:0 }, uA3:{ value:0 }, uFlat:{ value:0 } };
     m.userData.u = u;
     m.onBeforeCompile = sh => {
       Object.assign(sh.uniforms, u);
-      sh.vertexShader = "uniform float uA2, uA3;\n" + sh.vertexShader
+      sh.vertexShader = "uniform float uA2, uA3, uFlat;\n" + sh.vertexShader
         .replace("#include <beginnormal_vertex>", `
           vec3 objectNormal = vec3(normal);
-          { float cN = normal.y; objectNormal.y += uA2 * 1.5 * cN; objectNormal = normalize(objectNormal); }
+          { float cN = normal.y; objectNormal.y += uFlat * 1.6 * pow(max(-cN, 0.0), 3.0) * cN;
+            objectNormal.y += uA2 * 1.5 * cN; objectNormal = normalize(objectNormal); }
           #ifdef USE_TANGENT
             vec3 objectTangent = vec3(tangent.xyz);
           #endif`)
@@ -615,11 +1169,44 @@ function initGL(){
           vec3 transformed = vec3(position);
           { float r0 = max(length(position), 1e-4); float c = position.y / r0;
             float rr = 1.0 + uA2 * 0.5 * (3.0 * c * c - 1.0) + uA3 * 0.5 * (5.0 * c * c * c - 3.0 * c);
-            transformed *= rr; }`);
+            rr *= 1.0 - uFlat * pow(max(-c, 0.0), 3.0);
+            transformed *= rr;
+            transformed.xz *= 1.0 + uFlat * 0.3; }`);
     };
-    m.customProgramCacheKey = () => "waterdrop";
+    m.customProgramCacheKey = () => "waterball";
+    waterMats.push(m);
     return m;
   }
+  const ballGeo = new T.SphereGeometry(1, 128, 96);
+  const hitGeo = new T.SphereGeometry(1.45, 10, 8);
+
+  /* ---- the ring: a luminous filament, shaded per pixel so it stays smooth ---- */
+  const ringGroup = new T.Group(); scene.add(ringGroup);
+  const ringMat = new T.ShaderMaterial({
+    uniforms:{ uCol:{ value:Lcol }, uTime:U.uTime, uVis:{ value:1 } },
+    transparent:true, depthWrite:false, blending:T.AdditiveBlending,
+    vertexShader:`
+      varying vec3 vN; varying vec3 vV; varying vec2 vUv;
+      void main(){ vUv = uv; vec4 wp = modelMatrix * vec4(position, 1.0);
+        vN = normalize(mat3(modelMatrix) * normal); vV = cameraPosition - wp.xyz;
+        gl_Position = projectionMatrix * viewMatrix * wp; }`,
+    fragmentShader:`
+      uniform vec3 uCol; uniform float uTime, uVis;
+      varying vec3 vN; varying vec3 vV; varying vec2 vUv;
+      void main(){
+        float f = abs(dot(normalize(vN), normalize(vV)));
+        float core = pow(f, 90.0), inner = pow(f, 14.0), glow = pow(f, 3.0);
+        float u = vUv.x * 6.2831853;
+        float flow = 0.8 + 0.2 * sin(u * 5.0 - uTime * 0.6) * sin(u * 3.0 + uTime * 0.23);
+        float spark = pow(max(sin(u - uTime * 0.18), 0.0), 60.0) * 1.2;
+        vec3 c = uCol * (inner * 0.9 + glow * 0.16) * (flow + spark) + mix(uCol, vec3(1.0), 0.7) * core * (0.9 + spark);
+        gl_FragColor = vec4(c * uVis, 1.0);
+        #include <encodings_fragment>
+      }`
+  });
+  const filament = new T.Mesh(new T.TorusGeometry(R, 0.045, 24, 720), ringMat);
+  filament.rotation.x = Math.PI / 2; ringGroup.add(filament);
+
   const glowTex = (() => {
     const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
     const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
@@ -627,23 +1214,47 @@ function initGL(){
     g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
     const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; return t;
   })();
-  const ballGeo = new T.SphereGeometry(1, 96, 72);
-  const hitGeo = new T.SphereGeometry(1.5, 10, 8);
-  const BALL_R = 0.17;
-  /* slots in screen space: where each drop hangs, and how far from the lens */
-  const SLOTS_WIDE = [ { x:0.105, y:0.27, d:3.6 }, { x:0.175, y:0.43, d:4.3 }, { x:0.095, y:0.59, d:3.3 }, { x:0.165, y:0.75, d:4.0 } ];
-  const SLOTS_TALL = [ { x:0.13, y:0.13, d:3.8 }, { x:0.2,  y:0.24, d:4.4 }, { x:0.12, y:0.35, d:3.5 }, { x:0.19, y:0.46, d:4.1 } ];
-  const drops = links.map((a, i) => {
+
+  const balls = DROPS.map((d, i) => {
     const mat = waterMaterial();
-    const mesh = new T.Mesh(ballGeo, mat); mesh.visible = false;
+    const mesh = new T.Mesh(ballGeo, mat);
     const hit = new T.Mesh(hitGeo, new T.MeshBasicMaterial()); hit.visible = false; hit.userData.i = i; mesh.add(hit);
     const glow = new T.Sprite(new T.SpriteMaterial({ map:glowTex, color:Lcol.clone(), blending:T.AdditiveBlending, transparent:true, depthWrite:false, opacity:0.2 }));
-    glow.visible = false;
     scene.add(mesh); scene.add(glow);
-    return { a, mesh, hit, glow, mat, grow:0, gv:0, on:false, hov:0, sway:0, pulse:0, seed:i * 1.7 };
+    return { mesh, hit, glow, mat, hov:0, gone:false, regrow:1 };
   });
-  const hits = drops.map(d => d.hit);
-  function pulse(i){ if (drops[i]) drops[i].pulse = 1; }
+  const hits = balls.map(b => b.hit);
+
+  let prevRot = rot, spinS = 0, dragA = 0;
+  const pickables = hits;
+
+  const fMat = waterMaterial();
+  const faller = new T.Mesh(ballGeo, fMat); faller.visible = false; scene.add(faller);
+
+  /* Worthington jet: flared base, slender neck, bulbous tip that pinches off */
+  const jetPts = [[1.9,0],[1.1,0.05],[0.7,0.16],[0.5,0.34],[0.42,0.55],[0.4,0.7],[0.46,0.8],[0.58,0.88],[0.6,0.93],[0.5,0.975],[0.28,0.996],[0,1]].map(p => new T.Vector2(p[0], p[1]));
+  const jetMat = new T.MeshPhysicalMaterial({ color:0xffffff, roughness:0.02, transmission:1, thickness:0.25, ior:1.333, envMap:envMaps[0], envMapIntensity:1.4, clearcoat:1, clearcoatRoughness:0.02, attenuationColor:C("#A9D4CF"), attenuationDistance:1.2 });
+  const jet = new T.Mesh(new T.LatheGeometry(jetPts, 64), jetMat); jet.visible = false; scene.add(jet);
+  const tipDrop = new T.Mesh(ballGeo, jetMat); tipDrop.visible = false; scene.add(tipDrop);
+
+  /* crown splash droplets */
+  const SPL = 26;
+  const splash = new T.InstancedMesh(new T.SphereGeometry(1, 16, 12), jetMat, SPL);
+  splash.instanceMatrix.setUsage(T.DynamicDrawUsage); scene.add(splash);
+  const splState = Array.from({ length:SPL }, () => ({ p:new T.Vector3(), v:new T.Vector3(), r:0.02, alive:false }));
+  const mtx = new T.Matrix4(), zero = new T.Matrix4().makeScale(0, 0, 0), qa = new T.Quaternion(), vs = new T.Vector3(), yAxis = new T.Vector3(0, 1, 0);
+  for (let i = 0; i < SPL; i++) splash.setMatrixAt(i, zero);
+
+  /* motes */
+  const MC = 240, mPos = new Float32Array(MC * 3), mSpd = new Float32Array(MC);
+  for (let i = 0; i < MC; i++){
+    const a = Math.random() * Math.PI * 2, r = 1 + Math.random() * 9;
+    mPos[i*3] = Math.sin(a) * r; mPos[i*3+1] = Math.random() * 7; mPos[i*3+2] = Math.cos(a) * r - 1;
+    mSpd[i] = 0.04 + Math.random() * 0.12;
+  }
+  const mGeo = new T.BufferGeometry(); mGeo.setAttribute("position", new T.BufferAttribute(mPos, 3));
+  const motesMat = new T.PointsMaterial({ size:0.05, map:glowTex, color:Lcol.clone(), transparent:true, opacity:0.55, blending:T.AdditiveBlending, depthWrite:false });
+  scene.add(new T.Points(mGeo, motesMat));
 
   /* ripples */
   let ri = 0;
@@ -654,31 +1265,114 @@ function initGL(){
   }
 
   /* sizing */
-  let W = 1, H = 1, tanV = 0.36, aspect = 1;
+  let W = 1, H = 1, baseDist = 10.5, ballR = 0.3, aspect = 1, tanV = 0.36;
   function resize(){
     W = innerWidth; H = innerHeight;
     aspect = W / H;
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, aspect < 1 ? 1.75 : 2));
     renderer.setSize(W, H, false);
     camera.aspect = aspect;
-    camera.fov = aspect < 1 ? 56 : 40;
+    camera.fov = aspect < 1 ? 52 : 40;
     tanV = Math.tan(camera.fov * Math.PI / 360);
+    const tanH = Math.tan(camera.fov * Math.PI / 360) * aspect;
+    baseDist = Math.min(18, Math.max(10.5, (R + 0.9) / tanH * 0.78));
+    ballR = aspect < 1 ? 0.36 : 0.3;
     camera.updateProjectionMatrix();
   }
   resize(); addEventListener("resize", resize);
 
-  /* camera */
-  const X = new T.Vector3(1, 0, 0), Y = new T.Vector3(0, 1, 0);
-  const qYaw = new T.Quaternion(), qPitch = new T.Quaternion(), qPar = new T.Quaternion(), eul = new T.Euler();
+  /* camera helpers */
+  const UP = new T.Vector3(0, 1, 0), m4 = new T.Matrix4();
+  const pose = () => ({ p:new T.Vector3(), q:new T.Quaternion() });
+  const look = (P, eye, target, up) => { P.p.copy(eye); m4.lookAt(eye, target, up); P.q.setFromRotationMatrix(m4); return P; };
+  const ease = t => t < 0 ? 0 : t > 1 ? 1 : t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const easeOut = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+  const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const Pring = pose(), Pfollow = pose(), Ptop = pose(), Pcam = pose();
+  const tv = new T.Vector3(), tv2 = new T.Vector3(), tv3 = new T.Vector3();
   const par = new T.Vector2(), parS = new T.Vector2();
-  const tv = new T.Vector3(), tv2 = new T.Vector3();
-  camera.position.set(0, CAM_H, 0);
+
+  function ringPose(){
+    const intro = reduce ? 1 : Math.min(1, Math.max(0, elapsed) / 2.8), e = 1 - Math.pow(1 - intro, 3);
+    const dist = baseDist * (1 + 0.3 * (1 - e));
+    tv.set(parS.x * 0.45, 1.75 + dist * 0.11 + parS.y * 0.2 + (1 - e) * 1.4, dist);
+    tv2.set(0, 1.0, 0);
+    return look(Pring, tv, tv2, UP);
+  }
+  /* from just above the ball down to a low, close angle at the moment of contact */
+  function followPose(){
+    const F = faller.position, o = seq.o;
+    const k = Math.min(1, Math.max(0, (F.y - ballR) / Math.max(0.01, seq.y0 - ballR)));
+    const back = 1.75 - 0.7 * k;
+    tv.set(F.x + o.x * back, 0.42 + (F.y + 0.62 - 0.42) * k, F.z + o.z * back);
+    tv2.set(F.x - o.x * 0.12 * (1 - k), (F.y - 0.26) * k + 0.1 * (1 - k), F.z - o.z * 0.12 * (1 - k));
+    return look(Pfollow, tv, tv2, UP);
+  }
+  function topPose(I, h){
+    const t = elapsed * 0.25;
+    tv.set(I.x + Math.sin(t) * 0.02, h, I.z + Math.cos(t * 1.3) * 0.02);
+    tv2.set(I.x, 0, I.z);
+    tv3.set(-seq.o.x, 0, -seq.o.z);
+    return look(Ptop, tv, tv2, tv3);
+  }
+  const blend = (A, B, k) => { Pcam.p.lerpVectors(A.p, B.p, k); Pcam.q.slerpQuaternions(A.q, B.q, k); return Pcam; };
+  const TOP_H = 2.3;
+
+  let seq = null, ringVis = mode === "landing" ? 0 : 1;
+  const capture = () => ({ p:camera.position.clone(), q:camera.quaternion.clone() });
+
+  function startFall(from, isSwap){
+    seq.fallT0 = elapsed + (isSwap ? 0.05 : RELEASE);
+    seq.y0 = from.y; seq.impactT = null; seq.hitFrom = null;
+    seq.tImpact = seq.fallT0 + Math.sqrt(2 * Math.max(0.01, from.y - ballR) / G);
+    faller.position.copy(from);
+    faller.visible = true;
+    faller.scale.setScalar(ballR);
+    seq.isSwap = isSwap;
+  }
+  function dive(i){
+    const b = balls[i];
+    mode = "dive"; setDeep(true); pendingDive = -1;
+    const P = b.mesh.position.clone();
+    const o = new T.Vector3(camera.position.x - P.x, 0, camera.position.z - P.z).normalize();
+    seq = { i, i0:i, t0:elapsed, o, from:capture(), I:new T.Vector3(P.x, 0, P.z), I2:new T.Vector3(P.x, 0, P.z), shown:false };
+    b.gone = true; b.mesh.visible = false; b.glow.visible = false;
+    startFall(P, false);
+  }
+  function swap(j){
+    mode = "swap";
+    seq.i = j; seq.shown = false; seq.t0 = elapsed;
+    const a = Math.random() * Math.PI * 2, r = 0.2 + Math.random() * 0.2;
+    seq.I2.set(seq.I.x + Math.cos(a) * r, 0, seq.I.z + Math.sin(a) * r);
+    startFall(new T.Vector3(seq.I2.x, TOP_H - 0.62, seq.I2.z), true);
+  }
+  function back(){ mode = "return"; seq.t0 = elapsed; seq.from = capture(); }
+
+  function impact(x, z, S){
+    seq.impactT = elapsed;
+    U.uImpact.value.set(x, z, elapsed, S);
+    addRipple(x, z, 0.07 * S, 9.5);    // capillary ripples: short, fast, leading
+    addRipple(x, z, 0.13 * S, 3.6);    // gravity ripples: longer, slower
+    addRipple(x, z, 0.055 * S, 5.5);
+    seq.jet = { x, z, S, tip:false, tipV:0 };
+    seq.splashDue = elapsed + 0.06;
+  }
+  function ejectSplash(x, z, S){
+    for (let k = 0; k < SPL; k++){
+      const s = splState[k], a = k / SPL * Math.PI * 2 + (Math.random() - 0.5) * 0.35;
+      const big = Math.random() < 0.25;
+      const sp = (0.35 + Math.random() * 0.45) * S * (big ? 0.7 : 1), up = (0.55 + Math.random() * 0.6) * S * (big ? 0.8 : 1);
+      s.p.set(x + Math.cos(a) * 0.3, 0.06, z + Math.sin(a) * 0.3);
+      s.v.set(Math.cos(a) * sp, up, Math.sin(a) * sp);
+      s.r = big ? 0.012 + Math.random() * 0.007 : 0.004 + Math.random() * 0.005; s.alive = true;
+    }
+  }
 
   /* sun / moon */
+  function toggleCel(){ celTarget = celTarget > 0.5 ? 0 : 1; }
   const sunBtn = $("sunBtn");
-  sunBtn.addEventListener("click", () => { celTarget = celTarget > 0.5 ? 0 : 1; });
+  sunBtn.addEventListener("click", toggleCel);
   const root = document.documentElement;
-  const dropMats = drops.map(d => d.mat);
   function updateLight(realDt){
     const speed = reduce ? 3 : 1 / 3.4;
     if (cel !== celTarget){ cel += Math.sign(celTarget - cel) * Math.min(Math.abs(celTarget - cel), realDt * speed); }
@@ -689,164 +1383,542 @@ function initGL(){
     U.uHorizon.value.copy(horSun).lerp(horMoon, mixK);
     U.uZenith.value.copy(zenSun).lerp(zenMoon, mixK);
     dl.color.copy(dlSun).lerp(dlMoon, mixK); dl.intensity = 1.3 * dim;
+    motesMat.color.copy(Lcol);
     const ei = Math.round(mixK * 4);
-    if (ei !== envIdx){ envIdx = ei; dropMats.forEach(m => m.envMap = envMaps[ei]); }
+    if (ei !== envIdx){ envIdx = ei; waterMats.forEach(m => m.envMap = envMaps[ei]); jetMat.envMap = envMaps[ei]; }
     if (Math.abs(mixK - lastMix) > 0.002){
       lastMix = mixK;
-      root.style.setProperty("--lantern", "#" + sunC.clone().lerp(moonC, mixK).getHexString());
+      const cc = sunC.clone().lerp(moonC, mixK);
+      root.style.setProperty("--lantern", "#" + cc.getHexString());
       sunBtn.setAttribute("aria-label", celTarget > 0.5 ? "Zamień księżyc w słońce" : "Zamień słońce w księżyc");
     }
   }
 
-  /* pointer: hover drops, click drops, tap the water */
+  /* pointer */
   const ndc = new T.Vector2(9, 9), ray = new T.Raycaster();
-  let hovered = -1, down = null;
-  addEventListener("pointermove", e => {
+  let hovered = -1, down = null, dragging = false;
+  canvas.addEventListener("pointermove", e => {
     ndc.set(e.clientX / W * 2 - 1, -(e.clientY / H) * 2 + 1);
-    par.set(ndc.x, ndc.y);
-  }, { passive:true });
-  canvas.addEventListener("pointerdown", e => { down = { x:e.clientX, y:e.clientY }; ndc.set(e.clientX / W * 2 - 1, -(e.clientY / H) * 2 + 1); });
+    if (mode === "ring" || mode === "landing") par.set(ndc.x, ndc.y);
+    if (down && mode === "ring"){
+      if (!dragging && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6){ dragging = true; pendingDive = -1; }
+      if (dragging){ const dr = (e.clientX - down.lx) * 0.0075 + (e.clientY - down.ly) * 0.005; if (dr) lastDir = Math.sign(dr); targetRot += dr; down.lx = e.clientX; down.ly = e.clientY; }
+    }
+  });
+  canvas.addEventListener("pointerdown", e => {
+    down = { x:e.clientX, y:e.clientY, lx:e.clientX, ly:e.clientY }; dragging = false;
+    ndc.set(e.clientX / W * 2 - 1, -(e.clientY / H) * 2 + 1);
+    try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+  });
   canvas.addEventListener("pointerup", e => {
     if (!down) return;
-    const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8; down = null;
-    if (moved) return;
+    const wasDrag = dragging, d0 = down; down = null; dragging = false;
+    if (wasDrag){ snap(); return; }
     ray.setFromCamera(ndc, camera);
-    const h = ray.intersectObjects(hits, false)[0];
-    if (h){ const i = h.object.userData.i; if (drops[i].grow > 0.5){ leave(links[i].getAttribute("href"), i); return; } }
-    const o = ray.ray.origin, d = ray.ray.direction;
-    if (d.y < 0){ const t = -o.y / d.y; addRipple(o.x + d.x * t, o.z + d.z * t, 0.09, 6.5); addRipple(o.x + d.x * t, o.z + d.z * t, 0.07, 3.6); }
+    if (mode === "landing"){
+      if (Math.hypot(e.clientX - d0.x, e.clientY - d0.y) > 8) return;
+      const h = ray.intersectObjects(lHits, false)[0];
+      if (h){ const i = h.object.userData.li; if (ldrops[i].grow > 0.5){ if (i === 0) toRing(); else leave(lLinks[i].getAttribute("href"), i); return; } }
+    }
+    if (mode === "ring"){
+      const h = ray.intersectObjects(pickables, false)[0];
+      if (h){ request(h.object.userData.screen ? active : h.object.userData.i); return; }
+    }
+    if (mode === "ring" || mode === "content" || mode === "landing"){
+      const o = ray.ray.origin, d = ray.ray.direction;
+      if (d.y < 0){ const t = -o.y / d.y; addRipple(o.x + d.x * t, o.z + d.z * t, 0.06, 6.5); addRipple(o.x + d.x * t, o.z + d.z * t, 0.045, 3.6); }
+    }
   });
-  document.documentElement.addEventListener("pointerleave", () => { ndc.set(9, 9); par.set(0, 0); });
-  links.forEach((a, i) => {
-    a.addEventListener("pointerenter", () => { drops[i].linkHov = true; });
-    a.addEventListener("pointerleave", () => { drops[i].linkHov = false; });
-    a.addEventListener("focus", () => { drops[i].linkHov = true; });
-    a.addEventListener("blur", () => { drops[i].linkHov = false; });
-  });
+  canvas.addEventListener("pointercancel", () => { down = null; dragging = false; snap(); });
+  canvas.addEventListener("pointerleave", () => { if (!down) ndc.set(9, 9); });
 
+
+  /* ================= LANDING: camera driven by scroll, drops hanging in camera space ================= */
+  const LAND_POS = new T.Vector3(-16, 6.5, 12);   // the portfolio ring sits off to the right of this spot
+  const XA = new T.Vector3(1, 0, 0);
+  const qYaw = new T.Quaternion(), qPitch = new T.Quaternion(), qPar = new T.Quaternion(), eul = new T.Euler();
+  const Pland = pose();
+  /* pitch down through the water, a half turn while looking straight down, up again inverted */
+  function landPose(){
+    qYaw.setFromAxisAngle(UP, yawOf(p));
+    qPitch.setFromAxisAngle(XA, -tiltOf(p));
+    eul.set(parS.y * 0.018, -parS.x * 0.03, 0); qPar.setFromEuler(eul);
+    Pland.q.copy(qYaw).multiply(qPitch).multiply(qPar);
+    Pland.p.copy(LAND_POS); Pland.p.y += Math.sin(elapsed * 0.4) * 0.04;
+    return Pland;
+  }
+  const LBALL_R = 0.17;
+  /* slots in screen space: where each drop hangs, and how far from the lens */
+  const SLOTS_WIDE = [ { x:0.105, y:0.27, d:3.6 }, { x:0.175, y:0.43, d:4.3 }, { x:0.095, y:0.59, d:3.3 }, { x:0.165, y:0.75, d:4.0 } ];
+  const SLOTS_TALL = [ { x:0.13, y:0.13, d:3.8 }, { x:0.2,  y:0.24, d:4.4 }, { x:0.12, y:0.35, d:3.5 }, { x:0.19, y:0.46, d:4.1 } ];
+  const slots = () => aspect < 0.9 ? SLOTS_TALL : SLOTS_WIDE;
+  const ldrops = lLinks.map((a, i) => {
+    const mat = waterMaterial();
+    const mesh = new T.Mesh(ballGeo, mat); mesh.visible = false;
+    const hit = new T.Mesh(hitGeo, new T.MeshBasicMaterial()); hit.visible = false; hit.userData.li = i; mesh.add(hit);
+    const glow = new T.Sprite(new T.SpriteMaterial({ map:glowTex, color:Lcol.clone(), blending:T.AdditiveBlending, transparent:true, depthWrite:false, opacity:0.2 }));
+    glow.visible = false;
+    scene.add(mesh); scene.add(glow);
+    return { a, mesh, hit, glow, mat, grow:0, gv:0, on:false, hov:0, sway:0, pulse:0, seed:i * 1.7, linkHov:false, justRose:false };
+  });
+  const lHits = ldrops.map(d => d.hit);
+  let lHovered = -1;
+  lLinks.forEach((a, i) => {
+    a.addEventListener("pointerenter", () => { ldrops[i].linkHov = true; });
+    a.addEventListener("pointerleave", () => { ldrops[i].linkHov = false; });
+    a.addEventListener("focus", () => { ldrops[i].linkHov = true; });
+    a.addEventListener("blur", () => { ldrops[i].linkHov = false; });
+  });
+  const lv = new T.Vector3(), lv2 = new T.Vector3();
+  function slotLocal(i, out, extraY){
+    const S = slots()[i], D = S.d;
+    return out.set((S.x * 2 - 1) * D * tanV * aspect, (1 - S.y * 2) * D * tanV + (extraY || 0), -D);
+  }
   /* the drop "surfaces": a ring spreads on the water right beneath where it will hang */
   function surfaceRipple(pos){
-    tv2.copy(pos).sub(camera.position).normalize();
-    if (tv2.y < -0.05){
-      const t = -camera.position.y / tv2.y;
-      const x = camera.position.x + tv2.x * t, z = camera.position.z + tv2.z * t;
+    lv2.copy(pos).sub(camera.position).normalize();
+    if (lv2.y < -0.05){
+      const t = -camera.position.y / lv2.y;
+      const x = camera.position.x + lv2.x * t, z = camera.position.z + lv2.z * t;
       addRipple(x, z, 0.16, 3.4); addRipple(x, z, 0.1, 7.5);
     }
   }
-
-  let nextAmbient = 1.5;
-  function update(dt, realDt, prog, vel){
-    elapsed += dt;
-    U.uTime.value = elapsed;
-    updateLight(realDt);
-    parS.lerp(par, 1 - Math.exp(-realDt * 2));
-
-    /* camera: pitch down through the water, a half turn while looking straight down, up again inverted */
-    const phi = tiltOf(prog), psi = yawOf(prog);
-    qYaw.setFromAxisAngle(Y, psi);
-    qPitch.setFromAxisAngle(X, -phi);
-    eul.set(parS.y * 0.018, -parS.x * 0.03, 0);
-    qPar.setFromEuler(eul);
-    camera.quaternion.copy(qYaw).multiply(qPitch).multiply(qPar);
-    camera.position.set(0, CAM_H + Math.sin(elapsed * 0.4) * 0.04, 0);
-    camera.updateMatrixWorld();
-    skyMesh.position.copy(camera.position);
-
-    /* drops */
-    const slots = aspect < 0.9 ? SLOTS_TALL : SLOTS_WIDE;
-    ray.setFromCamera(ndc, camera);
-    const hh = ray.intersectObjects(hits.filter((h, i) => drops[i].grow > 0.3), false)[0];
-    hovered = hh ? hh.object.userData.i : -1;
-    canvas.classList.toggle("is-hover", hovered !== -1);
-    drops.forEach((b, i) => {
-      const want = prog >= EMERGE[i];
+  let lNextAmbient = 1.5;
+  function updateLandingDrops(realDt){
+    const live = mode === "landing";
+    if (live){
+      ray.setFromCamera(ndc, camera);
+      const hh = ray.intersectObjects(lHits.filter((h, i) => ldrops[i].grow > 0.3), false)[0];
+      lHovered = hh ? hh.object.userData.li : -1;
+    } else lHovered = -1;
+    ldrops.forEach((b, i) => {
+      const want = live && p >= EMERGE[i];
       if (want && !b.on){ b.on = true; b.justRose = true; }
-      if (!want && b.on){ b.on = false; }
+      if (!want && b.on) b.on = false;
       /* springy growth: overshoots a little, then settles */
       const target = b.on ? 1 : 0;
       if (reduce){ b.grow = target; b.gv = 0; }
       else { b.gv += ((target - b.grow) * 38 - b.gv * (b.on ? 7 : 11)) * realDt; b.grow += b.gv * realDt; }
       if (!b.on && b.grow < 0.002){ b.grow = 0; b.gv = 0; }
-      const hovOn = (hovered === i || b.linkHov) ? 1 : 0;
-      b.hov += (hovOn - b.hov) * (1 - Math.exp(-realDt * 8));
+      b.hov += (((lHovered === i || b.linkHov) && live ? 1 : 0) - b.hov) * (1 - Math.exp(-realDt * 8));
       b.pulse = Math.max(0, b.pulse - realDt * 1.4);
-      /* inertia: when the view tilts, the drop lags behind a touch */
-      const sTarget = Math.max(-1, Math.min(1, vel * 1.6));
-      b.sway += (sTarget - b.sway) * (1 - Math.exp(-realDt * (2.2 + i * 0.35)));
-
-      const S = slots[i], D = S.d;
-      const nx = S.x * 2 - 1, ny = 1 - S.y * 2;
+      const sT = Math.max(-1, Math.min(1, pVel * 1.6));
+      b.sway += (sT - b.sway) * (1 - Math.exp(-realDt * (2.2 + i * 0.35)));
+      const idx = N + 1 + i;
       const g = Math.max(0, b.grow);
+      if (g <= 0.001){
+        b.mesh.visible = b.glow.visible = false; U.uDrops.value[idx].w = 0;
+        b.a.style.opacity = "0"; b.a.style.pointerEvents = "none"; b.a.tabIndex = -1;
+        return;
+      }
       const rise = (1 - Math.min(1, g)) * 0.9;
       const bob = reduce ? 0 : Math.sin(elapsed * 0.9 + b.seed) * 0.035;
-      tv.set(nx * D * tanV * aspect, ny * D * tanV + bob - rise + b.sway * 0.28, -D);
-      b.mesh.position.copy(tv).applyMatrix4(camera.matrixWorld);
-      if (b.justRose){ b.justRose = false; if (!reduce) surfaceRipple(b.mesh.position); }
-
-      const s = BALL_R * g * (1 + b.hov * 0.1 + b.pulse * 0.25);
+      slotLocal(i, lv, bob - rise + b.sway * 0.28).applyMatrix4(camera.matrixWorld);
+      b.mesh.position.copy(lv);
+      if (b.justRose){ b.justRose = false; if (!reduce) surfaceRipple(lv); }
+      const s = LBALL_R * g * (1 + b.hov * 0.1 + b.pulse * 0.25);
       b.mesh.scale.setScalar(Math.max(s, 1e-4));
       b.mesh.visible = s > 0.003;
       b.mesh.rotation.y = elapsed * 0.15 + i;
       const u = b.mat.userData.u;
       u.uA2.value = reduce ? 0 : 0.02 * Math.sin(elapsed * 2.1 + i * 1.3) - b.gv * 0.03 + b.hov * 0.02 * Math.sin(elapsed * 9) + b.pulse * 0.08 * Math.sin(elapsed * 22);
       u.uA3.value = reduce ? 0 : 0.008 * Math.sin(elapsed * 2.9 + i) + b.sway * 0.04;
+      u.uFlat.value = 0;
       b.mat.emissive.copy(Lcol);
       b.mat.emissiveIntensity = b.hov * 0.16 + b.pulse * 0.4 + 0.02;
       b.glow.visible = b.mesh.visible;
       b.glow.material.color.copy(Lcol);
-      b.glow.position.copy(b.mesh.position);
-      const gs = BALL_R * 4.6 * g * (1 + b.hov * 0.4 + b.pulse);
+      b.glow.position.copy(lv);
+      const gs = LBALL_R * 4.6 * g * (1 + b.hov * 0.4 + b.pulse);
       b.glow.scale.set(Math.max(gs, 1e-4), Math.max(gs, 1e-4), 1);
       b.glow.material.opacity = 0.14 + b.hov * 0.26 + b.pulse * 0.4;
-      U.uDrops.value[i].set(b.mesh.position.x, b.mesh.position.y, b.mesh.position.z, Math.min(1, g) * (0.6 + b.hov * 0.9));
-
+      U.uDrops.value[idx].set(lv.x, lv.y, lv.z, Math.min(1, g) * (0.6 + b.hov * 0.9));
       /* label to the right of the drop */
-      tv2.copy(b.mesh.position).project(camera);
-      const rpx = (BALL_R * Math.min(1, g)) / (D * tanV) * H / 2;
-      const lx = (tv2.x * 0.5 + 0.5) * W + rpx + 14, ly = (-tv2.y * 0.5 + 0.5) * H;
-      const op = smooth(0.35, 0.95, g);
+      lv2.copy(lv).project(camera);
+      const D = slots()[i].d;
+      const rpx = (LBALL_R * Math.min(1, g)) / (D * tanV) * H / 2;
+      const lx = (lv2.x * 0.5 + 0.5) * W + rpx + 14, ly = (-lv2.y * 0.5 + 0.5) * H;
+      const op = smooth(0.35, 0.95, g) * landVis;
       b.a.style.opacity = op.toFixed(3);
       b.a.style.pointerEvents = op > 0.5 ? "auto" : "none";
       b.a.tabIndex = op > 0.5 ? 0 : -1;
       b.a.classList.toggle("is-hov", b.hov > 0.5);
       b.a.style.transform = `translate3d(${lx.toFixed(1)}px,${ly.toFixed(1)}px,0) translate(0,-50%)`;
     });
-
     /* a stray drop now and then, while the view is on the water */
-    if (!reduce && elapsed > nextAmbient){
-      tv2.set((Math.random() - 0.5) * 1.6, (Math.random() - 0.5) * 1.2, -1).normalize().applyQuaternion(camera.quaternion);
-      if (tv2.y < -0.3){ const t = -camera.position.y / tv2.y; addRipple(camera.position.x + tv2.x * t, camera.position.z + tv2.z * t, 0.05 + Math.random() * 0.04, 4 + Math.random() * 4); }
-      nextAmbient = elapsed + 1.6 + Math.random() * 2.4;
+    if (live && !reduce && elapsed > lNextAmbient){
+      lv2.set((Math.random() - 0.5) * 1.6, (Math.random() - 0.5) * 1.2, -1).normalize().applyQuaternion(camera.quaternion);
+      if (lv2.y < -0.3){ const t = -camera.position.y / lv2.y; addRipple(camera.position.x + lv2.x * t, camera.position.z + lv2.z * t, 0.05 + Math.random() * 0.04, 4 + Math.random() * 4); }
+      lNextAmbient = elapsed + 1.6 + Math.random() * 2.4;
+    }
+  }
+
+  /* ================= LANDING ⇄ PORTFOLIO =================
+     one drop darts right, splits 1 → 2 → 4 → 8 on the way, the camera swings after it,
+     and the eight settle into the ring; "Start" plays the same path backwards */
+  const TR_DUR = reduce ? 0.35 : 0.95;
+  const SPLIT = [0, 0.34, 0.26, 0.34, 0.16, 0.34, 0.26, 0.34];   // binary cascade: 4 first, then 2 & 6, then the odd ones
+  let tr = null, portMix = mode === "landing" ? 0 : 1;
+  const bz = new T.Vector3(), bzL = new T.Vector3(), OUTV = new T.Vector3();
+  function bez(P, t, out){
+    const u = 1 - t;
+    return out.set(0, 0, 0).addScaledVector(P[0], u * u * u).addScaledVector(P[1], 3 * u * u * t).addScaledVector(P[2], 3 * u * t * t).addScaledVector(P[3], t * t * t);
+  }
+  function makePaths(P0, R0){
+    return balls.map(() => [P0.clone(), P0.clone().addScaledVector(R0, 5.2).addScaledVector(UP, 0.25), new T.Vector3(), new T.Vector3()]);
+  }
+  /* ring end of every path follows the ring's own gentle bob */
+  function refreshEnds(){
+    tr.paths.forEach((P, i) => {
+      const a = i * STEP + rot;
+      P[3].set(R * Math.sin(a), ringGroup.position.y, R * Math.cos(a));
+      OUTV.set(P[3].x, 0, P[3].z).normalize();
+      P[2].copy(P[3]).addScaledVector(OUTV, 2.2).addScaledVector(UP, 1.0);
+    });
+  }
+  function toRing(push){
+    if (mode !== "landing") return;
+    const d0 = ldrops[0];
+    const P0 = d0.mesh.visible ? d0.mesh.position.clone() : slotLocal(0, new T.Vector3()).applyMatrix4(camera.matrixWorld);
+    const R0 = new T.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+    rot = targetRot = 0; pendingDive = -1;
+    if (active !== 0){ active = 0; renderCaption(true); }
+    balls.forEach(b => { b.gone = false; b.regrow = 1; });
+    tr = { dir:1, t0:elapsed, from:capture(), paths:makePaths(P0, R0), r0:LBALL_R * Math.min(1, Math.max(0.4, d0.grow)), wake:0 };
+    ldrops.forEach(b => { b.on = false; });
+    d0.grow = 0; d0.gv = 0;
+    mode = "toRing"; htmlEl.classList.add("in-port");
+    if (push !== false) try { history.pushState(null, "", "#portfolio"); } catch (_) {}
+  }
+  function toLand(push){
+    if (mode !== "ring") return;
+    pendingDive = -1;
+    landPose();
+    const to = { p:Pland.p.clone(), q:Pland.q.clone() };
+    const P0 = slotLocal(0, new T.Vector3()).applyQuaternion(to.q).add(to.p);
+    const R0 = new T.Vector3(1, 0, 0).applyQuaternion(to.q);
+    tr = { dir:-1, t0:elapsed, from:capture(), to, paths:makePaths(P0, R0), r0:LBALL_R, wake:0 };
+    mode = "toLand"; htmlEl.classList.remove("in-port");
+    if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {}
+  }
+  function updateTransition(){
+    const k = Math.min(1, Math.max(0, (elapsed - tr.t0) / TR_DUR));
+    const f = tr.dir > 0 ? k : 1 - k;
+    /* front-loaded: the drop darts off at once, then the eight glide into their places */
+    const u = 1 - Math.pow(1 - f, 2.2);
+    refreshEnds();
+    bez(tr.paths[0], u, bzL);
+    balls.forEach((b, i) => {
+      bez(tr.paths[i], u, bz);
+      const sep = smooth(SPLIT[i], SPLIT[i] + 0.3, f);
+      bz.sub(bzL).multiplyScalar(sep).add(bzL);
+      const vis = i === 0 || f > SPLIT[i];
+      const born = i === 0 ? 1 : smooth(SPLIT[i], SPLIT[i] + 0.14, f);
+      const s = (tr.r0 + (ballR - tr.r0) * smooth(0.25, 1, f)) * (0.72 + 0.28 * born);
+      b.mesh.position.copy(bz);
+      b.mesh.scale.setScalar(vis ? s : 1e-4);
+      b.mesh.visible = vis;
+      /* each split leaves both halves ringing for a moment */
+      const since = Math.max(0, f - SPLIT[i]);
+      const uu = b.mat.userData.u;
+      uu.uA2.value = reduce ? 0 : 0.14 * Math.exp(-since * 7) * Math.cos(since * 70) * (i === 0 ? 0.6 : 1);
+      uu.uA3.value = 0; uu.uFlat.value = 0;
+      b.mat.emissiveIntensity = 0.03;
+      b.glow.visible = vis; b.glow.position.copy(bz);
+      const gs = Math.max(s * 4.4, 1e-4); b.glow.scale.set(gs, gs, 1); b.glow.material.opacity = 0.18;
+      U.uDrops.value[i].set(bz.x, bz.y, bz.z, vis ? 0.5 : 0);
+    });
+    if (!reduce && tr.dir > 0 && elapsed > tr.wake && bzL.y < 3){ addRipple(bzL.x, bzL.z, 0.03, 7); tr.wake = elapsed + 0.06; }
+    if (k >= 1){
+      if (tr.dir > 0) mode = "ring";
+      else {
+        mode = "landing"; ringVis = 0;
+        const d0 = ldrops[0]; d0.on = p >= EMERGE[0]; d0.grow = d0.on ? 1 : 0; d0.gv = 0; d0.pulse = d0.on ? 0.6 : 0;
+        balls.forEach(b => { b.mesh.visible = false; b.glow.visible = false; });
+      }
+      tr = null;
+    }
+  }
+
+  let nextAmbient = 0;
+
+  /* slow motion around the impact, like high-speed footage */
+  function targetScale(){
+    if (reduce || !seq || mode !== "dive") return 1;
+    if (seq.impactT === null) return elapsed > seq.tImpact - 0.14 ? 0.33 : 1;
+    return elapsed - seq.impactT < 1.05 ? 0.33 : 1;
+  }
+
+  function update(dt, realDt){
+    U.uTime.value = elapsed;
+    updateLight(realDt);
+    if (mode !== "ring" && mode !== "landing") par.set(0, 0);
+    parS.lerp(par, 1 - Math.exp(-realDt * 2));
+
+    /* ring visibility: hidden once the camera looks straight down */
+    let rv = 1;
+    if (mode === "content" || mode === "swap") rv = 0;
+    else if (mode === "dive" && seq.impactT !== null && elapsed - seq.impactT > 1.0) rv = 0;
+    else if (mode === "return" && elapsed - seq.t0 < 0.7) rv = 0;
+    if (mode === "landing" || mode === "toLand") rv = 0;
+    ringVis += (rv - ringVis) * (1 - Math.exp(-realDt * 2.2));
+    const trK = tr ? Math.min(1, Math.max(0, (elapsed - tr.t0) / TR_DUR)) : 0;
+    if (mode === "toRing") ringVis = smooth(0.5, 1, trK);
+    else if (mode === "toLand") ringVis = 1 - smooth(0, 0.45, trK);
+    portMix = mode === "landing" ? 0 : mode === "toRing" ? ease(trK) : mode === "toLand" ? 1 - ease(trK) : 1;
+    U.uPort.value = portMix; U.uOcean.value = 1 - 0.75 * portMix;
+    U.uFog.value.set(16 - 6 * portMix, 150 - 86 * portMix);
+    const vis = ringVis;
+    ringMat.uniforms.uVis.value = vis;
+    U.uRingVis.value = vis;
+    filament.visible = vis > 0.01;
+
+    /* angular velocity of the ring → centrifugal drag on the water */
+    const w = (rot - prevRot) / Math.max(realDt, 1e-3); prevRot = rot;
+    spinS += (w - spinS) * (1 - Math.exp(-realDt * 3));
+    U.uSpin.value = reduce ? 0 : 1.4 * Math.tanh(spinS / 2.5);
+    /* drag builds up while the ring turns and relaxes back when it stops */
+    dragA += (w * 0.22 - dragA * 1.6) * realDt;
+    dragA = Math.max(-0.9, Math.min(0.9, dragA));
+    U.uDrag.value = reduce ? 0 : dragA;
+    /* spheres moving fast shed small ripples: a chain of circles that curves along the ring */
+    if (mode === "ring" && !reduce && Math.abs(spinS) > 0.6){
+      balls.forEach((b, i) => {
+        const a = i * STEP + rot;
+        if (b.gone || Math.cos(a) < -0.15) return;
+        b.wakeT = (b.wakeT || 0) - realDt;
+        if (b.wakeT <= 0){ b.wakeT = 0.15; addRipple(R * Math.sin(a), R * Math.cos(a), 0.024 * Math.min(1, Math.abs(spinS) / 3), 7.5); }
+      });
     }
 
-    /* invisible hit target over the sun disc */
-    tv.copy(camera.position).addScaledVector(sunDir, 200).project(camera);
-    const on = tv.z < 1 && Math.abs(tv.x) < 1.05 && Math.abs(tv.y) < 1.05;
-    sunBtn.hidden = !on;
-    if (on){
-      const px = RD / tanV * H / 2;
-      const size = Math.max(44, px * 2.6);
-      sunBtn.style.width = sunBtn.style.height = size.toFixed(0) + "px";
-      sunBtn.style.transform = `translate3d(${((tv.x * 0.5 + 0.5) * W).toFixed(1)}px,${((-tv.y * 0.5 + 0.5) * H).toFixed(1)}px,0) translate(-50%,-50%)`;
+
+    const ringY = RING_Y + Math.sin(elapsed * 0.6) * 0.045;
+    ringGroup.position.y = ringY;
+    ringGroup.rotation.z = Math.sin(elapsed * 0.31) * 0.012;
+    ringGroup.rotation.x = Math.cos(elapsed * 0.27) * 0.012;
+
+    if (mode === "ring"){
+      ray.setFromCamera(ndc, camera);
+      const h = dragging ? null : ray.intersectObjects(pickables, false)[0];
+      hovered = h ? (h.object.userData.screen ? -2 : h.object.userData.i) : -1;
+    } else hovered = -1;
+    canvas.classList.toggle("is-hover", hovered !== -1 || lHovered !== -1);
+
+    balls.forEach((b, i) => {
+      const isA = i === active;
+      b.hov += ((i === hovered ? 1 : 0) - b.hov) * (1 - Math.exp(-realDt * 8));
+      if (!b.gone && b.regrow < 1) b.regrow = Math.min(1, b.regrow + dt / 1.1);
+      const a = i * STEP + rot;
+      const x = R * Math.sin(a), z = R * Math.cos(a);
+      tv.set(x, 0, z).applyEuler(ringGroup.rotation);
+      const y = ringY + tv.y;
+      const grow = easeOut(b.regrow) * vis;
+      const s = ballR * grow * (1 + b.hov * 0.08);
+      b.mesh.position.set(x, y, z);
+      b.mesh.scale.setScalar(Math.max(s, 1e-4));
+      b.mesh.visible = !b.gone && s > 0.002;
+      b.glow.visible = b.mesh.visible;
+      b.mesh.rotation.y = elapsed * 0.15 + i;
+      const u = b.mat.userData.u;
+      u.uA2.value = 0.018 * Math.sin(elapsed * 2.1 + i * 1.3) + b.hov * 0.02 * Math.sin(elapsed * 9);
+      u.uA3.value = 0.008 * Math.sin(elapsed * 2.9 + i);
+      u.uFlat.value = 0;
+      b.mat.emissive.copy(Lcol);
+      b.mat.emissiveIntensity = b.hov * 0.16 + (isA ? 0.035 : 0);
+      b.glow.material.color.copy(Lcol);
+      b.glow.position.set(x, y, z);
+      const gs = ballR * 4.4 * grow * (1 + b.hov * 0.4);
+      b.glow.scale.set(Math.max(gs, 1e-4), Math.max(gs, 1e-4), 1);
+      b.glow.material.opacity = 0.12 + b.hov * 0.26 + (isA ? 0.1 : 0);
+      U.uDrops.value[i].set(x, y, z, b.gone ? 0 : grow * (0.5 + b.hov * 0.8 + (isA ? 0.3 : 0)));
+
+      tv.set(x, y - s - 0.1, z).project(camera);
+      const lab = labels[i];
+      let occl = 0;
+      const op = mode === "ring" && !isA && !b.gone && !occl ? smooth(-0.2, 0.55, Math.cos(a)) * grow : 0;
+      lab.style.opacity = op.toFixed(3);
+      lab.style.pointerEvents = op > 0.3 ? "auto" : "none";
+      lab.tabIndex = op > 0.3 ? 0 : -1;
+      lab.style.transform = `translate3d(${((tv.x * 0.5 + 0.5) * W).toFixed(1)}px,${((-tv.y * 0.5 + 0.5) * H).toFixed(1)}px,0) translate(-50%,0)`;
+    });
+
+    if (tr) updateTransition();
+
+    if (mode === "ring" && pendingDive >= 0 && Math.abs(targetRot - rot) < 0.006 && active === pendingDive) dive(pendingDive);
+
+    /* falling ball: rest → release wobble → uniformly accelerated fall → coalescence */
+    if (seq && faller.visible){
+      const u = fMat.userData.u;
+      fMat.emissive.copy(Lcol); fMat.emissiveIntensity = 0.02;
+      const tf = elapsed - seq.fallT0;
+      if (seq.impactT === null){
+        if (tf < 0){
+          const k = 1 + tf / RELEASE;
+          u.uA2.value = 0.07 * smooth(0, 1, k) + 0.012 * Math.sin(elapsed * 18) * k;
+          u.uA3.value = -0.02 * k; u.uFlat.value = 0;
+          faller.position.y = seq.y0 + 0.012 * Math.sin(k * Math.PI);
+        } else {
+          const v = G * tf;
+          faller.position.y = seq.y0 - 0.5 * G * tf * tf;
+          u.uA2.value = 0.07 * Math.exp(-tf / 0.75) * Math.cos(10.5 * tf);
+          u.uA3.value = -0.02 * Math.exp(-tf / 0.45) * Math.cos(15 * tf);
+          u.uFlat.value = Math.min(0.2, 0.075 * v * v);
+          seq.v = v;
+          if (faller.position.y - ballR * (1 - u.uFlat.value * 0.6) <= 0.01) impact(faller.position.x, faller.position.z, seq.isSwap ? 0.85 : 1);
+        }
+        faller.scale.setScalar(ballR);
+        U.uDrops.value[N].set(faller.position.x, faller.position.y, faller.position.z, 0.35 * smooth(0.0, 0.6, faller.position.y));
+      } else {
+        const m = elapsed - seq.impactT, sq = Math.min(1, m / 0.1);
+        faller.position.y -= (seq.v || 1) * dt;
+        u.uFlat.value *= 0.9;
+        faller.scale.set(ballR * (1 + 0.1 * sq), ballR * (1 - 0.15 * sq), ballR * (1 + 0.1 * sq));
+        if (faller.position.y < -ballR * 1.05 || m > 0.45) faller.visible = false;
+      }
+      faller.rotation.y += dt * 0.4;
     }
+
+    /* splash droplets, stretched along their velocity */
+    if (seq && seq.splashDue && elapsed >= seq.splashDue){ ejectSplash(seq.jet.x, seq.jet.z, seq.jet.S); seq.splashDue = 0; }
+    for (let k = 0; k < SPL; k++){
+      const s = splState[k];
+      if (!s.alive){ splash.setMatrixAt(k, zero); continue; }
+      s.v.y -= 3.4 * dt; s.p.addScaledVector(s.v, dt);
+      if (s.p.y < 0){ s.alive = false; addRipple(s.p.x, s.p.z, 0.008 + s.r * 0.4, 10); splash.setMatrixAt(k, zero); continue; }
+      const sp = s.v.length(), st = 1 + Math.min(0.9, sp * 0.35);
+      qa.setFromUnitVectors(yAxis, vs.copy(s.v).divideScalar(sp || 1));
+      mtx.compose(s.p, qa, vs.set(s.r / Math.sqrt(st), s.r * st, s.r / Math.sqrt(st)));
+      splash.setMatrixAt(k, mtx);
+    }
+    splash.instanceMatrix.needsUpdate = true;
+
+    /* Worthington jet and its pinched-off tip */
+    if (seq && seq.jet){
+      const J = seq.jet, a = elapsed - seq.impactT;
+      const Hmax = 0.5 * J.S;
+      let h = 0;
+      if (a > 0.42 && a < 0.8) h = Hmax * easeOut((a - 0.42) / 0.38);
+      else if (a >= 0.8 && a < 1.3) h = Hmax * (1 - Math.pow((a - 0.8) / 0.5, 2));
+      jet.visible = h > 0.01;
+      if (jet.visible){ const w = 0.022 * (1 + 0.5 * (1 - h / Hmax)); jet.position.set(J.x, -0.02, J.z); jet.scale.set(w, h, w); }
+      if (!J.tip && a >= 0.8){ J.tip = true; J.tipY = Hmax + 0.02; J.tipV = 0.5; tipDrop.visible = true; }
+      if (J.tip && tipDrop.visible){
+        J.tipV -= 3.4 * dt; J.tipY += J.tipV * dt;
+        const sq = 1 + Math.min(0.35, Math.abs(J.tipV) * 0.15);
+        tipDrop.position.set(J.x, J.tipY, J.z); tipDrop.scale.set(0.034 / Math.sqrt(sq), 0.034 * sq, 0.034 / Math.sqrt(sq));
+        if (J.tipY < 0.02){ tipDrop.visible = false; addRipple(J.x, J.z, 0.045 * J.S, 6.5); addRipple(J.x, J.z, 0.025 * J.S, 9.5); }
+      }
+      if (a > 3.5) seq.jet = null;
+    }
+
+    /* fine water patch follows the action */
+    const wx = seq ? seq.I.x : 0, wz = seq ? seq.I.z : 3.2;
+    water.position.set(LAND_POS.x + (wx - LAND_POS.x) * portMix, 0, LAND_POS.z + (wz - LAND_POS.z) * portMix);
+
+    /* camera */
+    if (mode === "landing"){
+      landPose(); camera.position.copy(Pland.p); camera.quaternion.copy(Pland.q);
+    } else if (mode === "toRing"){
+      /* the camera swings after the drops; it lags them, so they leave the frame first */
+      ringPose(); blend(tr.from, Pring, ease((trK - 0.1) / 0.9)); camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
+    } else if (mode === "toLand"){
+      blend(tr.from, tr.to, ease(trK)); camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
+    } else if (mode === "ring"){
+      const P = ringPose(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
+    } else if (mode === "dive"){
+      if (seq.impactT === null){
+        followPose();
+        blend(seq.from, Pfollow, ease((elapsed - seq.t0) / 1.25));
+      } else {
+        if (!seq.hitFrom) seq.hitFrom = capture();
+        const a = elapsed - seq.impactT;
+        const k = ease((a - 0.95) / 2.3);
+        U.uDrops.value[N].w *= Math.exp(-dt * 3);
+        topPose(seq.I, TOP_H);
+        blend(seq.hitFrom, Ptop, k);
+        Pcam.p.addScaledVector(seq.o, -0.1 * smooth(0, 0.95, a) * (1 - k));
+        if (!seq.shown && a > 2.6){ seq.shown = true; showVeil(seq.i); }
+        if (k >= 1){ mode = "content"; nextAmbient = elapsed + 1.5; }
+      }
+      camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
+    } else if (mode === "content" || mode === "swap"){
+      seq.I.lerp(seq.I2, 1 - Math.exp(-dt * 0.9));
+      topPose(seq.I, TOP_H); camera.position.copy(Ptop.p); camera.quaternion.copy(Ptop.q);
+      U.uDrops.value[N].set(seq.I.x, 1.4, seq.I.z, 0.3);
+      if (mode === "swap" && seq.impactT !== null && !seq.shown && elapsed - seq.impactT > 0.9){ seq.shown = true; fillVeil(seq.i); requestAnimationFrame(() => card.classList.remove("out")); mode = "content"; }
+      if (mode === "content" && elapsed > nextAmbient){
+        const a = Math.random() * Math.PI * 2, r = 0.3 + Math.random() * 0.9;
+        addRipple(seq.I.x + Math.cos(a) * r, seq.I.z + Math.sin(a) * r, 0.03 + Math.random() * 0.02, 5 + Math.random() * 3);
+        nextAmbient = elapsed + 2.2 + Math.random() * 2.2;
+      }
+    } else if (mode === "return"){
+      const k = ease((elapsed - seq.t0) / 2.4);
+      ringPose(); blend(seq.from, Pring, k);
+      camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
+      U.uDrops.value[N].w *= 0.95;
+      const b = balls[seq.i0];
+      if (b.gone && elapsed - seq.t0 > 1.0){ b.gone = false; b.regrow = 0; }
+      if (k >= 1){ mode = "ring"; setDeep(false); seq = null; faller.visible = false; }
+    }
+    camera.updateMatrixWorld();
+    skyMesh.position.copy(camera.position);
+    updateLandingDrops(realDt);
+
+    /* keep the invisible hit target over the sun disc */
+    if (mode === "ring" || mode === "landing"){
+      tv.copy(camera.position).addScaledVector(sunDir, 200).project(camera);
+      const on = tv.z < 1 && Math.abs(tv.x) < 1.05 && Math.abs(tv.y) < 1.05;
+      sunBtn.hidden = !on;
+      if (on){
+        const px = RD / Math.tan(camera.fov * Math.PI / 360) * H / 2;
+        const size = Math.max(44, px * 2.6);
+        sunBtn.style.width = sunBtn.style.height = size.toFixed(0) + "px";
+        sunBtn.style.transform = `translate3d(${((tv.x * 0.5 + 0.5) * W).toFixed(1)}px,${((-tv.y * 0.5 + 0.5) * H).toFixed(1)}px,0) translate(-50%,-50%)`;
+      }
+    } else sunBtn.hidden = true;
+
+    const mp = mGeo.attributes.position.array;
+    for (let i = 0; i < MC; i++){ mp[i*3+1] += mSpd[i] * dt * (reduce ? 0.2 : 1); if (mp[i*3+1] > 7.5) mp[i*3+1] = 0; }
+    mGeo.attributes.position.needsUpdate = true;
+    motesMat.opacity = 0.55 * (0.3 + 0.7 * vis) * portMix;
 
     renderer.render(scene, camera);
   }
-  return { update, pulse };
+  /* compile every program up front, so the first transition does not stall */
+  {
+    const hid = [];
+    scene.traverse(o => { if ((o.isMesh || o.isSprite || o.isPoints) && !o.visible){ hid.push(o); o.visible = true; } });
+    try { renderer.compile(scene, camera); } catch (_) {}
+    hid.forEach(o => { o.visible = false; });
+  }
+  return { update, back, swap, targetScale, toggleCel, toRing, toLand, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
+}
+
+/* fallback without WebGL: open content directly */
+if (!gl){
+  request = function(i){ if (mode !== "ring") return; active = mod(i, N); renderCaption(true); mode = "content"; setDeep(true); showVeil(active); };
+  $("sunBtn").hidden = true;
 }
 
 /* ================= LOOP ================= */
+renderCaption(true);
 let last = -1;
 function frame(now){
   if (last < 0) last = now;
   const rawDt = Math.min(0.5, Math.max(0, (now - last) / 1000)); last = now;
   const realDt = Math.min(0.05, rawDt);
-  p += (pT - p) * (1 - Math.exp(-rawDt * (reduce ? 30 : 3.6)));
-  if (Math.abs(pT - p) < 1e-5) p = pT;
+  if (mode === "landing"){ p += (pT - p) * (1 - Math.exp(-rawDt * (reduce ? 30 : 3.6))); if (Math.abs(pT - p) < 1e-5) p = pT; }
   const v = (p - pPrev) / Math.max(rawDt, 1e-3); pPrev = p;
   pVel += (v - pVel) * (1 - Math.exp(-realDt * 6));
+  landVis += ((mode === "landing" ? 1 : 0) - landVis) * (1 - Math.exp(-realDt * (mode === "landing" ? 5 : 12)));
   updateOverlay();
-  if (gl) gl.update(realDt, realDt, p, pVel);
+  if (gl) timeScale += (gl.targetScale() - timeScale) * (1 - Math.exp(-realDt * 6));
+  const dt = realDt * timeScale;
+  elapsed += dt;
+  if (mode === "ring") rot += (targetRot - rot) * (1 - Math.exp(-realDt * (reduce ? 20 : 6.5)));
+  const idx = mod(Math.round(-rot / STEP), N);
+  if (idx !== active){ active = idx; renderCaption(); }
+  if (gl) gl.update(dt, realDt);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
