@@ -375,8 +375,7 @@ html:not(.in-rain) .gal-caption{display:none}
 }
 
 </style>
-</head>
-<body>
+
 <canvas id="scene" aria-hidden="true"></canvas>
 <button class="sun-btn" id="sunBtn" type="button" aria-label="Zamień słońce w księżyc" hidden></button>
 <div class="track" id="track" aria-hidden="true"></div>
@@ -877,12 +876,19 @@ const LN = lLinks.length;
 const clamp01 = x => x < 0 ? 0 : x > 1 ? 1 : x;
 const sm = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const smr = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * t * (t * (t * 6 - 15) + 10); };
-/* camera tilt as a function of scroll: lingers on both horizons, water in between */
-const PHI0 = 0.12;
-const tiltOf = q => PHI0 + (Math.PI - 2 * PHI0) * smr(0.03, 0.97, q);
-const yawOf  = q => Math.PI * smr(0.36, 0.64, q);
+/* the scroll is one real-world move, never upside down: look down at the sea, cumulus condenses below,
+   the deck rises past the camera (which sinks through it), then the view lifts to the horizon
+   with the clouds overhead and the water below */
+const PHI0 = 0.12, PHI_END = -0.07, LIFT_A = 0.45, LIFT_B = 0.63;
+const tiltOf = q => q <= LIFT_A ? PHI0 + (Math.PI / 2 - PHI0) * smr(0.03, LIFT_A - 0.02, q)
+                                : Math.PI / 2 + (PHI_END - Math.PI / 2) * smr(LIFT_B, 0.97, q);
+const yawOf  = q => 0;
+const cloudOf = q => 0.5 * sm(0.26, 0.46, q) + 0.32 * sm(0.52, 0.72, q);   // broken cumulus between the camera and the sea, filling in as it rises overhead
+const liftOf  = q => smr(LIFT_A, LIFT_B, q);     // the deck rising past it
 
-let pT = 0, p = mode === "deep" ? 0.8 : mode === "part" ? 0.4 : mode === "tools" ? 0.6 : mode === "rain" ? 0.95 : 0, pPrev = p, pVel = 0, landVis = mode === "landing" ? 1 : 0;
+const P_DIRECT = mode === "deep" ? 0.8 : mode === "part" ? 0.4 : mode === "tools" ? 0.42 : mode === "rain" ? 0.95 : 0;
+const P_UPRIGHT = 0.42;
+let pT = 0, p = mode === "landing" ? 0 : P_DIRECT, pPrev = p, pVel = 0, landVis = mode === "landing" ? 1 : 0;
 function readScroll(){
   if (mode !== "landing") return;
   const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
@@ -891,7 +897,7 @@ function readScroll(){
 addEventListener("scroll", readScroll, { passive:true });
 addEventListener("resize", readScroll);
 readScroll(); if (mode === "landing") p = pT;
-if (mode === "deep" || mode === "part" || mode === "tools" || mode === "rain"){ pT = p; requestAnimationFrame(() => { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); scrollTo(0, p * max); }); }
+if (mode === "deep" || mode === "part" || mode === "tools" || mode === "rain"){ pT = P_DIRECT; requestAnimationFrame(() => { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); scrollTo(0, P_DIRECT * max); }); }
 function scrollToP(t){
   const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
   scrollTo({ top:t * max, behavior: reduce ? "auto" : "smooth" });
@@ -938,9 +944,21 @@ function leave(href, i){
 addEventListener("pageshow", () => { leaving = false; fadeEl.classList.remove("is-on"); });
 
 /* landing ⇄ portfolio live in one scene */
+/* ---- unwind: never roll the camera over. From an upside-down view the camera first turns back
+   along the scroll's own path until it looks down at the water, then the section's animation starts.
+   On the way back it returns to that upright view and turns up again to where the page was scrolled. ---- */
+let unwind = null;                 // { from, to, t0, dur, hold, go }
+function startUnwind(to, hold, go){
+  const d = Math.abs(p - to);
+  unwind = { from:p, to, t0:performance.now(), dur:reduce ? 1 : 380 + d * 760, hold, go };
+}
+function withUnwind(hold, go){
+  if (mode !== "landing" || unwind) return;
+  return go();                     // the view is always upright now: sections start straight from it
+}
 function enterPortfolio(push){
-  if (mode !== "landing") return;
-  if (gl) gl.toRing(push);
+  if (mode !== "landing" || unwind) return;
+  if (gl) return withUnwind(false, () => gl.toRing(push));
   else { mode = "ring"; htmlEl.classList.add("in-port"); if (push !== false) try { history.pushState(null, "", "#portfolio"); } catch (_) {} }
 }
 function goLanding(push){
@@ -949,8 +967,8 @@ function goLanding(push){
   else { mode = "landing"; htmlEl.classList.remove("in-port"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
 }
 function enterDeep(push){
-  if (mode !== "landing") return;
-  if (gl) gl.toDeep(push);
+  if (mode !== "landing" || unwind) return;
+  if (gl) return withUnwind(true, () => gl.toDeep(push));
   else { mode = "deep"; htmlEl.classList.add("in-depth", "sea-on"); if (push !== false) try { history.pushState(null, "", "#uslugi"); } catch (_) {} }
 }
 function surface(push){
@@ -960,8 +978,8 @@ function surface(push){
 }
 $("surfaceBtn").addEventListener("click", () => surface());
 function enterPart(push){
-  if (mode !== "landing") return;
-  if (gl) gl.toPart(push);
+  if (mode !== "landing" || unwind) return;
+  if (gl) return withUnwind(false, () => gl.toPart(push));
   else { mode = "part"; htmlEl.classList.add("in-part", "part-on", "part-flat"); if (push !== false) try { history.pushState(null, "", "#o-mnie"); } catch (_) {} }
 }
 function closePart(push){
@@ -971,8 +989,8 @@ function closePart(push){
 }
 $("partBack").addEventListener("click", () => closePart());
 function enterTools(push){
-  if (mode !== "landing") return;
-  if (gl) gl.toTools(push);
+  if (mode !== "landing" || unwind) return;
+  if (gl) return withUnwind(true, () => gl.toTools(push));
   else { mode = "tools"; htmlEl.classList.add("in-tools", "tools-on"); if (push !== false) try { history.pushState(null, "", "#narzedzia"); } catch (_) {} }
 }
 function closeTools(push){
@@ -981,8 +999,8 @@ function closeTools(push){
   else { mode = "landing"; htmlEl.classList.remove("in-tools", "tools-on"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
 }
 function enterRain(push){
-  if (mode !== "landing") return;
-  if (gl) gl.toRain(push);
+  if (mode !== "landing" || unwind) return;
+  if (gl) return withUnwind(true, () => gl.toRain(push));
   else { mode = "rain"; htmlEl.classList.add("in-rain", "rain-on"); if (push !== false) try { history.pushState(null, "", "#galeria"); } catch (_) {} }
 }
 function closeRain(push){
@@ -1053,7 +1071,7 @@ function updateOverlay(){
   ticks.forEach((b, i) => { b.classList.toggle("is-on", i === on); b.classList.toggle("is-past", STAGES[i].c <= p + 0.001); });
   gFill.style.height = (p * 100).toFixed(2) + "%";
   const deg = Math.round(tiltOf(p) * 180 / Math.PI);
-  if (deg !== lastDeg){ lastDeg = deg; gRead.innerHTML = `NACHYLENIE<b>${String(deg).padStart(3, "0")}°</b>`; }
+  if (deg !== lastDeg){ lastDeg = deg; gRead.innerHTML = `NACHYLENIE<b>${deg < 0 ? "−" + String(-deg).padStart(2, "0") : String(deg).padStart(3, "0")}°</b>`; }
 }
 
 /* ================= 3D ================= */
@@ -1611,6 +1629,15 @@ function initGL(){
       vec3 R = reflect(-V, N); R.y = abs(R.y);
       float st = starField(R, uTime) * uStars * (1.0 - 0.5 * uPort);
       vec3 refl = sky(R) + mix(uLight, uPearl, 0.5) * 0.03 * smoothstep(0.5, 1.0, R.y) + uPearl * st * 0.9;
+      if (uCloud > 0.001 && cameraPosition.y < uCloudLayer.x && R.y > 0.015){
+        /* the deck overhead mirrored in the water: coverage looked up where the reflected ray meets its base */
+        float tc = (uCloudLayer.x + 0.6 - vWorld.y) / R.y;
+        vec2 xc = vWorld.xz + R.xz * tc - flowAt(vWorld.xz + R.xz * tc).xy;
+        vec2 cc = texture2D(uCov, xc * 0.0105 + vec2(uTime * 0.0011, uTime * 0.0004)).rg;
+        float cv = smoothstep(0.3, 0.62, cc.r * 0.72 + cc.g * 0.28) * smoothstep(0.0, 0.25, uCloud) * exp(-tc * 0.012);
+        vec3 cb = uDeep * 2.2 + uTide * 0.5 + uLight * 0.22;
+        refl = mix(refl, mix(cb, sky(normalize(vec3(R.x, 0.02, R.z))), smoothstep(40.0, 160.0, tc)), cv * 0.85);
+      }
       vec3 body = mix(uDeep, uTide, clamp(w.x * 4.0 + 0.25, 0.0, 1.0) * 0.4);
       /* light wandering through the water body: seen best from straight above */
       float c1 = fbm(p * 0.45 + vec2(uTime * 0.04, -uTime * 0.025) + w.yz * 1.6);
@@ -1970,7 +1997,7 @@ function initGL(){
     if (mode === "landing"){
       if (Math.hypot(e.clientX - d0.x, e.clientY - d0.y) > 8) return;
       const h = ray.intersectObjects(lHits, false)[0];
-      if (h){ const i = h.object.userData.li; if (ldrops[i].grow > 0.5){ const a = lLinks[i]; if (a.hasAttribute("data-port")) toRing(); else if (a.hasAttribute("data-deep")) toDeep(); else if (a.hasAttribute("data-part")) toPart(); else if (a.hasAttribute("data-tools")) toTools(); else if (a.hasAttribute("data-rain")) toRain(); else leave(a.getAttribute("href"), i); return; } }
+      if (h){ const i = h.object.userData.li; if (ldrops[i].grow > 0.5){ const a = lLinks[i]; if (a.hasAttribute("data-port")) enterPortfolio(); else if (a.hasAttribute("data-deep")) enterDeep(); else if (a.hasAttribute("data-part")) enterPart(); else if (a.hasAttribute("data-tools")) enterTools(); else if (a.hasAttribute("data-rain")) enterRain(); else leave(a.getAttribute("href"), i); return; } }
     }
     if (mode === "rain"){
       if (Math.hypot(e.clientX - d0.x, e.clientY - d0.y) > 8) return;
@@ -1994,13 +2021,14 @@ function initGL(){
   const XA = new T.Vector3(1, 0, 0);
   const qYaw = new T.Quaternion(), qPitch = new T.Quaternion(), qPar = new T.Quaternion(), eul = new T.Euler();
   const Pland = pose();
-  /* pitch down through the water, a half turn while looking straight down, up again inverted */
+  /* pitch down to the sea, sink through the rising cloud deck, lift the gaze to the horizon under it */
+  const LIFT_DY = 3.3;
   function landPose(){
     qYaw.setFromAxisAngle(UP, yawOf(p));
     qPitch.setFromAxisAngle(XA, -tiltOf(p));
     eul.set(parS.y * 0.018, -parS.x * 0.03, 0); qPar.setFromEuler(eul);
     Pland.q.copy(qYaw).multiply(qPitch).multiply(qPar);
-    Pland.p.copy(LAND_POS); Pland.p.y += Math.sin(elapsed * 0.4) * 0.04;
+    Pland.p.copy(LAND_POS); Pland.p.y += Math.sin(elapsed * 0.4) * 0.04 - LIFT_DY * liftOf(p);
     return Pland;
   }
   let cloudMix = 0, cloudFrom = 0;
@@ -2014,7 +2042,7 @@ function initGL(){
     if (mode === "rain") rainPoke();
     if (!flow || U.uCloud.value < 0.15 || !(mode === "landing" || mode === "tools" || mode === "rain")){ aLast = null; return; }
     const now = elapsed;
-    tPlane.constant = -(mode === "rain" ? (U.uCloudLayer.value.x + U.uCloudLayer.value.y) / 2 : 1.6);
+    tPlane.constant = -(U.uCloudLayer.value.x + U.uCloudLayer.value.y) / 2;
     if (!ray.ray.intersectPlane(tPlane, tHit) || tHit.distanceTo(camera.position) > 70){ aLast = null; return; }
     if (aLast){
       const dt = Math.max(now - aLast.t, 1 / 120), dx = tHit.x - aLast.x, dz = tHit.z - aLast.z, d = Math.hypot(dx, dz);
@@ -2066,7 +2094,7 @@ function initGL(){
   let lNextAmbient = 1.5;
   function updateLandingDrops(realDt){
     const live = mode === "landing";
-    if (live){
+    if (live && !unwind){
       ray.setFromCamera(ndc, camera);
       const hh = ray.intersectObjects(lHits.filter((h, i) => ldrops[i].grow > 0.3), false)[0];
       lHovered = hh ? hh.object.userData.li : -1;
@@ -2089,7 +2117,7 @@ function initGL(){
         U.uDrops.value[di].set(F.P.x, y, F.P.z, 0.6);
         return;
       }
-      const want = live && p >= EMERGE[i];
+      const want = live && (p >= EMERGE[i] || (unwind && Math.max(unwind.from, unwind.to) >= EMERGE[i]));
       if (want && !b.on){ b.on = true; b.justRose = true; }
       if (!want && b.on) b.on = false;
       /* springy growth: overshoots a little, then settles */
@@ -2512,7 +2540,7 @@ function initGL(){
     ldrops.forEach(d => { d.on = false; });
     mist.position.copy(P); mist.userData.p0 = P.clone(); mistT = elapsed; mist.visible = true;
     cloudFrom = cloudMix;
-    tsv = { t0:elapsed, from:capture(), mid:null, shown:false };
+    tsv = { t0:elapsed, from:capture(), mid:null, shown:false, k0:liftOf(p) };
     tsv.mid = tsv.from.p.clone().lerp(Ptools.p, 0.5); tsv.mid.y += 1.5;
     tools.forEach(t => { t.pos.copy(t.home); t.vel.set(0, 0, 0); t.grow = 0; });
     mode = "toTools"; htmlEl.classList.add("in-tools");
@@ -2715,7 +2743,7 @@ function initGL(){
     cloudFrom = cloudMix;
     galZ = galZT = 0; yawS = pitchS = 0;
     galPose(0, 0, 0, Prain);
-    rv = { t0:elapsed, from:capture(), mid:new T.Vector3(GAL_X, 3.6, LAND_POS.z - 0.5), shown:false };
+    rv = { t0:elapsed, from:capture(), mid:new T.Vector3(GAL_X, 3.6, LAND_POS.z - 0.5), shown:false, k0:liftOf(p) };
     mode = "toRain"; htmlEl.classList.add("in-rain");
     if (push !== false) try { history.pushState(null, "", "#galeria"); } catch (_) {}
   }
@@ -2754,13 +2782,17 @@ function initGL(){
   /* where the cloud layer sits and what shows beneath it, per mode */
   function cloudLayerUpdate(){
     const L = U.uCloudLayer.value;
-    let k = 0, gap = cloudMix;
-    const t = rv ? elapsed - rv.t0 : 0;
-    if (mode === "toRain"){ k = smooth(0.3, 0.75, t / RAIN_IN); gap = cloudMix * (1 - smooth(0.4, 0.72, t / RAIN_IN)); }
-    else if (mode === "rain"){ k = 1; gap = 0; }
-    else if (mode === "fromRain"){ k = 1 - smooth(0.25, 0.7, t / RAIN_OUT); gap = cloudMix * smooth(0.3, 0.6, t / RAIN_OUT); }
+    let k = liftOf(p);
+    const t = rv ? elapsed - rv.t0 : 0, tt = tsv ? elapsed - tsv.t0 : 0;
+    if (mode === "toRain") k = rv.k0 + (1 - rv.k0) * smooth(0.3, 0.75, t / RAIN_IN);
+    else if (mode === "rain") k = 1;
+    else if (mode === "fromRain") k = 1 + (liftOf(pT) - 1) * smooth(0.25, 0.7, t / RAIN_OUT);
+    else if (mode === "tools") k = 0;
+    else if (mode === "toTools") k = tsv.k0 * (1 - smooth(0.12, 0.7, tt / TOOLS_IN));          // the camera climbs through the deck; it settles below
+    else if (mode === "fromTools") k = liftOf(pT) * smooth(0.25, 0.85, tt / TOOLS_OUT);       // and on the way down it rises back overhead
     L.set(LAYER_SEA.x + (LAYER_CEIL.x - LAYER_SEA.x) * k, LAYER_SEA.y + (LAYER_CEIL.y - LAYER_SEA.y) * k);
-    U.uCloudGap.value = gap;
+    /* the sea stays the sea under the clouds; only high above them (tools) the gaps show a dark depth */
+    U.uCloudGap.value = (mode === "tools" || mode === "toTools" || mode === "fromTools") ? cloudMix * (1 - k) : 0;
   }
   /* wheel / drag / keys move along the corridor */
   function galMove(d){ galZT = Math.max(-GAL_LEN, Math.min(0, galZT - d)); }
@@ -2881,9 +2913,9 @@ function initGL(){
     U.uFog.value.set(16 - 6 * portMix, 150 - 86 * portMix);
     /* past the middle of the scroll the sea is cloud; transitions trade it for water only where it can't be seen:
        under the surface, or while the camera sweeps across */
-    const cLand = smooth(0.42, 0.62, p), camY = camera.position.y;
+    const cLand = cloudOf(p), camY = camera.position.y;
     let cT = 0, cRate = 60;
-    if (mode === "landing"){ cT = cLand; cRate = 10; }
+    if (mode === "landing"){ cT = unwind && unwind.hold ? cloudMix : cLand; cRate = 10; }
     else if (mode === "toRing") cT = cloudFrom * Math.pow(1 - smooth(0.04, 0.52, trK), 2.2);   // thins out from the first moment of the turn, gone by its middle
     else if (mode === "toLand") cT = cLand * smooth(0.35, 0.95, trK);
     else if (mode === "toDeep"){ cT = camY > 0.05 ? cloudFrom : 0; if (camY <= 0.05) cRate = 1e4; }
@@ -2892,8 +2924,8 @@ function initGL(){
     else if (mode === "fromPart") cT = cLand * smooth(0.45, 1.0, pv ? (elapsed - pv.t0) / PART_OUT : 1);
     else if (mode === "toTools") cT = cloudFrom + (1 - cloudFrom) * smooth(0.15, 0.85, tsv ? (elapsed - tsv.t0) / TOOLS_IN : 1);
     else if (mode === "tools" || mode === "toRain" || mode === "rain"){ cT = 1; if (mode === "toRain") cRate = 8; }
-    else if (mode === "fromTools") cT = 1 + (cLand - 1) * smooth(0.3, 1.0, tsv ? (elapsed - tsv.t0) / TOOLS_OUT : 1);
-    else if (mode === "fromRain") cT = 1 + (cLand - 1) * smooth(0.6, 1.0, rv ? (elapsed - rv.t0) / RAIN_OUT : 1);
+    else if (mode === "fromTools") cT = 1 + (cloudOf(pT) - 1) * smooth(0.3, 1.0, tsv ? (elapsed - tsv.t0) / TOOLS_OUT : 1);
+    else if (mode === "fromRain") cT = 1 + (cloudOf(pT) - 1) * smooth(0.6, 1.0, rv ? (elapsed - rv.t0) / RAIN_OUT : 1);
     cloudMix += (cT - cloudMix) * (1 - Math.exp(-realDt * cRate));
     U.uCloud.value = cloudMix < 0.002 ? 0 : cloudMix;
     cloudLayerUpdate();
@@ -3148,15 +3180,24 @@ if (!gl){
 
 /* ================= LOOP ================= */
 renderCaption(true);
-let last = -1;
+let last = -1, prevMode = mode;
 function frame(now){
   if (last < 0) last = now;
   const rawDt = Math.min(0.5, Math.max(0, (now - last) / 1000)); last = now;
   const realDt = Math.min(0.05, rawDt);
-  if (mode === "landing"){ p += (pT - p) * (1 - Math.exp(-rawDt * (reduce ? 30 : 3.6))); if (Math.abs(pT - p) < 1e-5) p = pT; }
+  if (unwind){
+    const k = Math.min(1, (now - unwind.t0) / unwind.dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    p = unwind.from + (unwind.to - unwind.from) * e;
+    if (k >= 1){ const u = unwind; unwind = null; if (u.go) u.go(); }
+  } else if (mode === "landing"){
+    /* just back from a section: turn back up to where the page was scrolled, the same way the scroll would */
+    if (prevMode !== "landing" && Math.abs(pT - p) > 0.03) startUnwind(pT, ["fromTools", "fromRain", "fromDeep"].includes(prevMode), null);
+    else { p += (pT - p) * (1 - Math.exp(-rawDt * (reduce ? 30 : 3.6))); if (Math.abs(pT - p) < 1e-5) p = pT; }
+  }
+  prevMode = mode;
   const v = (p - pPrev) / Math.max(rawDt, 1e-3); pPrev = p;
   pVel += (v - pVel) * (1 - Math.exp(-realDt * 6));
-  landVis += ((mode === "landing" ? 1 : 0) - landVis) * (1 - Math.exp(-realDt * (mode === "landing" ? 5 : 12)));
+  landVis += ((mode === "landing" && !unwind ? 1 : 0) - landVis) * (1 - Math.exp(-realDt * (mode === "landing" && !unwind ? 5 : 12)));
   updateOverlay();
   if (gl) timeScale += (gl.targetScale() - timeScale) * (1 - Math.exp(-realDt * 6));
   const dt = realDt * timeScale;
@@ -3170,5 +3211,6 @@ function frame(now){
 requestAnimationFrame(frame);
 })();
 </script>
+
 </body>
 </html>
