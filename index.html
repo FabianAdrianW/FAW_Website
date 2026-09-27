@@ -958,7 +958,7 @@ function withUnwind(dir, i, go){
   if (!gl || reduce || !isInv(p)) return go();
   unwind = { kind:"in", dir, i, t0:performance.now(), dur:PASS_MS(dir), k:0, go, from:p, to:p };
 }
-function passOut(dir, now){ return { kind:"out", dir, i:-1, t0:now, dur:PASS_MS(dir), k:0, from:p, to:p }; }
+function passOut(dir, now){ return { kind:"out", dir, i:-1, t0:now, dur:dir > 0 ? 950 : 760, k:0, from:p, to:p }; }
 function enterPortfolio(push){
   if (mode !== "landing" || unwind) return;
   if (gl) return withUnwind(1, 0, () => gl.toRing(push));
@@ -2168,8 +2168,10 @@ function initGL(){
     Pland.q.copy(qYaw).multiply(qPitch).multiply(qPar);
     Pland.p.copy(LAND_POS); Pland.p.y += Math.sin(elapsed * 0.4) * 0.04;
     if (reduce || !isInv(p)) return Pland;
-    /* any other caller wants the landing as a destination: the upright spot where the passage begins */
-    if (mode !== "landing") return belowPose(Pland, (mode === "tools" || mode === "fromTools") ? -1 : 1);
+    /* any other caller wants the landing as a destination: on the way back the camera does not turn at
+       all — it keeps looking where it looked and simply moves, the shortest way, into the clouds
+       (up into the ceiling over water; down into the cloud sea from above it) */
+    if (mode !== "landing") return retPose(Pland, (mode === "tools" || mode === "fromTools") ? -1 : 1);
     if (unwind) passPose(Pland);
     return Pland;
   }
@@ -2182,6 +2184,14 @@ function initGL(){
     const psi = yawOf(p) + Math.PI;                 // an upside-down view at yaw ψ faces the heading of ψ + π upright
     qYaw.setFromAxisAngle(UP, psi); qPitch.setFromAxisAngle(XA, PASS_PITCH(dir));
     return out.copy(qYaw).multiply(qPitch);
+  }
+  const RET_Y = d => d > 0 ? 8.0 : 1.9;             // inside the ceiling / inside the low cloud sea
+  const retQ = new T.Quaternion(); let retSet = false;
+  function retPose(P, dir){
+    if (!retSet){ retQ.copy(camera.quaternion); retSet = true; }
+    P.p.set(LAND_POS.x, RET_Y(dir), LAND_POS.z);
+    P.q.copy(retQ);
+    return P;
   }
   function belowPose(P, dir){
     P.p.set(LAND_POS.x, PASS_Y(dir), LAND_POS.z);
@@ -2200,9 +2210,32 @@ function initGL(){
     return hermite(0.72, 1, 0.62, 1, 0.8, 0, s);
   }
   /* where the cloud layer is while the passage runs: over water it rises past the camera */
-  function passLayerK(){ if (!unwind || unwind.dir < 0) return 0; const s = unwind.kind === "in" ? unwind.k : 1 - unwind.k; return passDepth(1, s); }
+  function passLayerK(){
+    if (!unwind || unwind.dir < 0) return 0;
+    return unwind.kind === "in" ? passDepth(1, unwind.k) : 1 - smooth(0.3, 1, unwind.k);   // on the way back the deck sinks below
+  }
+  const pOut = new T.Vector3();
   function passPose(P){
     const u = unwind, dir = u.dir;
+    if (u.kind === "out"){
+      /* starting inside the cloud, exactly as the way back left it: turn over in the fog, then out on top */
+      if (!u.q0){ u.q0 = camera.quaternion.clone(); u.p0 = camera.position.clone(); }
+      const k = u.k, lean = 1 - smooth(0.72, 1, k);
+      qPA.copy(P.q).multiply(qPt.setFromAxisAngle(XA, 0.3 * lean));
+      let r;
+      if (dir > 0){
+        const e = ease(k);
+        pOut.copy(u.p0).lerp(P.p, e);
+        r = smooth(0.05, 0.5, k);
+      } else {
+        const e = 1 - passDepth(-1, 1 - k);
+        pOut.copy(u.p0).lerp(P.p, e);
+        r = smooth(0.47, 0.88, (pOut.y - LAYER_SEA.x) / (LAYER_SEA.y - LAYER_SEA.x));
+      }
+      P.q.slerpQuaternions(u.q0, qPA, r);
+      P.p.copy(pOut);
+      return;
+    }
     const s = u.kind === "in" ? u.k : 1 - u.k;      // the way back is the same path run backwards
     const e = passDepth(dir, s);
     const y = LAND_POS.y + (PASS_Y(dir) - LAND_POS.y) * e;
@@ -2220,13 +2253,18 @@ function initGL(){
   }
   /* a cloud gathers around the camera so the fog inside is always thick */
   let fillK = 0, fillFadeT = -1, ceilHold = false;
+  const RET_ALL = ["toLand", "fromDeep", "fromPart", "fromTools", "fromRain"];
   function passFill(){
     let f = 0;
     if (unwind && mode === "landing" && isInv(p)) f = unwind.kind === "in" ? smooth(0.02, 0.22, unwind.k) : 1 - smooth(0.8, 1, unwind.k);
-    else if (mode === "fromTools" && isInv(p) && tsv) f = smooth(0.35, 0.8, (elapsed - tsv.t0) / TOOLS_OUT);
+    else if (RET_ALL.includes(mode) && isInv(p)){
+      /* heading back into the clouds: the fog thickens as the camera enters them */
+      const L = U.uCloudLayer.value, h = (camera.position.y - L.x) / (L.y - L.x);
+      f = mode === "fromTools" ? smooth(1.3, 0.8, h) : smooth(-0.05, 0.3, h);
+    } else if (!RET_ALL.includes(mode)) retSet = false;
     if (fillFadeT >= 0){ const a = elapsed - fillFadeT; f = Math.max(f, 1 - smooth(0, 0.9, a)); if (a > 0.9) fillFadeT = -1; }
     fillK = f;
-    U.uFill.value.set(LAND_POS.x, LAND_POS.z, f);
+    U.uFill.value.set(camera.position.x, camera.position.z, f);
   }
   /* the passage is over: hand over to the section, from exactly where the camera is */
   function passEnd(u){
