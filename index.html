@@ -84,7 +84,7 @@ a{color:inherit}
 /* ---------- veil: content floating above the water ---------- */
 .veil{position:fixed;inset:0;z-index:4;pointer-events:none;display:grid;place-items:center;
   padding:calc(env(safe-area-inset-top,0px) + 70px) var(--gut) calc(env(safe-area-inset-bottom,0px) + 84px);
-  opacity:0;transition:opacity .4s ease}
+  opacity:0;transition:opacity .6s ease}
 .veil.is-on{opacity:1}
 .mist{position:absolute;left:50%;top:50%;width:min(1180px,160vw);height:min(1000px,130vh);transform:translate(-50%,-50%);pointer-events:none;
   background:radial-gradient(closest-side,rgba(196,219,216,.15),rgba(196,219,216,.07) 55%,rgba(196,219,216,0) 100%);
@@ -97,7 +97,7 @@ a{color:inherit}
 .veil-card{position:relative;pointer-events:auto;width:min(680px,100%);max-height:100%;overflow-y:auto;overscroll-behavior:contain;
   padding-block:26px;display:flex;flex-direction:column;gap:18px;text-shadow:0 1px 16px rgba(3,8,11,.75);
   -webkit-mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 30px),transparent);
-  transition:opacity .4s ease,transform .5s cubic-bezier(.2,.8,.2,1),filter .4s ease;animation:hover 9s ease-in-out infinite alternate}
+  transition:opacity .6s ease,transform .75s cubic-bezier(.2,.8,.2,1),filter .6s ease;animation:hover 9s ease-in-out infinite alternate}
 .veil-card.out{opacity:0;transform:translateY(16px) scale(.985);filter:blur(8px)}
 @keyframes hover{from{translate:0 -4px}to{translate:0 5px}}
 .veil-card .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern)}
@@ -319,6 +319,28 @@ html.part-flat .wall-facts dt{font-size:11px;padding-top:3px}
 html.part-flat .wall-facts dd,html.part-flat .wall-links{font-size:16px}
 html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6px}
 
+/* ---------- prev / next in a project: two droplets with arrows ---------- */
+.veil-nav .drop-nav{gap:12px}
+.drop-btn{position:relative;flex:none;display:grid;place-items:center;width:54px;height:58px;color:var(--pearl);
+  border-radius:50% 50% 50% 50% / 53% 53% 47% 47%;
+  background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.55) 0,rgba(255,255,255,.1) 16%,rgba(255,255,255,0) 30%),
+             radial-gradient(circle at 60% 76%,rgba(227,178,106,.22),rgba(227,178,106,0) 45%),
+             radial-gradient(circle at 50% 50%,rgba(40,72,82,.26),rgba(10,24,32,.5) 70%,rgba(200,225,222,.22) 100%);
+  box-shadow:inset -5px -7px 12px rgba(0,0,0,.35),inset 3px 4px 9px rgba(255,255,255,.14),0 8px 18px rgba(0,0,0,.35),0 0 0 1px rgba(230,236,232,.16);
+  -webkit-backdrop-filter:blur(3px) saturate(1.3);backdrop-filter:blur(3px) saturate(1.3);
+  animation:dropIdle 4.5s ease-in-out infinite;transition:box-shadow .3s}
+.drop-btn svg{width:18px;height:18px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.drop-nav:hover .drop-btn,.drop-nav:focus-visible .drop-btn{box-shadow:inset -5px -7px 12px rgba(0,0,0,.35),inset 3px 4px 9px rgba(255,255,255,.14),0 8px 22px rgba(0,0,0,.35),0 0 0 1px rgba(227,178,106,.5),0 0 22px rgba(227,178,106,.25)}
+#veilNext .drop-btn{animation-delay:-2.2s}
+@keyframes dropIdle{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(.98,1.03)}}
+.drop-nav span{transition:opacity .3s}
+.drop-nav.is-falling span{opacity:0}
+.drop-nav.is-falling .drop-btn{animation:dropFall .45s cubic-bezier(.55,0,.85,.35) forwards}
+@keyframes dropFall{0%{transform:none;opacity:1}18%{transform:scale(1.12,.86);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(.42,.62);opacity:0}}
+.drop-nav.is-back .drop-btn{animation:dropBack .5s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes dropBack{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.drop-btn{animation:none}}
+
 </style>
 </head>
 <body>
@@ -340,6 +362,7 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
   <a class="drop-link" href="#o-mnie" data-part data-i="1"><span class="n">02</span><span class="t">O mnie</span><small>Kim jestem i jak pracuję</small></a>
   <a class="drop-link" href="narzedzia.html" data-i="2"><span class="n">03</span><span class="t">Narzędzia</span><small>Z czego korzystam na co dzień</small></a>
   <a class="drop-link" href="#uslugi" data-deep data-i="3"><span class="n">04</span><span class="t">Czym się zajmuję</span><small>Usługi dla firm i osób prywatnych</small></a>
+  <a class="drop-link" href="galeria.html" data-i="4"><span class="n">05</span><span class="t">Galeria</span><small>Zdjęcia · wkrótce</small></a>
 </nav>
 
 <section class="panel" data-c="0.2" aria-labelledby="p1">
@@ -405,9 +428,6 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
     <nav class="topnav" aria-label="Sekcje">
       <a class="home-link" href="#start" id="homeLink">← Start</a>
       <button type="button" data-go="0">Portfolio</button>
-      <button type="button" data-go="5">Galeria</button>
-      <button type="button" data-go="6">O mnie</button>
-      <button type="button" data-go="7">Kontakt</button>
     </nav>
   </div>
   <div></div>
@@ -431,8 +451,8 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
   </article>
   <button class="round veil-close" type="button" id="veilClose" aria-label="Wróć do pierścienia"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m3 3 8 8M11 3l-8 8"/></svg></button>
   <div class="veil-nav">
-    <button type="button" id="veilPrev"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M9 2 4 7l5 5"/></svg><span></span></button>
-    <button type="button" id="veilNext"><span></span><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m5 2 5 5-5 5"/></svg></button>
+    <button type="button" id="veilPrev" class="drop-nav" aria-label="Poprzedni projekt"><i class="drop-btn" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.6 3.2 4.8 7l3.8 3.8"/></svg></i><span></span></button>
+    <button type="button" id="veilNext" class="drop-nav" aria-label="Następny projekt"><span></span><i class="drop-btn" aria-hidden="true"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5.4 3.2 9.2 7l-3.8 3.8"/></svg></i></button>
   </div>
 </section>
 
@@ -565,29 +585,6 @@ const DROPS = [
         <dt>Stos</dt><dd>Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4</dd>
       </dl>
       <div class="links">${ext(GH+"Poke","Repozytorium","GitHub")}</div>`},
-  { id:"galeria", name:"Galeria", kind:"Zdjęcia",
-    line:"Kadry z wody, światła i nocy.", body:null },
-  { id:"o-mnie", name:"O mnie", kind:"Kim jestem",
-    line:"Filolog angielski, który buduje produkty AI od specyfikacji.",
-    body:`
-      <p class="lede">Jestem filologiem angielskim, który buduje produkty AI. Zaczynam od specyfikacji, a model językowy traktuję jak wykonawcę, którego pracę da się sprawdzić.</p>
-      <p>Uczyłem angielskiego jako korepetytor, prowadziłem własną firmę nieruchomości i przez trzy lata mieszkałem w Holandii. Studiuję Psychologię i Informatykę (Projektowanie Systemów Inteligentnych) w WSB Merito. Z badań do pracy magisterskiej wyrosło Eyelingo.</p>
-      <dl class="facts">
-        <dt>Obszar</dt><dd>AI Product Builder: automatyzacje i zastosowania AI w produkcie</dd>
-        <dt>Metoda</dt><dd>Spec-first: klauzula, kontrakt, walidator, pomiar</dd>
-        <dt>Języki</dt><dd>Polski, angielski, hiszpański, niderlandzki, japoński (podstawy)</dd>
-        <dt>Studia</dt><dd>Filologia angielska; magisterskie: Psychologia i Informatyka, WSB Merito</dd>
-      </dl>`},
-  { id:"kontakt", name:"Kontakt", kind:"Napisz",
-    line:"Mail, LinkedIn i kod na GitHubie.",
-    body:`
-      <p class="lede">Chętnie porozmawiam o produkcie, automatyzacji albo o tym, jak sprawdzić, czy model robi to, co ma robić.</p>
-      <div class="mail"><code id="mailAddr">eyeamadrian@gmail.com</code><button class="chip-btn" type="button" id="copyMail">Kopiuj adres</button></div>
-      <div class="links">
-        ${ext("https://www.linkedin.com/in/adrian-wojtasik-224a4741a/","LinkedIn")}
-        ${ext("https://github.com/FabianAdrianW","GitHub","FabianAdrianW")}
-        ${ext("https://www.youtube.com/@eyeamadrian","YouTube","@eyeamadrian")}
-      </div>`}
 ];
 
 /* ================= STATE ================= */
@@ -689,8 +686,19 @@ function step(dir){
   else fillVeil(j);
 }
 $("veilClose").addEventListener("click", back);
-$("veilPrev").addEventListener("click", () => step(-1));
-$("veilNext").addEventListener("click", () => step(1));
+/* the prev / next buttons are droplets: pressed, they fall into the water and the next project rises */
+function dropStep(btn, dir){
+  if (mode !== "content" || btn.classList.contains("is-falling")) return;
+  const d = btn.querySelector(".drop-btn"), r = d.getBoundingClientRect();
+  d.style.setProperty("--tx", (innerWidth / 2 - (r.left + r.width / 2)).toFixed(1) + "px");
+  d.style.setProperty("--ty", (innerHeight / 2 - (r.top + r.height / 2)).toFixed(1) + "px");
+  btn.classList.remove("is-back"); btn.classList.add("is-falling");
+  setTimeout(() => step(dir), reduce ? 0 : 300);
+  setTimeout(() => { btn.classList.remove("is-falling"); btn.classList.add("is-back"); }, reduce ? 60 : 1150);
+  setTimeout(() => btn.classList.remove("is-back"), reduce ? 80 : 1700);
+}
+$("veilPrev").addEventListener("click", () => dropStep($("veilPrev"), -1));
+$("veilNext").addEventListener("click", () => dropStep($("veilNext"), 1));
 
 /* ================= LIGHTBOX ================= */
 const lb = $("lightbox"); let lbIdx = 0;
@@ -775,8 +783,8 @@ window.addEventListener("keydown", e => {
   if (!lb.hidden){ if (e.key === "ArrowLeft") showPhoto(lbIdx - 1); if (e.key === "ArrowRight") showPhoto(lbIdx + 1); return; }
   if (mode === "content"){
     const inCard = document.activeElement && document.activeElement.closest && document.activeElement.closest(".veil-card");
-    if (!inCard && e.key === "ArrowRight") step(1);
-    if (!inCard && e.key === "ArrowLeft") step(-1);
+    if (!inCard && e.key === "ArrowRight") dropStep($("veilNext"), 1);
+    if (!inCard && e.key === "ArrowLeft") dropStep($("veilPrev"), -1);
     return;
   }
   if (mode !== "ring") return;
@@ -798,7 +806,7 @@ const STAGES = [
   { c:0.8, name:"Czym się zajmuję" },
   { c:1,   name:"Kontakt" }
 ];
-const EMERGE = [0.12, 0.32, 0.52, 0.72];     // scroll progress at which each drop rises
+const EMERGE = [0.12, 0.32, 0.52, 0.72, 0.88];     // scroll progress at which each drop rises
 const lLinks = Array.from(document.querySelectorAll(".drop-link"));
 const lPanels = Array.from(document.querySelectorAll(".panel"));
 const LN = lLinks.length;
@@ -971,7 +979,7 @@ function initGL(){
 
   const scene = new T.Scene();
   const camera = new T.PerspectiveCamera(40, 1, 0.03, 900);
-  const R = 3.6, RING_Y = 1.35, NR = 36, ND = N + 1 + LN, G = 18, RELEASE = 0.08;   // fast fall: click → content in under a second
+  const R = 3.6, RING_Y = 1.35, NR = 36, ND = N + 1 + LN, G = 8, RELEASE = 0.12;   // fast fall: click → content in under a second
   const C = h => new T.Color(h);
 
   /* ---- light: sun ↔ moon ---- */
@@ -996,7 +1004,7 @@ function initGL(){
     uSunCol:{ value:sunC }, uMoonCol:{ value:moonC }, uCel:{ value:0 },
     uDeep:{ value:C("#041017") }, uTide:{ value:C("#1A4250") }, uPearl:{ value:C("#E6ECE8") },
     uStars:{ value:1 }, uSpin:{ value:0 }, uDrag:{ value:0 },
-    uPort:{ value: mode === "ring" ? 1 : 0 }, uOcean:{ value: mode === "ring" ? 0.25 : 1 }, uFog:{ value:new T.Vector2(16, 150) }, uUnder:{ value:0 }, uCloud:{ value:0 }
+    uPort:{ value: mode === "ring" ? 1 : 0 }, uOcean:{ value: mode === "ring" ? 0.25 : 1 }, uFog:{ value:new T.Vector2(16, 150) }, uUnder:{ value:0 }, uCloud:{ value:0 }, uTrail:{ value: Array.from({ length:16 }, () => new T.Vector4(0, 0, -99, 0)) }, uTrailV:{ value: Array.from({ length:16 }, () => new T.Vector2()) }
   };
 
   const SKY = `
@@ -1216,7 +1224,7 @@ function initGL(){
       float c; vec3 w = waves(wp.xz, c);
       wp.y += w.x * (1.0 - uCloud);
       /* the cloud sea is gently lumpy, so the horizon line isn't ruler-straight */
-      if (uCloud > 0.001) wp.y += (fbm(wp.xz * 0.14 + vec2(uTime * 0.02, 0.0)) - 0.45) * 0.9 * uCloud;
+      if (uCloud > 0.001) wp.y += (fbm(wp.xz * 0.085 + vec2(uTime * 0.015, 0.0)) - 0.4) * 1.6 * uCloud;
       if (uPartT > 0.0){
         vec2 d = wp.xz - uPartO.xz;
         float lx = dot(d, uPartR), lz = -dot(d, uPartF);
@@ -1234,6 +1242,8 @@ function initGL(){
     ${NOISE}
     uniform float uRingVis, uStars, uUnder, uCloud;
     uniform vec2 uFog;
+    uniform vec4 uTrail[16];
+    uniform vec2 uTrailV[16];
     uniform vec3 uDeep, uTide, uPearl;
     varying vec3 vWorld;
     vec2 microGrad(vec2 p){
@@ -1307,24 +1317,38 @@ function initGL(){
       vec3 vd = -V;
       vec3 fogc = sky(normalize(vec3(vd.x, 0.015, vd.z)));
       if (uCloud > 0.001){
-        /* sea of cloud: warped fbm density, lit from the side by the low sun,
+        /* a stick drawn through the cloud: dents where it passed, material dragged along into streaks,
+           both healing over a few seconds */
+        float dent = 0.0; vec2 drag = vec2(0.0);
+        for (int i = 0; i < 16; i++){
+          vec4 Tp = uTrail[i];
+          float age = uTime - Tp.z;
+          if (Tp.w <= 0.0 || age < 0.0 || age > 5.0) continue;
+          vec2 dp = p - Tp.xy; float r2 = dot(dp, dp);
+          float life = exp(-age * 0.75) * smoothstep(0.0, 0.08, age + 0.04);
+          dent = max(dent, exp(-r2 / 0.22) * life * Tp.w);
+          drag += uTrailV[i] * exp(-r2 / 0.9) * life;
+        }
+        /* sea of cloud: big warped billows, lit from the side by the low sun,
            glowing where it is thin against the light (forward scattering) */
-        vec2 wv = vec2(fbm(p * 0.08 + vec2(uTime * 0.012, 0.0)), fbm(p * 0.08 + vec2(5.2, -uTime * 0.01)));
-        vec2 cb = p * 0.14 + wv * 1.7 + vec2(uTime * 0.02, 0.0);
+        vec2 wv = vec2(fbm(p * 0.05 + vec2(uTime * 0.01, 0.0)), fbm(p * 0.05 + vec2(5.2, -uTime * 0.008)));
+        vec2 cb = p * 0.085 + wv * 1.8 + vec2(uTime * 0.015, 0.0) - drag * 0.02;
         float fade = exp(-dist * 0.012);
         const float ce = 0.05;
         float d0 = fbm(cb), dx = fbm(cb + vec2(ce, 0.0)), dz = fbm(cb + vec2(0.0, ce));
-        float det = fbm(p * 0.55 + wv * 0.9 - vec2(uTime * 0.03, 0.0));
-        float dens = clamp(smoothstep(0.32, 0.72, d0) * 0.9 + (det - 0.5) * 0.35 * fade, 0.0, 1.0);
-        vec3 Nc = normalize(vec3(-(dx - d0) / ce * 0.35 * fade, 1.0, -(dz - d0) / ce * 0.35 * fade));
+        float bill = 1.0 - abs(fbm(p * 0.3 + wv * 1.2 - vec2(uTime * 0.022, 0.0) - drag * 0.05) * 2.0 - 1.0);
+        float dens = clamp(smoothstep(0.26, 0.64, d0) * 0.95 + (bill - 0.55) * 0.45 * fade, 0.0, 1.0);
+        dens *= 1.0 - 0.8 * dent;
+        vec3 Nc = normalize(vec3(-(dx - d0) / ce * 0.6 * fade, 1.0, -(dz - d0) / ce * 0.6 * fade));
         vec3 Ls = normalize(vec3(uSunDir.x, max(uSunDir.y, 0.22), uSunDir.z));
         float diff = clamp(dot(Nc, Ls) * 0.55 + 0.45, 0.0, 1.0);
         float fwd = max(dot(-V, uSunDir), 0.0);
         vec3 shadeC = mix(uDeep, uTide, 0.5) * 0.85;
         vec3 litC = mix(uTide * 1.25, uLight * 0.65 + uPearl * 0.07, 0.4);
-        vec3 cc = mix(shadeC, litC, diff * (0.35 + 0.65 * dens));
+        vec3 cc = mix(shadeC, litC, diff * (0.35 + 0.65 * dens)) * (0.86 + 0.3 * bill * fade);
         cc += uLight * (pow(fwd, 5.0) * 0.3 + pow(fwd, 40.0) * 0.55) * (0.3 + 0.9 * (1.0 - dens));
         cc += sky(vec3(0.0, 1.0, 0.0)) * 0.25;
+        cc *= 1.0 - 0.3 * dent;
         vec3 gap = mix(uDeepSky, uDeep, 0.5) * 0.7;
         vec3 cloud = mix(gap, cc, smoothstep(0.03, 0.4, dens));
         /* the water doesn't cross-fade, it clouds over: the thickest puffs form first */
@@ -1634,6 +1658,7 @@ function initGL(){
   canvas.addEventListener("pointermove", e => {
     ndc.set(e.clientX / W * 2 - 1, -(e.clientY / H) * 2 + 1);
     if (mode === "ring" || mode === "landing") par.set(ndc.x, ndc.y);
+    if (mode === "landing" && cloudMix > 0.2) poke();
     if (down && mode === "ring"){
       if (!dragging && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6){ dragging = true; pendingDive = -1; }
       if (dragging){ const dr = (e.clientX - down.lx) * 0.0075 + (e.clientY - down.ly) * 0.005; if (dr) lastDir = Math.sign(dr); targetRot += dr; down.lx = e.clientX; down.ly = e.clientY; }
@@ -1681,11 +1706,31 @@ function initGL(){
     Pland.p.copy(LAND_POS); Pland.p.y += Math.sin(elapsed * 0.4) * 0.04;
     return Pland;
   }
-  let cloudMix = 0;
+  let cloudMix = 0, cloudFrom = 0;
+  /* the cursor as a stick in the cloud: a short trail of points with their velocities */
+  let tIdx = 0, tLast = null;
+  const tHit = new T.Vector3(), tPlane = new T.Plane(new T.Vector3(0, 1, 0), -0.1);
+  function poke(){
+    ray.setFromCamera(ndc, camera);
+    if (!ray.ray.intersectPlane(tPlane, tHit)) return;
+    if (tHit.distanceTo(camera.position) > 40) return;
+    const now = elapsed;
+    if (tLast){
+      const dt = now - tLast.t, dx = tHit.x - tLast.x, dz = tHit.z - tLast.z, d = Math.hypot(dx, dz);
+      if (d < 0.12 && dt < 0.05) return;
+      let vx = dx / Math.max(dt, 0.016), vz = dz / Math.max(dt, 0.016); const vl = Math.hypot(vx, vz);
+      if (vl > 8){ vx *= 8 / vl; vz *= 8 / vl; }
+      if (d > 3 || dt > 0.4){ vx = 0; vz = 0; }
+      U.uTrail.value[tIdx].set(tHit.x, tHit.z, now, 1);
+      U.uTrailV.value[tIdx].set(vx, vz);
+      tIdx = (tIdx + 1) % 16;
+    }
+    tLast = { x:tHit.x, z:tHit.z, t:now };
+  }
   const LBALL_R = 0.17;
   /* slots in screen space: where each drop hangs, and how far from the lens */
-  const SLOTS_WIDE = [ { x:0.105, y:0.27, d:3.6 }, { x:0.175, y:0.43, d:4.3 }, { x:0.095, y:0.59, d:3.3 }, { x:0.165, y:0.75, d:4.0 } ];
-  const SLOTS_TALL = [ { x:0.13, y:0.13, d:3.8 }, { x:0.2,  y:0.24, d:4.4 }, { x:0.12, y:0.35, d:3.5 }, { x:0.19, y:0.46, d:4.1 } ];
+  const SLOTS_WIDE = [ { x:0.105, y:0.23, d:3.6 }, { x:0.175, y:0.37, d:4.3 }, { x:0.095, y:0.51, d:3.3 }, { x:0.165, y:0.65, d:4.0 }, { x:0.11, y:0.79, d:3.7 } ];
+  const SLOTS_TALL = [ { x:0.13, y:0.12, d:3.8 }, { x:0.2,  y:0.21, d:4.4 }, { x:0.12, y:0.30, d:3.5 }, { x:0.19, y:0.39, d:4.1 }, { x:0.13, y:0.48, d:3.8 } ];
   const slots = () => aspect < 0.9 ? SLOTS_TALL : SLOTS_WIDE;
   const ldrops = lLinks.map((a, i) => {
     const mat = waterMaterial();
@@ -1836,6 +1881,7 @@ function initGL(){
     rot = targetRot = 0; pendingDive = -1;
     if (active !== 0){ active = 0; renderCaption(true); }
     balls.forEach(b => { b.gone = false; b.regrow = 1; });
+    cloudFrom = cloudMix;
     tr = { dir:1, t0:elapsed, from:capture(), paths:makePaths(P0, R0), r0:LBALL_R * Math.min(1, Math.max(0.4, d0.grow)), wake:0 };
     ldrops.forEach(b => { b.on = false; });
     d0.grow = 0; d0.gv = 0;
@@ -1937,6 +1983,7 @@ function initGL(){
     const fallT = reduce ? 0.12 : 0.34;
     b.fall = { t0:elapsed, P, g:2 * P.y / (fallT * fallT), hit:false };
     ldrops.forEach(d => { d.on = false; });
+    cloudFrom = cloudMix;
     dv = { t0:elapsed, from:capture(), I, mid:new T.Vector3(I.x, 1.0, I.z + 3.0), shown:false, up:false };
     seedBubbles(I);
     mode = "toDeep"; htmlEl.classList.add("in-depth");
@@ -2233,6 +2280,7 @@ function initGL(){
     const fallT = reduce ? 0.12 : 0.28;
     b.fall = { t0:elapsed, P, g:2 * P.y / (fallT * fallT), hit:false };
     ldrops.forEach(d => { d.on = false; });
+    cloudFrom = cloudMix;
     pv = { t0:elapsed, from:capture(), shown:false, fell:false };
     setPart(true);
     mode = "toPart"; htmlEl.classList.add("in-part");
@@ -2296,8 +2344,8 @@ function initGL(){
     /* ring visibility: hidden once the camera looks straight down */
     let rv = 1;
     if (mode === "content" || mode === "swap") rv = 0;
-    else if (mode === "dive" && seq.impactT !== null && elapsed - seq.impactT > 0.12) rv = 0;
-    else if (mode === "return" && elapsed - seq.t0 < 0.25) rv = 0;
+    else if (mode === "dive" && seq.impactT !== null && elapsed - seq.impactT > 0.18) rv = 0;
+    else if (mode === "return" && elapsed - seq.t0 < 0.38) rv = 0;
     const sea = ["landing", "toDeep", "deep", "fromDeep", "toPart", "part", "fromPart"].includes(mode);
     if (sea || mode === "toLand") rv = 0;
     ringVis += (rv - ringVis) * (1 - Math.exp(-realDt * 5));
@@ -2307,9 +2355,18 @@ function initGL(){
     portMix = sea ? 0 : mode === "toRing" ? ease(trK) : mode === "toLand" ? 1 - ease(trK) : 1;
     U.uPort.value = portMix; U.uOcean.value = 1 - 0.75 * portMix;
     U.uFog.value.set(16 - 6 * portMix, 150 - 86 * portMix);
-    /* past the middle of the scroll the sea turns into cloud */
-    const cT = mode === "landing" ? smooth(0.42, 0.62, p) : 0;
-    cloudMix += (cT - cloudMix) * (1 - Math.exp(-realDt * (mode === "landing" ? 10 : 4)));
+    /* past the middle of the scroll the sea is cloud; transitions trade it for water only where it can't be seen:
+       under the surface, or while the camera sweeps across */
+    const cLand = smooth(0.42, 0.62, p), camY = camera.position.y;
+    let cT = 0, cRate = 60;
+    if (mode === "landing"){ cT = cLand; cRate = 10; }
+    else if (mode === "toRing") cT = cloudFrom * (1 - smooth(0.35, 0.9, trK));
+    else if (mode === "toLand") cT = cLand * smooth(0.35, 0.95, trK);
+    else if (mode === "toDeep"){ cT = camY > 0.05 ? cloudFrom : 0; if (camY <= 0.05) cRate = 1e4; }
+    else if (mode === "fromDeep"){ cT = camY > 0.05 ? cLand : 0; cRate = camY > 0.05 ? 5 : 1e4; }
+    else if (mode === "toPart") cT = cloudFrom * (1 - smooth(0.12, 0.55, pv ? (elapsed - pv.t0) / PART_IN : 1));
+    else if (mode === "fromPart") cT = cLand * smooth(0.45, 1.0, pv ? (elapsed - pv.t0) / PART_OUT : 1);
+    cloudMix += (cT - cloudMix) * (1 - Math.exp(-realDt * cRate));
     U.uCloud.value = cloudMix < 0.002 ? 0 : cloudMix;
     const vis = ringVis;
     ringMat.uniforms.uVis.value = vis;
@@ -2350,7 +2407,7 @@ function initGL(){
     balls.forEach((b, i) => {
       const isA = i === active;
       b.hov += ((i === hovered ? 1 : 0) - b.hov) * (1 - Math.exp(-realDt * 8));
-      if (!b.gone && b.regrow < 1) b.regrow = Math.min(1, b.regrow + dt / 0.45);
+      if (!b.gone && b.regrow < 1) b.regrow = Math.min(1, b.regrow + dt / 0.65);
       const a = i * STEP + rot;
       const x = R * Math.sin(a), z = R * Math.cos(a);
       tv.set(x, 0, z).applyEuler(ringGroup.rotation);
@@ -2418,7 +2475,7 @@ function initGL(){
         faller.position.y -= (seq.v || 1) * dt;
         u.uFlat.value *= 0.9;
         faller.scale.set(ballR * (1 + 0.1 * sq), ballR * (1 - 0.15 * sq), ballR * (1 + 0.1 * sq));
-        if (faller.position.y < -ballR * 1.05 || m > 0.2) faller.visible = false;
+        if (faller.position.y < -ballR * 1.05 || m > 0.3) faller.visible = false;
       }
       faller.rotation.y += dt * 0.4;
     }
@@ -2442,11 +2499,11 @@ function initGL(){
       const J = seq.jet, a = elapsed - seq.impactT;
       const Hmax = 0.5 * J.S;
       let h = 0;
-      if (a > 0.25 && a < 0.48) h = Hmax * easeOut((a - 0.25) / 0.23);
-      else if (a >= 0.48 && a < 0.78) h = Hmax * (1 - Math.pow((a - 0.48) / 0.3, 2));
+      if (a > 0.37 && a < 0.72) h = Hmax * easeOut((a - 0.37) / 0.35);
+      else if (a >= 0.72 && a < 1.17) h = Hmax * (1 - Math.pow((a - 0.72) / 0.45, 2));
       jet.visible = h > 0.01;
       if (jet.visible){ const w = 0.022 * (1 + 0.5 * (1 - h / Hmax)); jet.position.set(J.x, -0.02, J.z); jet.scale.set(w, h, w); }
-      if (!J.tip && a >= 0.48){ J.tip = true; J.tipY = Hmax + 0.02; J.tipV = 0.5; tipDrop.visible = true; }
+      if (!J.tip && a >= 0.72){ J.tip = true; J.tipY = Hmax + 0.02; J.tipV = 0.5; tipDrop.visible = true; }
       if (J.tip && tipDrop.visible){
         J.tipV -= 3.4 * dt; J.tipY += J.tipV * dt;
         const sq = 1 + Math.min(0.35, Math.abs(J.tipV) * 0.15);
@@ -2478,16 +2535,16 @@ function initGL(){
     } else if (mode === "dive"){
       if (seq.impactT === null){
         followPose();
-        blend(seq.from, Pfollow, ease((elapsed - seq.t0) / 0.38));
+        blend(seq.from, Pfollow, ease((elapsed - seq.t0) / 0.57));
       } else {
         if (!seq.hitFrom) seq.hitFrom = capture();
         const a = elapsed - seq.impactT;
-        const k = ease((a - 0.06) / 0.5);
+        const k = ease((a - 0.09) / 0.75);
         U.uDrops.value[N].w *= Math.exp(-dt * 3);
         topPose(seq.I, TOP_H);
         blend(seq.hitFrom, Ptop, k);
-        Pcam.p.addScaledVector(seq.o, -0.1 * smooth(0, 0.25, a) * (1 - k));
-        if (!seq.shown && a > 0.3){ seq.shown = true; showVeil(seq.i); }
+        Pcam.p.addScaledVector(seq.o, -0.1 * smooth(0, 0.38, a) * (1 - k));
+        if (!seq.shown && a > 0.45){ seq.shown = true; showVeil(seq.i); }
         if (k >= 1){ mode = "content"; nextAmbient = elapsed + 1.5; }
       }
       camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
@@ -2495,19 +2552,19 @@ function initGL(){
       seq.I.lerp(seq.I2, 1 - Math.exp(-dt * 0.9));
       topPose(seq.I, TOP_H); camera.position.copy(Ptop.p); camera.quaternion.copy(Ptop.q);
       U.uDrops.value[N].set(seq.I.x, 1.4, seq.I.z, 0.3);
-      if (mode === "swap" && seq.impactT !== null && !seq.shown && elapsed - seq.impactT > 0.3){ seq.shown = true; fillVeil(seq.i); requestAnimationFrame(() => card.classList.remove("out")); mode = "content"; }
+      if (mode === "swap" && seq.impactT !== null && !seq.shown && elapsed - seq.impactT > 0.45){ seq.shown = true; fillVeil(seq.i); requestAnimationFrame(() => card.classList.remove("out")); mode = "content"; }
       if (mode === "content" && elapsed > nextAmbient){
         const a = Math.random() * Math.PI * 2, r = 0.3 + Math.random() * 0.9;
         addRipple(seq.I.x + Math.cos(a) * r, seq.I.z + Math.sin(a) * r, 0.03 + Math.random() * 0.02, 5 + Math.random() * 3);
         nextAmbient = elapsed + 2.2 + Math.random() * 2.2;
       }
     } else if (mode === "return"){
-      const k = ease((elapsed - seq.t0) / 0.9);
+      const k = ease((elapsed - seq.t0) / 1.35);
       ringPose(); blend(seq.from, Pring, k);
       camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
       U.uDrops.value[N].w *= 0.95;
       const b = balls[seq.i0];
-      if (b.gone && elapsed - seq.t0 > 0.3){ b.gone = false; b.regrow = 0; }
+      if (b.gone && elapsed - seq.t0 > 0.45){ b.gone = false; b.regrow = 0; }
       if (k >= 1){ mode = "ring"; setDeep(false); seq = null; faller.visible = false; }
     }
     camera.updateMatrixWorld();
@@ -2567,7 +2624,7 @@ function frame(now){
   if (gl) timeScale += (gl.targetScale() - timeScale) * (1 - Math.exp(-realDt * 6));
   const dt = realDt * timeScale;
   elapsed += dt;
-  if (mode === "ring") rot += (targetRot - rot) * (1 - Math.exp(-realDt * (reduce ? 20 : pendingDive >= 0 ? 16 : 6.5)));
+  if (mode === "ring") rot += (targetRot - rot) * (1 - Math.exp(-realDt * (reduce ? 20 : pendingDive >= 0 ? 12 : 6.5)));
   const idx = mod(Math.round(-rot / STEP), N);
   if (idx !== active){ active = idx; renderCaption(); }
   if (gl) gl.update(dt, realDt);
