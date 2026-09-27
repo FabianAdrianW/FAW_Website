@@ -286,6 +286,39 @@ html.sea-on .deep-card{transform:none;pointer-events:auto}
   .deep-mist{width:100%;background:linear-gradient(transparent,rgba(3,12,17,.6) 30%,rgba(3,12,17,.7))}
 }
 
+/* ---------- parted sea: "O mnie" on two walls of water ---------- */
+html.in-part,html.in-part body{overflow:hidden}
+html.in-part .drop-link,html.in-part .panel,html.in-part .panel *,html.in-part .gauge,html.in-part .gauge *,html.in-part .mark{pointer-events:none!important}
+.part{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s .45s}
+html.part-on .part{opacity:1;visibility:visible;transition:opacity .5s ease}
+.wall-screen{position:fixed;left:0;top:0;width:660px;height:600px;box-sizing:border-box;padding:40px 46px;display:flex;flex-direction:column;gap:16px;
+  transform-origin:0 0;color:var(--pearl);text-shadow:0 1px 10px rgba(2,8,12,.55);pointer-events:none;overflow:hidden}
+html.part-on .wall-screen{pointer-events:auto}
+.wall-screen .eyebrow{font-family:var(--mono);font-size:14px;letter-spacing:.22em;text-transform:uppercase;color:var(--lantern)}
+.wall-screen h2{font-family:var(--display);font-weight:400;font-size:68px;line-height:.95;margin:-2px 0 4px;text-wrap:balance}
+.wall-screen p{margin:0;font-size:20px;line-height:1.55;color:#D3DDDA}
+.wall-screen p.lede{font-size:25px;line-height:1.42;color:var(--pearl)}
+.wall-facts{display:grid;grid-template-columns:150px 1fr;gap:18px 24px;margin:4px 0 0;padding-top:20px;border-top:1px solid var(--line-strong)}
+.wall-facts dt{font-family:var(--mono);font-size:13.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist);padding-top:6px}
+.wall-facts dd{margin:0;font-size:21px;line-height:1.4}
+.wall-links{display:flex;flex-wrap:wrap;gap:10px 28px;font-size:21px;margin-top:6px}
+.wall-links a{text-decoration:none;border-bottom:1px solid var(--line-strong);padding-bottom:3px;transition:color .25s,border-color .25s}
+.wall-links a:hover{color:var(--lantern);border-color:var(--lantern)}
+.wall-back{align-self:flex-start;margin-top:auto;height:54px;padding:0 28px;border-radius:27px;border:1px solid var(--line-strong);background:rgba(4,12,16,.3);font-size:19px;transition:border-color .25s,color .25s}
+.wall-back:hover{border-color:var(--lantern);color:var(--lantern)}
+/* narrow screens: the walls stay, the text sits flat and scrolls */
+html.part-flat .part-scroll{position:absolute;left:0;right:0;bottom:0;max-height:76vh;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:26px;
+  padding:34px var(--gut) calc(env(safe-area-inset-bottom,0px) + 26px);background:linear-gradient(rgba(3,10,14,0),rgba(3,10,14,.82) 70px,rgba(3,10,14,.9))}
+html.part-flat.part-on .part-scroll{pointer-events:auto}
+html.part-flat .wall-screen{position:static;width:auto;height:auto;padding:0;transform:none!important;overflow:visible;gap:12px}
+html.part-flat .wall-screen h2{font-size:clamp(40px,9vw,58px)}
+html.part-flat .wall-screen p{font-size:15.5px}
+html.part-flat .wall-screen p.lede{font-size:18px}
+html.part-flat .wall-facts{grid-template-columns:minmax(80px,120px) 1fr;gap:10px 16px}
+html.part-flat .wall-facts dt{font-size:11px;padding-top:3px}
+html.part-flat .wall-facts dd,html.part-flat .wall-links{font-size:16px}
+html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6px}
+
 </style>
 </head>
 <body>
@@ -304,7 +337,7 @@ html.sea-on .deep-card{transform:none;pointer-events:auto}
 
 <nav class="drops" id="drops" aria-label="Podstrony">
   <a class="drop-link" href="#portfolio" data-port data-i="0"><span class="n">01</span><span class="t">Portfolio</span><small>Projekty i case studies</small></a>
-  <a class="drop-link" href="o-mnie.html" data-i="1"><span class="n">02</span><span class="t">O mnie</span><small>Kim jestem i jak pracuję</small></a>
+  <a class="drop-link" href="#o-mnie" data-part data-i="1"><span class="n">02</span><span class="t">O mnie</span><small>Kim jestem i jak pracuję</small></a>
   <a class="drop-link" href="narzedzia.html" data-i="2"><span class="n">03</span><span class="t">Narzędzia</span><small>Z czego korzystam na co dzień</small></a>
   <a class="drop-link" href="#uslugi" data-deep data-i="3"><span class="n">04</span><span class="t">Czym się zajmuję</span><small>Usługi dla firm i osób prywatnych</small></a>
 </nav>
@@ -321,7 +354,7 @@ html.sea-on .deep-card{transform:none;pointer-events:auto}
   <div class="eyebrow">02 · O mnie</div>
   <h2 id="p2">Filolog, który buduje produkty AI</h2>
   <p>Uczyłem angielskiego, prowadziłem firmę nieruchomości i trzy lata mieszkałem w Holandii. Dziś studiuję Psychologię i Informatykę w WSB Merito i rozwijam Eyelingo, które wyrosło z badań do mojej pracy magisterskiej.</p>
-  <a class="go" href="o-mnie.html">Więcej o mnie <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+  <a class="go" href="#o-mnie" data-part>Więcej o mnie <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
 </section>
 
 <section class="panel" data-c="0.6" aria-labelledby="p3">
@@ -439,6 +472,32 @@ html.sea-on .deep-card{transform:none;pointer-events:auto}
   </article>
 </section>
 
+<section class="part" id="part" aria-labelledby="partTitle">
+  <div class="part-scroll">
+    <article class="wall-screen" id="wallL">
+      <div class="eyebrow">02 · O mnie</div>
+      <h2 id="partTitle">Filolog, który buduje produkty AI</h2>
+      <p class="lede">Jestem filologiem angielskim, który buduje produkty AI. Zaczynam od specyfikacji, a model językowy traktuję jak wykonawcę, którego pracę da się sprawdzić.</p>
+      <p>Uczyłem angielskiego jako korepetytor, prowadziłem własną firmę nieruchomości i przez trzy lata mieszkałem w Holandii. Studiuję Psychologię i Informatykę (Projektowanie Systemów Inteligentnych) w WSB Merito. Z badań do pracy magisterskiej wyrosło Eyelingo.</p>
+    </article>
+    <article class="wall-screen" id="wallR" aria-label="O mnie w skrócie">
+      <div class="eyebrow">W skrócie</div>
+      <dl class="wall-facts">
+        <dt>Obszar</dt><dd>AI Product Builder: automatyzacje i zastosowania AI w produkcie</dd>
+        <dt>Metoda</dt><dd>Spec-first: klauzula, kontrakt, walidator, pomiar</dd>
+        <dt>Języki</dt><dd>Polski, angielski, hiszpański, niderlandzki, japoński (podstawy)</dd>
+        <dt>Studia</dt><dd>Filologia angielska; magisterskie: Psychologia i Informatyka, WSB Merito</dd>
+      </dl>
+      <div class="wall-links">
+        <a href="https://www.linkedin.com/in/adrian-wojtasik-224a4741a/" target="_blank" rel="noopener">LinkedIn ↗</a>
+        <a href="https://github.com/FabianAdrianW" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="https://www.youtube.com/@eyeamadrian" target="_blank" rel="noopener">YouTube ↗</a>
+      </div>
+      <button class="wall-back" type="button" id="partBack">← Wróć do horyzontu</button>
+    </article>
+  </div>
+</section>
+
 <div class="fade" id="fade" aria-hidden="true"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
@@ -535,7 +594,7 @@ const DROPS = [
 const N = DROPS.length, STEP = Math.PI * 2 / N;
 const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
 let rot = 0, targetRot = 0, active = 0, pendingDive = -1;
-let mode = location.hash === "#portfolio" ? "ring" : location.hash === "#uslugi" ? "deep" : "landing";           // ring | dive | content | swap | return
+let mode = location.hash === "#portfolio" ? "ring" : location.hash === "#uslugi" ? "deep" : location.hash === "#o-mnie" ? "part" : "landing";           // ring | dive | content | swap | return
 let contentIdx = -1, elapsed = 0;
 const mod = (a, n) => ((a % n) + n) % n;
 const $ = id => document.getElementById(id);
@@ -699,7 +758,7 @@ const snap = () => {
   else targetRot = (lastDir > 0 ? Math.ceil(f) : Math.floor(f)) * STEP;
 };
 window.addEventListener("wheel", e => {
-  if (mode === "landing" || mode === "toDeep" || mode === "deep" || mode === "fromDeep") return;
+  if (["landing", "toDeep", "deep", "fromDeep", "toPart", "part", "fromPart"].includes(mode)) return;
   if (e.target.closest && e.target.closest(".veil-card,.lightbox")) return;
   e.preventDefault();
   let d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
@@ -712,7 +771,7 @@ window.addEventListener("wheel", e => {
 }, { passive:false });
 
 window.addEventListener("keydown", e => {
-  if (e.key === "Escape"){ if (!lb.hidden) closeLightbox(); else if (mode === "deep") surface(); else back(); return; }
+  if (e.key === "Escape"){ if (!lb.hidden) closeLightbox(); else if (mode === "deep") surface(); else if (mode === "part") closePart(); else back(); return; }
   if (!lb.hidden){ if (e.key === "ArrowLeft") showPhoto(lbIdx - 1); if (e.key === "ArrowRight") showPhoto(lbIdx + 1); return; }
   if (mode === "content"){
     const inCard = document.activeElement && document.activeElement.closest && document.activeElement.closest(".veil-card");
@@ -730,6 +789,7 @@ window.addEventListener("keydown", e => {
 const htmlEl = document.documentElement;
 if (mode === "ring") htmlEl.classList.add("in-port");
 if (mode === "deep") htmlEl.classList.add("in-depth", "sea-on");
+if (mode === "part") htmlEl.classList.add("in-part", "part-on");
 const STAGES = [
   { c:0,   name:"Horyzont" },
   { c:0.2, name:"Portfolio" },
@@ -750,7 +810,7 @@ const PHI0 = 0.12;
 const tiltOf = q => PHI0 + (Math.PI - 2 * PHI0) * smr(0.03, 0.97, q);
 const yawOf  = q => Math.PI * smr(0.36, 0.64, q);
 
-let pT = 0, p = mode === "deep" ? 0.8 : 0, pPrev = p, pVel = 0, landVis = mode === "landing" ? 1 : 0;
+let pT = 0, p = mode === "deep" ? 0.8 : mode === "part" ? 0.4 : 0, pPrev = p, pVel = 0, landVis = mode === "landing" ? 1 : 0;
 function readScroll(){
   if (mode !== "landing") return;
   const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
@@ -759,7 +819,7 @@ function readScroll(){
 addEventListener("scroll", readScroll, { passive:true });
 addEventListener("resize", readScroll);
 readScroll(); if (mode === "landing") p = pT;
-if (mode === "deep"){ pT = p; requestAnimationFrame(() => { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); scrollTo(0, p * max); }); }
+if (mode === "deep" || mode === "part"){ pT = p; requestAnimationFrame(() => { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); scrollTo(0, p * max); }); }
 function scrollToP(t){
   const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
   scrollTo({ top:t * max, behavior: reduce ? "auto" : "smooth" });
@@ -795,6 +855,7 @@ function leave(href, i){
   /* in-scene sections never fade to black */
   if (href === "#portfolio") return enterPortfolio();
   if (href === "#uslugi") return enterDeep();
+  if (href === "#o-mnie") return enterPart();
   leaving = true;
   if (gl && i >= 0) gl.pulse(i);
   setTimeout(() => fadeEl.classList.add("is-on"), reduce ? 0 : 160);
@@ -824,12 +885,24 @@ function surface(push){
   else { mode = "landing"; htmlEl.classList.remove("in-depth", "sea-on"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
 }
 $("surfaceBtn").addEventListener("click", () => surface());
+function enterPart(push){
+  if (mode !== "landing") return;
+  if (gl) gl.toPart(push);
+  else { mode = "part"; htmlEl.classList.add("in-part", "part-on", "part-flat"); if (push !== false) try { history.pushState(null, "", "#o-mnie"); } catch (_) {} }
+}
+function closePart(push){
+  if (mode !== "part") return;
+  if (gl) gl.fromPart(push);
+  else { mode = "landing"; htmlEl.classList.remove("in-part", "part-on", "part-flat"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
+}
+$("partBack").addEventListener("click", () => closePart());
 const plain = e => !(e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1);
 lLinks.forEach((a, i) => a.addEventListener("click", e => {
   if (!plain(e)) return;
   e.preventDefault();
   if (a.hasAttribute("data-port")) enterPortfolio();
   else if (a.hasAttribute("data-deep")) enterDeep();
+  else if (a.hasAttribute("data-part")) enterPart();
   else leave(a.getAttribute("href"), i);
 }));
 document.querySelectorAll(".panel .go").forEach(a => a.addEventListener("click", e => {
@@ -837,6 +910,7 @@ document.querySelectorAll(".panel .go").forEach(a => a.addEventListener("click",
   e.preventDefault();
   if (a.hasAttribute("data-port")) return enterPortfolio();
   if (a.hasAttribute("data-deep")) return enterDeep();
+  if (a.hasAttribute("data-part")) return enterPart();
   leave(a.getAttribute("href"), lLinks.findIndex(l => l.getAttribute("href") === a.getAttribute("href")));
 }));
 ["homeLink", "brandHome"].forEach(id => { const el = $(id); if (el) el.addEventListener("click", e => { e.preventDefault(); goLanding(); }); });
@@ -844,6 +918,8 @@ addEventListener("popstate", () => {
   const h = location.hash;
   if (h === "#portfolio" && mode === "landing") enterPortfolio(false);
   else if (h === "#uslugi" && mode === "landing") enterDeep(false);
+  else if (h === "#o-mnie" && mode === "landing") enterPart(false);
+  else if (h !== "#o-mnie" && mode === "part") closePart(false);
   else if (h !== "#portfolio" && mode === "ring") goLanding(false);
   else if (h !== "#uslugi" && mode === "deep") surface(false);
 });
@@ -1126,10 +1202,25 @@ function initGL(){
   const waterVS = `
     ${WAVES}
     varying vec3 vWorld;
+    uniform vec3 uPartO; uniform vec2 uPartR, uPartF; uniform float uPartT;
+    /* half-width of the parted corridor at local z (−z runs down the path) */
+    float corrHalf(float z){
+      if (z < -7.72) return 1.3;
+      if (z < -4.68) return mix(1.3, 4.34, (z + 7.72) / 3.04);
+      return mix(4.34, 7.5, clamp((z + 4.68) / 8.68, 0.0, 1.0));
+    }
     void main(){
       vec4 wp = modelMatrix * vec4(position, 1.0);
       float c; vec3 w = waves(wp.xz, c);
       wp.y += w.x;
+      if (uPartT > 0.0){
+        vec2 d = wp.xz - uPartO.xz;
+        float lx = dot(d, uPartR), lz = -dot(d, uPartF);
+        float r = smoothstep(0.0, 0.35, uPartT - max(4.0 - lz - 8.0, 0.0) / 300.0);
+        float hw = corrHalf(lz);
+        float inside = (1.0 - smoothstep(hw + 0.25, hw + 1.4, abs(lx))) * (1.0 - smoothstep(3.5, 4.5, lz)) * step(-245.0, lz);
+        wp.y = mix(wp.y, -2.3, inside * r);
+      }
       vWorld = wp.xyz;
       gl_Position = projectionMatrix * viewMatrix * wp;
     }`;
@@ -1860,7 +1951,7 @@ function initGL(){
     return Ptmp;
   }
   function updateDeepFx(realDt, dt){
-    const under = camera.position.y < 0.0;
+    const under = camera.position.y < 0.0 && mode !== "toPart" && mode !== "part" && mode !== "fromPart";
     U.uUnder.value = under ? 1 : 0;
     const want = under ? 0.5 : 0;
     bubMat.opacity += (want - bubMat.opacity) * (1 - Math.exp(-realDt * (under ? 3 : 12)));
@@ -1873,6 +1964,289 @@ function initGL(){
       }
       bGeo.attributes.position.needsUpdate = true;
     }
+  }
+
+
+  /* ================= PARTING: "O mnie" — the sea opens into a narrow path =================
+     two vertical walls of water rise along a corridor that runs towards the sun; right in front of the
+     viewer each wall turns 45° like the pages of an open book, and those two faces carry the text */
+  const PART_IN = reduce ? 0.45 : 1.45, PART_OUT = reduce ? 0.45 : 1.2;
+  const PART_I = 1;                                   // index of the "O mnie" drop
+  const P_FWD = new T.Vector3(sunDir.x, 0, sunDir.z).normalize();   // the path leads straight at the sun
+  const P_RIGHT = new T.Vector3(-P_FWD.z, 0, P_FWD.x);
+  const P_O = LAND_POS.clone().setY(0).addScaledVector(P_FWD, 7);
+  const P_HW = 1.3, P_FLOOR = -1.5, P_TOP = 2.6;
+  const P_D = Math.SQRT1_2;
+  /* local coords: x to the right, z backwards (−z runs down the path) */
+  const pB = { x:-P_HW, z:-7.72 }, pA = { x:-P_HW - 4.3 * P_D, z:-7.72 + 4.3 * P_D };
+  const pC = { x:(pA.x + pB.x) / 2, z:(pA.z + pB.z) / 2 };
+  const SCR_HALF = 1.76, SCR_Y0 = -1.25, SCR_Y1 = 1.95;          // 3.52 × 3.2 — matches the 660 × 600 px panels
+  const scrA = { x:pC.x - SCR_HALF * P_D, z:pC.z + SCR_HALF * P_D }, scrB = { x:pC.x + SCR_HALF * P_D, z:pC.z - SCR_HALF * P_D };
+  const toWorld = (x, y, z, out) => (out || new T.Vector3()).copy(P_O).addScaledVector(P_RIGHT, x).addScaledVector(P_FWD, -z).setY(y);
+  U.uPartO = { value:P_O.clone() };
+  U.uPartR = { value:new T.Vector2(P_RIGHT.x, P_RIGHT.z) };
+  U.uPartF = { value:new T.Vector2(P_FWD.x, P_FWD.z) };
+  U.uPartT = { value:0 };
+
+  /* wall centre-line: straight sections joined by soft bends */
+  function wallLine(){
+    const pts = [{ x:-7.5, z:4 }, pA, pB, { x:-P_HW, z:-240 }], rad = [0, 1.2, 0.8, 0];
+    const out = [pts[0]];
+    for (let i = 1; i < pts.length - 1; i++){
+      const a = pts[i - 1], b = pts[i], c = pts[i + 1];
+      let ux = b.x - a.x, uz = b.z - a.z, l1 = Math.hypot(ux, uz); ux /= l1; uz /= l1;
+      let vx = c.x - b.x, vz = c.z - b.z, l2 = Math.hypot(vx, vz); vx /= l2; vz /= l2;
+      const th = Math.acos(Math.max(-1, Math.min(1, ux * vx + uz * vz))), t = rad[i] * Math.tan(th / 2);
+      const p1 = { x:b.x - ux * t, z:b.z - uz * t }, p2 = { x:b.x + vx * t, z:b.z + vz * t };
+      for (let k = 0; k <= 10; k++){ const s = k / 10, u = 1 - s; out.push({ x:u * u * p1.x + 2 * u * s * b.x + s * s * p2.x, z:u * u * p1.z + 2 * u * s * b.z + s * s * p2.z }); }
+    }
+    out.push(pts[pts.length - 1]);
+    const cum = [0]; for (let i = 1; i < out.length; i++) cum.push(cum[i - 1] + Math.hypot(out[i].x - out[i - 1].x, out[i].z - out[i - 1].z));
+    return { pts:out, cum, len:cum[cum.length - 1] };
+  }
+  const WL = wallLine();
+  function atS(s){
+    let i = 1; while (i < WL.cum.length - 1 && WL.cum[i] < s) i++;
+    const a = WL.pts[i - 1], b = WL.pts[i], f = (s - WL.cum[i - 1]) / Math.max(1e-6, WL.cum[i] - WL.cum[i - 1]);
+    const tx = b.x - a.x, tz = b.z - a.z, tl = Math.hypot(tx, tz);
+    return { x:a.x + tx * f, z:a.z + tz * f, tx:tx / tl, tz:tz / tl };
+  }
+  function sOf(p){ let best = 0, bd = 1e9; for (let s = 0; s < 30; s += 0.01){ const q = atS(s), d = (q.x - p.x) ** 2 + (q.z - p.z) ** 2; if (d < bd){ bd = d; best = s; } } return best; }
+  const SCR_S = new T.Vector2(sOf(scrA), sOf(scrB));
+  function wallGeo(side){                          // side −1 = left, +1 = right (mirror)
+    const ss = []; for (let s = 0; s < WL.len; s += 0.2 + Math.max(0, s - 15) * 0.03) ss.push(s); ss.push(WL.len);
+    const ROWS = 24, n = ss.length, pos = new Float32Array(n * (ROWS + 1) * 3), nor = new Float32Array(n * (ROWS + 1) * 3), uv = new Float32Array(n * (ROWS + 1) * 2), idx = [];
+    const w = new T.Vector3();
+    ss.forEach((s, i) => {
+      const q = atS(s), lx = side < 0 ? q.x : -q.x;
+      const nlx = side < 0 ? -q.tz : q.tz, nlz = side < 0 ? q.tx : q.tx;   // inward normal in local coords
+      toWorld(lx, 0, q.z, w);
+      const nx = P_RIGHT.x * nlx - P_FWD.x * nlz, nz = P_RIGHT.z * nlx - P_FWD.z * nlz;
+      for (let r = 0; r <= ROWS; r++){
+        const o = i * (ROWS + 1) + r;
+        pos[o * 3] = w.x; pos[o * 3 + 1] = 0; pos[o * 3 + 2] = w.z;
+        nor[o * 3] = nx; nor[o * 3 + 1] = 0; nor[o * 3 + 2] = nz;
+        uv[o * 2] = s; uv[o * 2 + 1] = r / ROWS;
+      }
+    });
+    for (let i = 0; i < n - 1; i++) for (let r = 0; r < ROWS; r++){
+      const a = i * (ROWS + 1) + r, b = a + ROWS + 1;
+      idx.push(a, b, a + 1, b, b + 1, a + 1);
+    }
+    const g = new T.BufferGeometry();
+    g.setAttribute("position", new T.BufferAttribute(pos, 3));
+    g.setAttribute("normal", new T.BufferAttribute(nor, 3));
+    g.setAttribute("aUv", new T.BufferAttribute(uv, 2));
+    g.setIndex(idx);
+    return g;
+  }
+  const wallU = Object.assign({}, U, {
+    uScr:{ value:new T.Vector4(SCR_S.x, SCR_S.y, SCR_Y0, SCR_Y1) }, uScrOn:{ value:0 }
+  });
+  const wallMat = new T.ShaderMaterial({
+    uniforms:wallU, side:T.DoubleSide,
+    vertexShader:`
+      uniform float uTime, uPartT;
+      attribute vec2 aUv;
+      varying vec3 vWorld; varying vec3 vN; varying vec2 vS; varying float vV;
+      void main(){
+        float s = aUv.x;
+        float r = smoothstep(0.0, 0.35, uPartT - max(s - 8.0, 0.0) / 300.0);
+        float top = mix(-0.3, ${P_TOP.toFixed(2)}, r) + (0.07 * sin(s * 1.3 - uTime * 1.6) + 0.035 * sin(s * 3.1 + uTime * 2.3)) * r;
+        float y = mix(${P_FLOOR.toFixed(2)}, top, aUv.y);
+        vec3 p = vec3(position.x, y, position.z);
+        p += normal * (0.05 * aUv.y * aUv.y + 0.025 * sin(y * 2.0 + s * 0.8 - uTime * 1.1)) * r;
+        vWorld = p; vN = normal; vS = vec2(s, y); vV = aUv.y;
+        gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
+      }`,
+    fragmentShader:`
+      uniform float uTime, uStars, uScrOn; uniform vec3 uDeep, uTide, uPearl; uniform vec2 uFog; uniform vec4 uScr;
+      ${SKY}
+      ${NOISE}
+      varying vec3 vWorld; varying vec3 vN; varying vec2 vS; varying float vV;
+      void main(){
+        float s = vS.x, y = vS.y;
+        float h01 = clamp((y - ${P_FLOOR.toFixed(2)}) / ${(P_TOP - P_FLOOR).toFixed(2)}, 0.0, 1.0);
+        vec3 V = normalize(cameraPosition - vWorld);
+        float dist = length(cameraPosition - vWorld);
+        /* the screen: a calm, darker pane of water with a thin lit rim */
+        float dS = min(s - uScr.x, uScr.y - s), dY = min(y - uScr.z, uScr.w - y), dE = min(dS, dY);
+        float inS = smoothstep(-0.02, 0.1, dE) * uScrOn;
+        float rim = exp(-abs(dE) * 38.0) * step(-0.25, dE) * uScrOn;
+        float calm = 1.0 - 0.85 * inS;
+        /* the sheet: slow downward flow, finer ripples on top */
+        float f1 = fbm(vec2(s * 0.9, y * 0.55 - uTime * 0.35));
+        float f2 = fbm(vec2(s * 2.7 + 3.1, y * 1.8 - uTime * 0.9));
+        vec3 Nn = normalize(vN);
+        vec3 Tt = normalize(cross(Nn, vec3(0.0, 1.0, 0.0)));
+        vec3 N = normalize(Nn + (Tt * (f1 - 0.5) * 0.55 + vec3(0.0, 1.0, 0.0) * (f2 - 0.5) * 0.4) * calm);
+        float ndv = max(dot(N, V), 0.0);
+        float fres = 0.03 + 0.8 * pow(1.0 - ndv, 5.0);
+        vec3 R = reflect(-V, N);
+        vec3 refl = sky(R);
+        vec3 body = mix(uDeep * 0.55, uTide * 0.95, pow(h01, 1.8));
+        float ca = pow(1.0 - abs(fbm(vec2(s * 0.6, y * 0.35 - uTime * 0.25)) * 2.0 - 1.0), 6.0);
+        body += mix(uLight, uPearl, 0.5) * ca * 0.08 * (0.3 + h01) * calm;
+        vec3 col = mix(body, refl, fres);
+        vec3 Hs = normalize(uSunDir + V);
+        col += uLight * pow(max(dot(N, Hs), 0.0), 500.0) * 1.2 * calm;
+        col += mix(uTide, uLight, 0.35) * smoothstep(0.92, 1.0, vV) * (0.1 + 0.15 * f2);
+        col = mix(col, uDeep * 0.5 + refl * 0.06, 0.62 * inS);
+        col += mix(uLight, uPearl, 0.3) * rim * 0.45;
+        vec3 vd = -V;
+        col = mix(col, sky(normalize(vec3(vd.x, 0.015, vd.z))), smoothstep(uFog.x, uFog.y, dist));
+        gl_FragColor = vec4(col, 1.0);
+        #include <encodings_fragment>
+      }`
+  });
+  const wallL = new T.Mesh(wallGeo(-1), wallMat), wallR = new T.Mesh(wallGeo(1), wallMat);
+  wallL.frustumCulled = wallR.frustumCulled = false;
+  scene.add(wallL); scene.add(wallR);
+
+  /* the wet path between the walls */
+  const floorMat = new T.ShaderMaterial({
+    uniforms:U,
+    vertexShader:`
+      uniform vec3 uPartO; uniform vec2 uPartR, uPartF;
+      varying vec3 vWorld; varying vec2 vL;
+      void main(){
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vec2 d = wp.xz - uPartO.xz;
+        vL = vec2(dot(d, uPartR), -dot(d, uPartF));
+        vWorld = wp.xyz;
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }`,
+    fragmentShader:`
+      uniform float uTime; uniform vec3 uDeep, uTide, uPearl; uniform vec2 uFog, uPartR, uPartF;
+      ${SKY}
+      ${NOISE}
+      varying vec3 vWorld; varying vec2 vL;
+      void main(){
+        vec2 q = vL;
+        float n = fbm(q * 1.7);
+        float rip = sin(q.y * 11.0 + q.x * 1.7 + fbm(q * 0.9) * 7.0) * (0.5 + 0.5 * fbm(q * 0.4 + 3.0));
+        float puddle = smoothstep(0.48, 0.58, fbm(q * vec2(0.8, 0.22) + 7.0));
+        vec2 gl = vec2((fbm(q * 3.0 + 2.0) - 0.5) * 0.16, rip * 0.02) * (1.0 - puddle * 0.9);
+        vec3 N = normalize(vec3(uPartR.x * gl.x - uPartF.x * gl.y, 1.0, uPartR.y * gl.x - uPartF.y * gl.y));
+        vec3 V = normalize(cameraPosition - vWorld);
+        float dist = length(cameraPosition - vWorld);
+        vec3 R = reflect(-V, N);
+        float fres = 0.04 + 0.96 * pow(1.0 - max(dot(N, V), 0.0), 5.0);
+        vec3 sand = mix(vec3(0.016, 0.02, 0.021), vec3(0.04, 0.045, 0.043), n) * (0.92 + 0.08 * rip);
+        sand = mix(sand, uDeep * 0.8, 0.35);
+        vec3 col = mix(sand, sky(R), mix(fres * 0.9, 0.9, puddle));
+        float m = max(dot(R, uSunDir), 0.0);
+        col += uLight * (pow(m, 260.0) * 1.6 * (0.35 + puddle) + pow(m, 24.0) * 0.07);
+        /* the walls' shadow near their feet */
+        col *= mix(0.55, 1.0, smoothstep(0.0, 0.9, ${P_HW.toFixed(2)} - abs(q.x)) * step(q.y, -8.0) + step(-8.0, q.y));
+        vec3 vd = -V;
+        col = mix(col, sky(normalize(vec3(vd.x, 0.015, vd.z))), smoothstep(uFog.x, uFog.y, dist));
+        gl_FragColor = vec4(col, 1.0);
+        #include <encodings_fragment>
+      }`
+  });
+  const floorMesh = new T.Mesh(new T.PlaneGeometry(16, 246, 1, 1), floorMat);
+  floorMesh.rotation.x = -Math.PI / 2;
+  const floorPivot = new T.Group(); floorPivot.add(floorMesh);
+  floorMesh.position.z = (4 - 242) / 2;                    // local z from +4 to −242
+  floorPivot.position.copy(P_O).setY(P_FLOOR);
+  floorPivot.rotation.y = Math.atan2(-P_FWD.x, -P_FWD.z);   // local −z runs down the path
+  scene.add(floorPivot);
+  floorMesh.frustumCulled = false;
+  const setPart = on => { wallL.visible = wallR.visible = floorPivot.visible = floorMesh.visible = on; };
+  setPart(false);
+
+  /* the viewer's spot on the path, and a point above it the camera arcs through */
+  const Ppart = pose(), Pp = pose();
+  {
+    const eye = toWorld(0, -0.35, 2.0);
+    const tgt = eye.clone().addScaledVector(P_FWD, 10); tgt.y += 10 * Math.tan(0.05);
+    look(Ppart, eye, tgt, UP);
+  }
+  const partMid = toWorld(0, 2.4, 3.0);
+  let pv = null;
+
+  /* text panels: real HTML mapped onto the two wall faces with a projective transform */
+  const scrEls = [$("wallL"), $("wallR")];
+  const PANEL_W = 660, PANEL_H = 600;
+  const corners = [
+    [toWorld(scrA.x, SCR_Y1, scrA.z), toWorld(scrB.x, SCR_Y1, scrB.z), toWorld(scrA.x, SCR_Y0, scrA.z), toWorld(scrB.x, SCR_Y0, scrB.z)],
+    [toWorld(-scrB.x, SCR_Y1, scrB.z), toWorld(-scrA.x, SCR_Y1, scrA.z), toWorld(-scrB.x, SCR_Y0, scrB.z), toWorld(-scrA.x, SCR_Y0, scrA.z)]
+  ];
+  const adj = m => [m[4]*m[8]-m[5]*m[7], m[2]*m[7]-m[1]*m[8], m[1]*m[5]-m[2]*m[4], m[5]*m[6]-m[3]*m[8], m[0]*m[8]-m[2]*m[6], m[2]*m[3]-m[0]*m[5], m[3]*m[7]-m[4]*m[6], m[1]*m[6]-m[0]*m[7], m[0]*m[4]-m[1]*m[3]];
+  const mulMM = (a, b) => { const c = new Array(9); for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++){ let s = 0; for (let k = 0; k < 3; k++) s += a[3 * i + k] * b[3 * k + j]; c[3 * i + j] = s; } return c; };
+  const mulMV = (m, v) => [m[0]*v[0]+m[1]*v[1]+m[2]*v[2], m[3]*v[0]+m[4]*v[1]+m[5]*v[2], m[6]*v[0]+m[7]*v[1]+m[8]*v[2]];
+  const basis = (x1, y1, x2, y2, x3, y3, x4, y4) => { const m = [x1, x2, x3, y1, y2, y3, 1, 1, 1]; const v = mulMV(adj(m), [x4, y4, 1]); return mulMM(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]]); };
+  const SRC = basis(0, 0, PANEL_W, 0, 0, PANEL_H, PANEL_W, PANEL_H), SRC_ADJ = adj(SRC);
+  const pc = new T.Vector3();
+  let flatWas = null;
+  function placePanels(){
+    const flat = aspect < 1.15 || W < 820;
+    if (flat !== flatWas){ flatWas = flat; htmlEl.classList.toggle("part-flat", flat); if (flat) scrEls.forEach(el => { el.style.transform = ""; }); }
+    if (flat) return;
+    scrEls.forEach((el, i) => {
+      const d = []; let ok = true;
+      corners[i].forEach(c => { pc.copy(c).project(camera); if (pc.z > 1) ok = false; d.push((pc.x * 0.5 + 0.5) * W, (-pc.y * 0.5 + 0.5) * H); });
+      if (!ok){ el.style.visibility = "hidden"; return; }
+      el.style.visibility = "";
+      const t = mulMM(basis(...d), SRC_ADJ);
+      for (let k = 0; k < 9; k++) t[k] /= t[8];
+      el.style.transform = `matrix3d(${t[0]},${t[3]},0,${t[6]},${t[1]},${t[4]},0,${t[7]},0,0,1,0,${t[2]},${t[5]},0,1)`;
+    });
+  }
+
+  function toPart(push){
+    if (mode !== "landing") return;
+    const b = ldrops[PART_I];
+    const P = b.mesh.visible ? b.mesh.position.clone() : slotLocal(PART_I, new T.Vector3()).applyMatrix4(camera.matrixWorld);
+    if (P.y < 0.6) P.y = 0.6;
+    const fallT = reduce ? 0.12 : 0.28;
+    b.fall = { t0:elapsed, P, g:2 * P.y / (fallT * fallT), hit:false };
+    ldrops.forEach(d => { d.on = false; });
+    pv = { t0:elapsed, from:capture(), shown:false, fell:false };
+    setPart(true);
+    mode = "toPart"; htmlEl.classList.add("in-part");
+    if (push !== false) try { history.pushState(null, "", "#o-mnie"); } catch (_) {}
+  }
+  function fromPart(push){
+    if (mode !== "part") return;
+    pv = { t0:elapsed, from:capture(), fell:false };
+    mode = "fromPart"; htmlEl.classList.remove("part-on");
+    if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {}
+  }
+  if (mode === "part"){
+    pv = { t0:0, from:{ p:Ppart.p.clone(), q:Ppart.q.clone() }, shown:true };
+    U.uPartT.value = 1.2; wallU.uScrOn.value = 1; setPart(true);
+  }
+  function partCamera(){
+    const t = pv ? elapsed - pv.t0 : 0;
+    if (mode === "part"){
+      Pp.p.copy(Ppart.p); Pp.p.y += Math.sin(elapsed * 0.5) * 0.012;
+      Pp.q.copy(Ppart.q);
+      U.uPartT.value = 1.2; wallU.uScrOn.value = Math.min(1, wallU.uScrOn.value + 0.05);
+      return Pp;
+    }
+    if (mode === "toPart"){
+      qbez(pv.from.p, partMid, Ppart.p, ease((t - 0.05) / (PART_IN - 0.05)), Pp.p);
+      Pp.q.slerpQuaternions(pv.from.q, Ppart.q, ease((t - 0.05) / (PART_IN - 0.15)));
+      U.uPartT.value = 1.2 * easeOut((t - 0.16) / 0.9);
+      wallU.uScrOn.value = smooth(PART_IN - 0.55, PART_IN - 0.05, t);
+      if (!pv.shown && t > PART_IN - 0.45){ pv.shown = true; htmlEl.classList.add("part-on"); }
+      if (t >= PART_IN) mode = "part";
+      return Pp;
+    }
+    /* fromPart: rise out of the path, the walls fall back into the sea behind us */
+    landPose();
+    qbez(pv.from.p, partMid, Pland.p, ease(t / PART_OUT), Pp.p);
+    Pp.q.slerpQuaternions(pv.from.q, Pland.q, ease((t - 0.18) / (PART_OUT - 0.18)));
+    U.uPartT.value = 1.2 * (1 - smooth(0.12, 0.95, t / PART_OUT));
+    wallU.uScrOn.value = 1 - smooth(0, 0.25, t);
+    if (!pv.fell && t > PART_OUT * 0.6){
+      pv.fell = true;
+      for (let k = 0; k < 3; k++){ const w = toWorld(k % 2 ? 1.2 : -1.2, 0, -3 - k * 3); addRipple(w.x, w.z, 0.12, 3.4); }
+    }
+    if (t >= PART_OUT){ mode = "landing"; htmlEl.classList.remove("in-part"); pv = null; U.uPartT.value = 0; setPart(false); }
+    return Pp;
   }
 
   let nextAmbient = 0;
@@ -1895,7 +2269,7 @@ function initGL(){
     if (mode === "content" || mode === "swap") rv = 0;
     else if (mode === "dive" && seq.impactT !== null && elapsed - seq.impactT > 1.0) rv = 0;
     else if (mode === "return" && elapsed - seq.t0 < 0.7) rv = 0;
-    const sea = mode === "landing" || mode === "toDeep" || mode === "deep" || mode === "fromDeep";
+    const sea = ["landing", "toDeep", "deep", "fromDeep", "toPart", "part", "fromPart"].includes(mode);
     if (sea || mode === "toLand") rv = 0;
     ringVis += (rv - ringVis) * (1 - Math.exp(-realDt * 2.2));
     const trK = tr ? Math.min(1, Math.max(0, (elapsed - tr.t0) / TR_DUR)) : 0;
@@ -2051,7 +2425,8 @@ function initGL(){
 
     /* fine water patch follows the action */
     const wx = seq ? seq.I.x : 0, wz = seq ? seq.I.z : 3.2;
-    water.position.set(LAND_POS.x + (wx - LAND_POS.x) * portMix, 0, LAND_POS.z + (wz - LAND_POS.z) * portMix);
+    if (portMix === 0) water.position.set(camera.position.x, 0, camera.position.z);
+    else water.position.set(LAND_POS.x + (wx - LAND_POS.x) * portMix, 0, LAND_POS.z + (wz - LAND_POS.z) * portMix);
 
     /* camera */
     if (mode === "landing"){
@@ -2063,6 +2438,8 @@ function initGL(){
       blend(tr.from, tr.to, ease(trK)); camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
     } else if (mode === "toDeep" || mode === "deep" || mode === "fromDeep"){
       const P = deepCamera(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
+    } else if (mode === "toPart" || mode === "part" || mode === "fromPart"){
+      const P = partCamera(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
     } else if (mode === "ring"){
       const P = ringPose(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
     } else if (mode === "dive"){
@@ -2104,6 +2481,7 @@ function initGL(){
     skyMesh.position.copy(camera.position);
     updateLandingDrops(realDt);
     updateDeepFx(realDt, dt);
+    if (pv) placePanels();
 
     /* keep the invisible hit target over the sun disc */
     if (mode === "ring" || mode === "landing"){
@@ -2132,7 +2510,7 @@ function initGL(){
     try { renderer.compile(scene, camera); } catch (_) {}
     hid.forEach(o => { o.visible = false; });
   }
-  return { update, back, swap, targetScale, toggleCel, toRing, toLand, toDeep, fromDeep, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
+  return { update, back, swap, targetScale, toggleCel, toRing, toLand, toDeep, fromDeep, toPart, fromPart, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
 }
 
 /* fallback without WebGL: open content directly */
