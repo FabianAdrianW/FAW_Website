@@ -84,7 +84,7 @@ a{color:inherit}
 /* ---------- veil: content floating above the water ---------- */
 .veil{position:fixed;inset:0;z-index:4;pointer-events:none;display:grid;place-items:center;
   padding:calc(env(safe-area-inset-top,0px) + 70px) var(--gut) calc(env(safe-area-inset-bottom,0px) + 84px);
-  opacity:0;transition:opacity 1.1s ease}
+  opacity:0;transition:opacity .4s ease}
 .veil.is-on{opacity:1}
 .mist{position:absolute;left:50%;top:50%;width:min(1180px,160vw);height:min(1000px,130vh);transform:translate(-50%,-50%);pointer-events:none;
   background:radial-gradient(closest-side,rgba(196,219,216,.15),rgba(196,219,216,.07) 55%,rgba(196,219,216,0) 100%);
@@ -97,7 +97,7 @@ a{color:inherit}
 .veil-card{position:relative;pointer-events:auto;width:min(680px,100%);max-height:100%;overflow-y:auto;overscroll-behavior:contain;
   padding-block:26px;display:flex;flex-direction:column;gap:18px;text-shadow:0 1px 16px rgba(3,8,11,.75);
   -webkit-mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 30px),transparent);mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 30px),transparent);
-  transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.8,.2,1),filter .9s ease;animation:hover 9s ease-in-out infinite alternate}
+  transition:opacity .4s ease,transform .5s cubic-bezier(.2,.8,.2,1),filter .4s ease;animation:hover 9s ease-in-out infinite alternate}
 .veil-card.out{opacity:0;transform:translateY(16px) scale(.985);filter:blur(8px)}
 @keyframes hover{from{translate:0 -4px}to{translate:0 5px}}
 .veil-card .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern)}
@@ -971,7 +971,7 @@ function initGL(){
 
   const scene = new T.Scene();
   const camera = new T.PerspectiveCamera(40, 1, 0.03, 900);
-  const R = 3.6, RING_Y = 1.35, NR = 36, ND = N + 1 + LN, G = 1.4, RELEASE = 0.4;
+  const R = 3.6, RING_Y = 1.35, NR = 36, ND = N + 1 + LN, G = 18, RELEASE = 0.08;   // fast fall: click → content in under a second
   const C = h => new T.Color(h);
 
   /* ---- light: sun ↔ moon ---- */
@@ -996,7 +996,7 @@ function initGL(){
     uSunCol:{ value:sunC }, uMoonCol:{ value:moonC }, uCel:{ value:0 },
     uDeep:{ value:C("#041017") }, uTide:{ value:C("#1A4250") }, uPearl:{ value:C("#E6ECE8") },
     uStars:{ value:1 }, uSpin:{ value:0 }, uDrag:{ value:0 },
-    uPort:{ value: mode === "ring" ? 1 : 0 }, uOcean:{ value: mode === "ring" ? 0.25 : 1 }, uFog:{ value:new T.Vector2(16, 150) }, uUnder:{ value:0 }
+    uPort:{ value: mode === "ring" ? 1 : 0 }, uOcean:{ value: mode === "ring" ? 0.25 : 1 }, uFog:{ value:new T.Vector2(16, 150) }, uUnder:{ value:0 }, uCloud:{ value:0 }
   };
 
   const SKY = `
@@ -1202,6 +1202,8 @@ function initGL(){
   const waterVS = `
     ${WAVES}
     varying vec3 vWorld;
+    ${NOISE}
+    uniform float uCloud;
     uniform vec3 uPartO; uniform vec2 uPartR, uPartF; uniform float uPartT;
     /* half-width of the parted corridor at local z (−z runs down the path) */
     float corrHalf(float z){
@@ -1212,7 +1214,9 @@ function initGL(){
     void main(){
       vec4 wp = modelMatrix * vec4(position, 1.0);
       float c; vec3 w = waves(wp.xz, c);
-      wp.y += w.x;
+      wp.y += w.x * (1.0 - uCloud);
+      /* the cloud sea is gently lumpy, so the horizon line isn't ruler-straight */
+      if (uCloud > 0.001) wp.y += (fbm(wp.xz * 0.14 + vec2(uTime * 0.02, 0.0)) - 0.45) * 0.9 * uCloud;
       if (uPartT > 0.0){
         vec2 d = wp.xz - uPartO.xz;
         float lx = dot(d, uPartR), lz = -dot(d, uPartF);
@@ -1228,7 +1232,7 @@ function initGL(){
     ${WAVES}
     ${SKY}
     ${NOISE}
-    uniform float uRingVis, uStars, uUnder;
+    uniform float uRingVis, uStars, uUnder, uCloud;
     uniform vec2 uFog;
     uniform vec3 uDeep, uTide, uPearl;
     varying vec3 vWorld;
@@ -1302,6 +1306,31 @@ function initGL(){
       }
       vec3 vd = -V;
       vec3 fogc = sky(normalize(vec3(vd.x, 0.015, vd.z)));
+      if (uCloud > 0.001){
+        /* sea of cloud: warped fbm density, lit from the side by the low sun,
+           glowing where it is thin against the light (forward scattering) */
+        vec2 wv = vec2(fbm(p * 0.08 + vec2(uTime * 0.012, 0.0)), fbm(p * 0.08 + vec2(5.2, -uTime * 0.01)));
+        vec2 cb = p * 0.14 + wv * 1.7 + vec2(uTime * 0.02, 0.0);
+        float fade = exp(-dist * 0.012);
+        const float ce = 0.05;
+        float d0 = fbm(cb), dx = fbm(cb + vec2(ce, 0.0)), dz = fbm(cb + vec2(0.0, ce));
+        float det = fbm(p * 0.55 + wv * 0.9 - vec2(uTime * 0.03, 0.0));
+        float dens = clamp(smoothstep(0.32, 0.72, d0) * 0.9 + (det - 0.5) * 0.35 * fade, 0.0, 1.0);
+        vec3 Nc = normalize(vec3(-(dx - d0) / ce * 0.35 * fade, 1.0, -(dz - d0) / ce * 0.35 * fade));
+        vec3 Ls = normalize(vec3(uSunDir.x, max(uSunDir.y, 0.22), uSunDir.z));
+        float diff = clamp(dot(Nc, Ls) * 0.55 + 0.45, 0.0, 1.0);
+        float fwd = max(dot(-V, uSunDir), 0.0);
+        vec3 shadeC = mix(uDeep, uTide, 0.5) * 0.85;
+        vec3 litC = mix(uTide * 1.25, uLight * 0.65 + uPearl * 0.07, 0.4);
+        vec3 cc = mix(shadeC, litC, diff * (0.35 + 0.65 * dens));
+        cc += uLight * (pow(fwd, 5.0) * 0.3 + pow(fwd, 40.0) * 0.55) * (0.3 + 0.9 * (1.0 - dens));
+        cc += sky(vec3(0.0, 1.0, 0.0)) * 0.25;
+        vec3 gap = mix(uDeepSky, uDeep, 0.5) * 0.7;
+        vec3 cloud = mix(gap, cc, smoothstep(0.03, 0.4, dens));
+        /* the water doesn't cross-fade, it clouds over: the thickest puffs form first */
+        float cm = smoothstep((1.0 - dens) - 0.25, (1.0 - dens) + 0.25, uCloud * 1.5 - 0.25);
+        col = mix(col, cloud, cm);
+      }
       col = mix(col, fogc, smoothstep(uFog.x, uFog.y, dist));
       gl_FragColor = vec4(col, 1.0);
       #include <encodings_fragment>
@@ -1382,7 +1411,7 @@ function initGL(){
     waterMats.push(m);
     return m;
   }
-  const ballGeo = new T.SphereGeometry(1, 128, 96);
+  const ballGeo = new T.SphereGeometry(1, 72, 54);
   const hitGeo = new T.SphereGeometry(1.45, 10, 8);
 
   /* ---- the ring: a luminous filament, shaded per pixel so it stays smooth ---- */
@@ -1652,6 +1681,7 @@ function initGL(){
     Pland.p.copy(LAND_POS); Pland.p.y += Math.sin(elapsed * 0.4) * 0.04;
     return Pland;
   }
+  let cloudMix = 0;
   const LBALL_R = 0.17;
   /* slots in screen space: where each drop hangs, and how far from the lens */
   const SLOTS_WIDE = [ { x:0.105, y:0.27, d:3.6 }, { x:0.175, y:0.43, d:4.3 }, { x:0.095, y:0.59, d:3.3 }, { x:0.165, y:0.75, d:4.0 } ];
@@ -2254,8 +2284,7 @@ function initGL(){
   /* slow motion around the impact, like high-speed footage */
   function targetScale(){
     if (reduce || !seq || mode !== "dive") return 1;
-    if (seq.impactT === null) return elapsed > seq.tImpact - 0.14 ? 0.33 : 1;
-    return elapsed - seq.impactT < 1.05 ? 0.33 : 1;
+    return 1;   // no slow motion: the whole dive stays under a second
   }
 
   function update(dt, realDt){
@@ -2267,17 +2296,21 @@ function initGL(){
     /* ring visibility: hidden once the camera looks straight down */
     let rv = 1;
     if (mode === "content" || mode === "swap") rv = 0;
-    else if (mode === "dive" && seq.impactT !== null && elapsed - seq.impactT > 1.0) rv = 0;
-    else if (mode === "return" && elapsed - seq.t0 < 0.7) rv = 0;
+    else if (mode === "dive" && seq.impactT !== null && elapsed - seq.impactT > 0.12) rv = 0;
+    else if (mode === "return" && elapsed - seq.t0 < 0.25) rv = 0;
     const sea = ["landing", "toDeep", "deep", "fromDeep", "toPart", "part", "fromPart"].includes(mode);
     if (sea || mode === "toLand") rv = 0;
-    ringVis += (rv - ringVis) * (1 - Math.exp(-realDt * 2.2));
+    ringVis += (rv - ringVis) * (1 - Math.exp(-realDt * 5));
     const trK = tr ? Math.min(1, Math.max(0, (elapsed - tr.t0) / TR_DUR)) : 0;
     if (mode === "toRing") ringVis = smooth(0.5, 1, trK);
     else if (mode === "toLand") ringVis = 1 - smooth(0, 0.45, trK);
     portMix = sea ? 0 : mode === "toRing" ? ease(trK) : mode === "toLand" ? 1 - ease(trK) : 1;
     U.uPort.value = portMix; U.uOcean.value = 1 - 0.75 * portMix;
     U.uFog.value.set(16 - 6 * portMix, 150 - 86 * portMix);
+    /* past the middle of the scroll the sea turns into cloud */
+    const cT = mode === "landing" ? smooth(0.42, 0.62, p) : 0;
+    cloudMix += (cT - cloudMix) * (1 - Math.exp(-realDt * (mode === "landing" ? 10 : 4)));
+    U.uCloud.value = cloudMix < 0.002 ? 0 : cloudMix;
     const vis = ringVis;
     ringMat.uniforms.uVis.value = vis;
     U.uRingVis.value = vis;
@@ -2317,7 +2350,7 @@ function initGL(){
     balls.forEach((b, i) => {
       const isA = i === active;
       b.hov += ((i === hovered ? 1 : 0) - b.hov) * (1 - Math.exp(-realDt * 8));
-      if (!b.gone && b.regrow < 1) b.regrow = Math.min(1, b.regrow + dt / 1.1);
+      if (!b.gone && b.regrow < 1) b.regrow = Math.min(1, b.regrow + dt / 0.45);
       const a = i * STEP + rot;
       const x = R * Math.sin(a), z = R * Math.cos(a);
       tv.set(x, 0, z).applyEuler(ringGroup.rotation);
@@ -2356,7 +2389,7 @@ function initGL(){
 
     if (tr) updateTransition();
 
-    if (mode === "ring" && pendingDive >= 0 && Math.abs(targetRot - rot) < 0.006 && active === pendingDive) dive(pendingDive);
+    if (mode === "ring" && pendingDive >= 0 && Math.abs(targetRot - rot) < 0.05 && active === pendingDive) dive(pendingDive);
 
     /* falling ball: rest → release wobble → uniformly accelerated fall → coalescence */
     if (seq && faller.visible){
@@ -2385,7 +2418,7 @@ function initGL(){
         faller.position.y -= (seq.v || 1) * dt;
         u.uFlat.value *= 0.9;
         faller.scale.set(ballR * (1 + 0.1 * sq), ballR * (1 - 0.15 * sq), ballR * (1 + 0.1 * sq));
-        if (faller.position.y < -ballR * 1.05 || m > 0.45) faller.visible = false;
+        if (faller.position.y < -ballR * 1.05 || m > 0.2) faller.visible = false;
       }
       faller.rotation.y += dt * 0.4;
     }
@@ -2409,11 +2442,11 @@ function initGL(){
       const J = seq.jet, a = elapsed - seq.impactT;
       const Hmax = 0.5 * J.S;
       let h = 0;
-      if (a > 0.42 && a < 0.8) h = Hmax * easeOut((a - 0.42) / 0.38);
-      else if (a >= 0.8 && a < 1.3) h = Hmax * (1 - Math.pow((a - 0.8) / 0.5, 2));
+      if (a > 0.25 && a < 0.48) h = Hmax * easeOut((a - 0.25) / 0.23);
+      else if (a >= 0.48 && a < 0.78) h = Hmax * (1 - Math.pow((a - 0.48) / 0.3, 2));
       jet.visible = h > 0.01;
       if (jet.visible){ const w = 0.022 * (1 + 0.5 * (1 - h / Hmax)); jet.position.set(J.x, -0.02, J.z); jet.scale.set(w, h, w); }
-      if (!J.tip && a >= 0.8){ J.tip = true; J.tipY = Hmax + 0.02; J.tipV = 0.5; tipDrop.visible = true; }
+      if (!J.tip && a >= 0.48){ J.tip = true; J.tipY = Hmax + 0.02; J.tipV = 0.5; tipDrop.visible = true; }
       if (J.tip && tipDrop.visible){
         J.tipV -= 3.4 * dt; J.tipY += J.tipV * dt;
         const sq = 1 + Math.min(0.35, Math.abs(J.tipV) * 0.15);
@@ -2445,16 +2478,16 @@ function initGL(){
     } else if (mode === "dive"){
       if (seq.impactT === null){
         followPose();
-        blend(seq.from, Pfollow, ease((elapsed - seq.t0) / 1.25));
+        blend(seq.from, Pfollow, ease((elapsed - seq.t0) / 0.38));
       } else {
         if (!seq.hitFrom) seq.hitFrom = capture();
         const a = elapsed - seq.impactT;
-        const k = ease((a - 0.95) / 2.3);
+        const k = ease((a - 0.06) / 0.5);
         U.uDrops.value[N].w *= Math.exp(-dt * 3);
         topPose(seq.I, TOP_H);
         blend(seq.hitFrom, Ptop, k);
-        Pcam.p.addScaledVector(seq.o, -0.1 * smooth(0, 0.95, a) * (1 - k));
-        if (!seq.shown && a > 2.6){ seq.shown = true; showVeil(seq.i); }
+        Pcam.p.addScaledVector(seq.o, -0.1 * smooth(0, 0.25, a) * (1 - k));
+        if (!seq.shown && a > 0.3){ seq.shown = true; showVeil(seq.i); }
         if (k >= 1){ mode = "content"; nextAmbient = elapsed + 1.5; }
       }
       camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
@@ -2462,19 +2495,19 @@ function initGL(){
       seq.I.lerp(seq.I2, 1 - Math.exp(-dt * 0.9));
       topPose(seq.I, TOP_H); camera.position.copy(Ptop.p); camera.quaternion.copy(Ptop.q);
       U.uDrops.value[N].set(seq.I.x, 1.4, seq.I.z, 0.3);
-      if (mode === "swap" && seq.impactT !== null && !seq.shown && elapsed - seq.impactT > 0.9){ seq.shown = true; fillVeil(seq.i); requestAnimationFrame(() => card.classList.remove("out")); mode = "content"; }
+      if (mode === "swap" && seq.impactT !== null && !seq.shown && elapsed - seq.impactT > 0.3){ seq.shown = true; fillVeil(seq.i); requestAnimationFrame(() => card.classList.remove("out")); mode = "content"; }
       if (mode === "content" && elapsed > nextAmbient){
         const a = Math.random() * Math.PI * 2, r = 0.3 + Math.random() * 0.9;
         addRipple(seq.I.x + Math.cos(a) * r, seq.I.z + Math.sin(a) * r, 0.03 + Math.random() * 0.02, 5 + Math.random() * 3);
         nextAmbient = elapsed + 2.2 + Math.random() * 2.2;
       }
     } else if (mode === "return"){
-      const k = ease((elapsed - seq.t0) / 2.4);
+      const k = ease((elapsed - seq.t0) / 0.9);
       ringPose(); blend(seq.from, Pring, k);
       camera.position.copy(Pcam.p); camera.quaternion.copy(Pcam.q);
       U.uDrops.value[N].w *= 0.95;
       const b = balls[seq.i0];
-      if (b.gone && elapsed - seq.t0 > 1.0){ b.gone = false; b.regrow = 0; }
+      if (b.gone && elapsed - seq.t0 > 0.3){ b.gone = false; b.regrow = 0; }
       if (k >= 1){ mode = "ring"; setDeep(false); seq = null; faller.visible = false; }
     }
     camera.updateMatrixWorld();
@@ -2534,7 +2567,7 @@ function frame(now){
   if (gl) timeScale += (gl.targetScale() - timeScale) * (1 - Math.exp(-realDt * 6));
   const dt = realDt * timeScale;
   elapsed += dt;
-  if (mode === "ring") rot += (targetRot - rot) * (1 - Math.exp(-realDt * (reduce ? 20 : 6.5)));
+  if (mode === "ring") rot += (targetRot - rot) * (1 - Math.exp(-realDt * (reduce ? 20 : pendingDive >= 0 ? 16 : 6.5)));
   const idx = mod(Math.round(-rot / STEP), N);
   if (idx !== active){ active = idx; renderCaption(); }
   if (gl) gl.update(dt, realDt);
