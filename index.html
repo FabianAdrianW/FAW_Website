@@ -286,13 +286,15 @@ html.sea-on .deep-card{transform:none;pointer-events:auto}
   .deep-mist{width:100%;background:linear-gradient(transparent,rgba(3,12,17,.6) 30%,rgba(3,12,17,.7))}
 }
 
-/* ---------- parted sea: "O mnie" on two walls of water ---------- */
+/* ---------- "O mnie": text lying on the still, mirror-like water ---------- */
 html.in-part,html.in-part body{overflow:hidden}
 html.in-part .drop-link,html.in-part .panel,html.in-part .panel *,html.in-part .gauge,html.in-part .gauge *,html.in-part .mark{pointer-events:none!important}
 .part{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s .45s}
 html.part-on .part{opacity:1;visibility:visible;transition:opacity .5s ease}
+.fx-defs{position:absolute;width:0;height:0;overflow:hidden}
 .wall-screen{position:fixed;left:0;top:0;width:660px;height:600px;box-sizing:border-box;padding:40px 46px;display:flex;flex-direction:column;gap:16px;
-  transform-origin:0 0;color:var(--pearl);text-shadow:0 1px 10px rgba(2,8,12,.55);pointer-events:none;overflow:hidden}
+  transform-origin:0 0;color:var(--pearl);text-shadow:0 0 18px rgba(200,225,222,.18),0 1px 8px rgba(2,8,12,.6);pointer-events:none;overflow:hidden;filter:url(#shimmer)}
+html.part-flat .wall-screen{filter:none}
 html.part-on .wall-screen{pointer-events:auto}
 .wall-screen .eyebrow{font-family:var(--mono);font-size:14px;letter-spacing:.22em;text-transform:uppercase;color:var(--lantern)}
 .wall-screen h2{font-family:var(--display);font-weight:400;font-size:68px;line-height:.95;margin:-2px 0 4px;text-wrap:balance}
@@ -341,6 +343,35 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
 @keyframes dropBack{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
 @media (prefers-reduced-motion:reduce){.drop-btn{animation:none}}
 
+/* ---------- Narzędzia above the clouds, Galeria under the rain ---------- */
+html.in-tools,html.in-tools body,html.in-rain,html.in-rain body{overflow:hidden}
+html.in-tools .drop-link,html.in-tools .panel,html.in-tools .panel *,html.in-tools .gauge,html.in-tools .gauge *,html.in-tools .mark,
+html.in-rain .drop-link,html.in-rain .panel,html.in-rain .panel *,html.in-rain .gauge,html.in-rain .gauge *,html.in-rain .mark{pointer-events:none!important}
+.sky-panel{position:fixed;z-index:4;left:var(--gut);top:calc(env(safe-area-inset-top,0px) + clamp(18px,3vw,34px));width:min(420px,calc(100% - 2 * var(--gut)));
+  display:flex;flex-direction:column;gap:12px;pointer-events:none;opacity:0;visibility:hidden;transform:translateY(10px);
+  transition:opacity .45s ease,transform .6s cubic-bezier(.2,.8,.2,1),visibility 0s .45s;text-shadow:0 1px 14px rgba(2,8,12,.85)}
+html.tools-on .tools-panel,html.rain-on .rain-panel{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition:opacity .5s ease,transform .6s cubic-bezier(.2,.8,.2,1)}
+.sky-panel .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern)}
+.sky-panel h2{font-family:var(--display);font-weight:400;font-size:clamp(40px,5vw,66px);line-height:.95;margin:-4px 0 2px;text-wrap:balance}
+.sky-panel p{margin:0;max-width:40ch;color:#D3DDDA;line-height:1.6}
+.sky-back{align-self:flex-start;height:38px;padding:0 18px;border-radius:19px;border:1px solid var(--line-strong);background:rgba(4,12,16,.3);font-size:13.5px;margin-top:4px;transition:border-color .25s,color .25s}
+.sky-back:hover{border-color:var(--lantern);color:var(--lantern)}
+.tool-cloud{position:fixed;left:0;top:0;z-index:3;pointer-events:none;opacity:0;text-align:center;will-change:transform,opacity;max-width:230px;
+  color:var(--pearl);text-shadow:0 1px 10px rgba(2,8,12,.95),0 0 26px rgba(2,8,12,.7)}
+html:not(.tools-on) .tool-cloud{opacity:0!important}
+.tool-cloud h3{margin:0 0 7px;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern)}
+.tool-cloud ul{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:16px;line-height:1.25}
+.tool-cloud li span{display:block;font-size:12px;color:#B9C7C5;letter-spacing:.01em}
+.lens-label{position:fixed;left:0;top:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .25s;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--pearl);text-shadow:0 1px 8px #000;white-space:nowrap}
+html:not(.in-rain) .lens-label{display:none}
+@media (max-width:760px){
+  .tool-cloud{max-width:150px}
+  .tool-cloud ul{font-size:13px}
+  .tool-cloud li span{display:none}
+  .sky-panel p{font-size:14px}
+}
+
 </style>
 </head>
 <body>
@@ -360,9 +391,9 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
 <nav class="drops" id="drops" aria-label="Podstrony">
   <a class="drop-link" href="#portfolio" data-port data-i="0"><span class="n">01</span><span class="t">Portfolio</span><small>Projekty i case studies</small></a>
   <a class="drop-link" href="#o-mnie" data-part data-i="1"><span class="n">02</span><span class="t">O mnie</span><small>Kim jestem i jak pracuję</small></a>
-  <a class="drop-link" href="narzedzia.html" data-i="2"><span class="n">03</span><span class="t">Narzędzia</span><small>Z czego korzystam na co dzień</small></a>
+  <a class="drop-link" href="#narzedzia" data-tools data-i="2"><span class="n">03</span><span class="t">Narzędzia</span><small>Z czego korzystam na co dzień</small></a>
   <a class="drop-link" href="#uslugi" data-deep data-i="3"><span class="n">04</span><span class="t">Czym się zajmuję</span><small>Usługi dla firm i osób prywatnych</small></a>
-  <a class="drop-link" href="galeria.html" data-i="4"><span class="n">05</span><span class="t">Galeria</span><small>Zdjęcia · wkrótce</small></a>
+  <a class="drop-link" href="#galeria" data-rain data-i="4"><span class="n">05</span><span class="t">Galeria</span><small>Zdjęcia · wkrótce</small></a>
 </nav>
 
 <section class="panel" data-c="0.2" aria-labelledby="p1">
@@ -385,7 +416,7 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
   <h2 id="p3">Z czego korzystam</h2>
   <p>Modele językowe podpinam przez API, a ich odpowiedzi sprawdzam walidatorami. Resztę stosu dobieram do skali projektu.</p>
   <ul class="chips"><li>Supabase</li><li>PostgreSQL</li><li>Next.js</li><li>React</li><li>TypeScript</li><li>Python</li><li>Three.js</li><li>Claude</li><li>ElevenLabs</li></ul>
-  <a class="go" href="narzedzia.html">Pełna lista narzędzi <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+  <a class="go" href="#narzedzia" data-tools>Pełna lista narzędzi <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
 </section>
 
 <section class="panel" data-c="0.8" aria-labelledby="p4">
@@ -492,6 +523,7 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
   </article>
 </section>
 
+<svg class="fx-defs" width="0" height="0" aria-hidden="true" focusable="false"><filter id="shimmer" x="-4%" y="-4%" width="108%" height="108%"><feTurbulence type="fractalNoise" baseFrequency="0.008 0.05" numOctaves="2" seed="4" result="n"/><feDisplacementMap id="shimMap" in="SourceGraphic" in2="n" scale="1.2" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 <section class="part" id="part" aria-labelledby="partTitle">
   <div class="part-scroll">
     <article class="wall-screen" id="wallL">
@@ -513,10 +545,28 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
         <a href="https://github.com/FabianAdrianW" target="_blank" rel="noopener">GitHub ↗</a>
         <a href="https://www.youtube.com/@eyeamadrian" target="_blank" rel="noopener">YouTube ↗</a>
       </div>
-      <button class="wall-back" type="button" id="partBack">← Wróć do horyzontu</button>
+      <button class="wall-back" type="button" id="partBack">↑ Wróć do horyzontu</button>
     </article>
   </div>
 </section>
+
+<section class="sky-panel tools-panel" id="toolsPanel" aria-labelledby="toolsTitle">
+  <div class="eyebrow">03 · Narzędzia</div>
+  <h2 id="toolsTitle">Z czego korzystam</h2>
+  <p>Modele językowe podpinam przez API, a ich odpowiedzi sprawdzam walidatorami. Resztę stosu dobieram do skali projektu.</p>
+  <button class="sky-back" type="button" id="toolsBack">↓ Wróć do horyzontu</button>
+</section>
+<div class="tool-cloud" aria-label="AI"><h3>AI</h3><ul><li>Claude<span>przez OpenRouter</span></li><li>ElevenLabs<span>synteza mowy</span></li><li>Asystenci AI do kodu<span>praca spec-and-verify</span></li></ul></div>
+<div class="tool-cloud" aria-label="Dane i zaplecze"><h3>Dane i zaplecze</h3><ul><li>Supabase<span>PostgreSQL, RLS, Edge Functions</span></li><li>Stripe<span>płatności</span></li></ul></div>
+<div class="tool-cloud" aria-label="Interfejs"><h3>Interfejs</h3><ul><li>Next.js i React</li><li>TypeScript, Tailwind CSS</li><li>Three.js / WebGL</li></ul></div>
+<div class="tool-cloud" aria-label="Desktop i skrypty"><h3>Desktop i skrypty</h3><ul><li>Python</li><li>PyQt6</li><li>GitHub</li></ul></div>
+<section class="sky-panel rain-panel" id="rainPanel" aria-labelledby="rainTitle">
+  <div class="eyebrow">05 · Galeria</div>
+  <h2 id="rainTitle">Galeria</h2>
+  <p>Kliknij spadającą kroplę, żeby obejrzeć kadr. Na razie są tu kadry poglądowe, zdjęcia pojawią się wkrótce.</p>
+  <button class="sky-back" type="button" id="rainBack">↑ Wróć nad chmury</button>
+</section>
+<div class="lens-label" id="lensLabel" aria-hidden="true"></div>
 
 <div class="fade" id="fade" aria-hidden="true"></div>
 
@@ -586,12 +636,13 @@ const DROPS = [
       </dl>
       <div class="links">${ext(GH+"Poke","Repozytorium","GitHub")}</div>`},
 ];
+const PHOTOS = ["Pełnia nad tonią","Pierwsza fala","Kula nad wodą","Złoty pas","Przed świtem","Trzy okręgi","Mgła","Odbicie","Północ"];
 
 /* ================= STATE ================= */
 const N = DROPS.length, STEP = Math.PI * 2 / N;
 const reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
 let rot = 0, targetRot = 0, active = 0, pendingDive = -1;
-let mode = location.hash === "#portfolio" ? "ring" : location.hash === "#uslugi" ? "deep" : location.hash === "#o-mnie" ? "part" : "landing";           // ring | dive | content | swap | return
+let mode = location.hash === "#portfolio" ? "ring" : location.hash === "#uslugi" ? "deep" : location.hash === "#o-mnie" ? "part" : location.hash === "#narzedzia" ? "tools" : location.hash === "#galeria" ? "rain" : "landing";           // ring | dive | content | swap | return
 let contentIdx = -1, elapsed = 0;
 const mod = (a, n) => ((a % n) + n) % n;
 const $ = id => document.getElementById(id);
@@ -702,7 +753,11 @@ $("veilNext").addEventListener("click", () => dropStep($("veilNext"), 1));
 
 /* ================= LIGHTBOX ================= */
 const lb = $("lightbox"); let lbIdx = 0;
-function showPhoto(k){ lbIdx = mod(k, PHOTOS.length); $("lbImg").src = photoURLs[lbIdx]; $("lbImg").alt = PHOTOS[lbIdx]; $("lbCap").textContent = PHOTOS[lbIdx]; }
+/* photographs (for now: studies painted in the browser) are made one at a time, when first needed */
+const studyCanvases = [], studyURLs = [];
+function studyCanvas(k){ return studyCanvases[k] || (studyCanvases[k] = paintStudy(k, true)); }
+function studyURL(k){ return studyURLs[k] || (studyURLs[k] = studyCanvas(k).toDataURL("image/jpeg", 0.86)); }
+function showPhoto(k){ lbIdx = mod(k, PHOTOS.length); $("lbImg").src = studyURL(lbIdx); $("lbImg").alt = PHOTOS[lbIdx]; $("lbCap").textContent = PHOTOS[lbIdx]; }
 function openLightbox(k){ showPhoto(k); lb.hidden = false; $("lbClose").focus({ preventScroll:true }); }
 function closeLightbox(){ lb.hidden = true; }
 $("lbClose").addEventListener("click", closeLightbox);
@@ -766,7 +821,7 @@ const snap = () => {
   else targetRot = (lastDir > 0 ? Math.ceil(f) : Math.floor(f)) * STEP;
 };
 window.addEventListener("wheel", e => {
-  if (["landing", "toDeep", "deep", "fromDeep", "toPart", "part", "fromPart"].includes(mode)) return;
+  if (["landing", "toDeep", "deep", "fromDeep", "toPart", "part", "fromPart", "toTools", "tools", "fromTools", "toRain", "rain", "fromRain"].includes(mode)) return;
   if (e.target.closest && e.target.closest(".veil-card,.lightbox")) return;
   e.preventDefault();
   let d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
@@ -779,7 +834,7 @@ window.addEventListener("wheel", e => {
 }, { passive:false });
 
 window.addEventListener("keydown", e => {
-  if (e.key === "Escape"){ if (!lb.hidden) closeLightbox(); else if (mode === "deep") surface(); else if (mode === "part") closePart(); else back(); return; }
+  if (e.key === "Escape"){ if (!lb.hidden) closeLightbox(); else if (mode === "deep") surface(); else if (mode === "part") closePart(); else if (mode === "tools") closeTools(); else if (mode === "rain") closeRain(); else back(); return; }
   if (!lb.hidden){ if (e.key === "ArrowLeft") showPhoto(lbIdx - 1); if (e.key === "ArrowRight") showPhoto(lbIdx + 1); return; }
   if (mode === "content"){
     const inCard = document.activeElement && document.activeElement.closest && document.activeElement.closest(".veil-card");
@@ -798,6 +853,8 @@ const htmlEl = document.documentElement;
 if (mode === "ring") htmlEl.classList.add("in-port");
 if (mode === "deep") htmlEl.classList.add("in-depth", "sea-on");
 if (mode === "part") htmlEl.classList.add("in-part", "part-on");
+if (mode === "tools") htmlEl.classList.add("in-tools", "tools-on");
+if (mode === "rain") htmlEl.classList.add("in-rain", "rain-on");
 const STAGES = [
   { c:0,   name:"Horyzont" },
   { c:0.2, name:"Portfolio" },
@@ -818,7 +875,7 @@ const PHI0 = 0.12;
 const tiltOf = q => PHI0 + (Math.PI - 2 * PHI0) * smr(0.03, 0.97, q);
 const yawOf  = q => Math.PI * smr(0.36, 0.64, q);
 
-let pT = 0, p = mode === "deep" ? 0.8 : mode === "part" ? 0.4 : 0, pPrev = p, pVel = 0, landVis = mode === "landing" ? 1 : 0;
+let pT = 0, p = mode === "deep" ? 0.8 : mode === "part" ? 0.4 : mode === "tools" ? 0.6 : mode === "rain" ? 0.95 : 0, pPrev = p, pVel = 0, landVis = mode === "landing" ? 1 : 0;
 function readScroll(){
   if (mode !== "landing") return;
   const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
@@ -827,7 +884,7 @@ function readScroll(){
 addEventListener("scroll", readScroll, { passive:true });
 addEventListener("resize", readScroll);
 readScroll(); if (mode === "landing") p = pT;
-if (mode === "deep" || mode === "part"){ pT = p; requestAnimationFrame(() => { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); scrollTo(0, p * max); }); }
+if (mode === "deep" || mode === "part" || mode === "tools" || mode === "rain"){ pT = p; requestAnimationFrame(() => { const max = Math.max(1, document.documentElement.scrollHeight - innerHeight); scrollTo(0, p * max); }); }
 function scrollToP(t){
   const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
   scrollTo({ top:t * max, behavior: reduce ? "auto" : "smooth" });
@@ -864,6 +921,8 @@ function leave(href, i){
   if (href === "#portfolio") return enterPortfolio();
   if (href === "#uslugi") return enterDeep();
   if (href === "#o-mnie") return enterPart();
+  if (href === "#narzedzia") return enterTools();
+  if (href === "#galeria") return enterRain();
   leaving = true;
   if (gl && i >= 0) gl.pulse(i);
   setTimeout(() => fadeEl.classList.add("is-on"), reduce ? 0 : 160);
@@ -904,6 +963,28 @@ function closePart(push){
   else { mode = "landing"; htmlEl.classList.remove("in-part", "part-on", "part-flat"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
 }
 $("partBack").addEventListener("click", () => closePart());
+function enterTools(push){
+  if (mode !== "landing") return;
+  if (gl) gl.toTools(push);
+  else { mode = "tools"; htmlEl.classList.add("in-tools", "tools-on"); if (push !== false) try { history.pushState(null, "", "#narzedzia"); } catch (_) {} }
+}
+function closeTools(push){
+  if (mode !== "tools") return;
+  if (gl) gl.fromTools(push);
+  else { mode = "landing"; htmlEl.classList.remove("in-tools", "tools-on"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
+}
+function enterRain(push){
+  if (mode !== "landing") return;
+  if (gl) gl.toRain(push);
+  else { mode = "rain"; htmlEl.classList.add("in-rain", "rain-on"); if (push !== false) try { history.pushState(null, "", "#galeria"); } catch (_) {} }
+}
+function closeRain(push){
+  if (mode !== "rain") return;
+  if (gl) gl.fromRain(push);
+  else { mode = "landing"; htmlEl.classList.remove("in-rain", "rain-on"); if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {} }
+}
+$("toolsBack").addEventListener("click", () => closeTools());
+$("rainBack").addEventListener("click", () => closeRain());
 const plain = e => !(e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1);
 lLinks.forEach((a, i) => a.addEventListener("click", e => {
   if (!plain(e)) return;
@@ -911,6 +992,8 @@ lLinks.forEach((a, i) => a.addEventListener("click", e => {
   if (a.hasAttribute("data-port")) enterPortfolio();
   else if (a.hasAttribute("data-deep")) enterDeep();
   else if (a.hasAttribute("data-part")) enterPart();
+  else if (a.hasAttribute("data-tools")) enterTools();
+  else if (a.hasAttribute("data-rain")) enterRain();
   else leave(a.getAttribute("href"), i);
 }));
 document.querySelectorAll(".panel .go").forEach(a => a.addEventListener("click", e => {
@@ -919,6 +1002,7 @@ document.querySelectorAll(".panel .go").forEach(a => a.addEventListener("click",
   if (a.hasAttribute("data-port")) return enterPortfolio();
   if (a.hasAttribute("data-deep")) return enterDeep();
   if (a.hasAttribute("data-part")) return enterPart();
+  if (a.hasAttribute("data-tools")) return enterTools();
   leave(a.getAttribute("href"), lLinks.findIndex(l => l.getAttribute("href") === a.getAttribute("href")));
 }));
 ["homeLink", "brandHome"].forEach(id => { const el = $(id); if (el) el.addEventListener("click", e => { e.preventDefault(); goLanding(); }); });
@@ -928,6 +1012,10 @@ addEventListener("popstate", () => {
   else if (h === "#uslugi" && mode === "landing") enterDeep(false);
   else if (h === "#o-mnie" && mode === "landing") enterPart(false);
   else if (h !== "#o-mnie" && mode === "part") closePart(false);
+  else if (h === "#narzedzia" && mode === "landing") enterTools(false);
+  else if (h !== "#narzedzia" && mode === "tools") closeTools(false);
+  else if (h === "#galeria" && mode === "landing") enterRain(false);
+  else if (h !== "#galeria" && mode === "rain") closeRain(false);
   else if (h !== "#portfolio" && mode === "ring") goLanding(false);
   else if (h !== "#uslugi" && mode === "deep") surface(false);
 });
@@ -1004,7 +1092,7 @@ function initGL(){
     uSunCol:{ value:sunC }, uMoonCol:{ value:moonC }, uCel:{ value:0 },
     uDeep:{ value:C("#041017") }, uTide:{ value:C("#1A4250") }, uPearl:{ value:C("#E6ECE8") },
     uStars:{ value:1 }, uSpin:{ value:0 }, uDrag:{ value:0 },
-    uPort:{ value: mode === "ring" ? 1 : 0 }, uOcean:{ value: mode === "ring" ? 0.25 : 1 }, uFog:{ value:new T.Vector2(16, 150) }, uUnder:{ value:0 }, uCloud:{ value:0 }, uTrail:{ value: Array.from({ length:16 }, () => new T.Vector4(0, 0, -99, 0)) }, uTrailV:{ value: Array.from({ length:16 }, () => new T.Vector2()) }
+    uPort:{ value: mode === "ring" ? 1 : 0 }, uOcean:{ value: mode === "ring" ? 0.25 : 1 }, uFog:{ value:new T.Vector2(16, 150) }, uUnder:{ value:0 }
   };
 
   const SKY = `
@@ -1034,6 +1122,11 @@ function initGL(){
   const WAVES = `
     #define NR ${NR}
     uniform float uTime, uCalm, uRingR, uOcean, uPort;
+    uniform vec4 uMirror;
+    float calmAt(vec2 p){
+      if (uMirror.w <= 0.0) return 1.0;
+      return 1.0 - uMirror.w * (1.0 - smoothstep(uMirror.z, uMirror.z + 5.0, length(p - uMirror.xy)));
+    }
     /* open-sea swell for the landing view: directional waves with deep-water dispersion */
     vec3 dw(vec2 p, vec2 d, float k, float a, float ph0){
       float ph = dot(p, d) * k - uTime * sqrt(9.8 * k) * 0.5 * uCalm + ph0;
@@ -1127,11 +1220,250 @@ function initGL(){
       crest = 0.0;
       vec2 q = spinWarp(p);
       gWarp = q;
-      vec3 w = centerWave(q) * mix(0.3, 1.0, uPort) + impactWave(p) + ocean(p) * uOcean;
+      vec3 w = (centerWave(q) * mix(0.3, 1.0, uPort) + ocean(p) * uOcean) * calmAt(p) + impactWave(p);
       for (int i = 0; i < NR; i++) w += rippleWave(q, uRipples[i], uRippleK[i], crest);
       return w;
     }`;
 
+
+  /* ================= CLOUDS: volumetric cumulus + air flow driven by the cursor ================= */
+  const GL2 = !!renderer.capabilities.isWebGL2;
+  /* tileable value-noise fbm, 256² — R: coverage, G: second coverage octave set, B: fallback detail */
+  const covTex = (() => {
+    const S = 256, data = new Uint8Array(S * S * 4);
+    const lat = (n, seed) => { const a = new Float32Array(n * n); let s = seed; for (let i = 0; i < a.length; i++){ s = (s * 16807) % 2147483647; a[i] = s / 2147483647; } return a; };
+    const tabs = [lat(8, 11), lat(16, 23), lat(32, 37), lat(64, 41), lat(128, 53)];
+    const tabs2 = [lat(4, 71), lat(8, 83), lat(16, 97), lat(32, 101)];
+    const tabs3 = [lat(32, 131), lat(64, 137), lat(128, 139)];
+    const sm = t => t * t * (3 - 2 * t);
+    const vn = (a, n, x, y) => { const fx = x * n, fy = y * n, ix = Math.floor(fx), iy = Math.floor(fy), tx = sm(fx - ix), ty = sm(fy - iy);
+      const i0 = ((ix % n) + n) % n, j0 = ((iy % n) + n) % n, i1 = (i0 + 1) % n, j1 = (j0 + 1) % n;
+      const a00 = a[j0 * n + i0], a10 = a[j0 * n + i1], a01 = a[j1 * n + i0], a11 = a[j1 * n + i1];
+      return (a00 + (a10 - a00) * tx) + ((a01 + (a11 - a01) * tx) - (a00 + (a10 - a00) * tx)) * ty; };
+    const fb = (T, x, y) => { let s = 0, w = 0.55, t = 0; T.forEach(a => { const n = Math.round(Math.sqrt(a.length)); s += w * vn(a, n, x, y); t += w; w *= 0.5; }); return s / t; };
+    for (let j = 0; j < S; j++) for (let i = 0; i < S; i++){
+      const x = i / S, y = j / S, o = (j * S + i) * 4;
+      data[o] = Math.round(255 * fb(tabs, x, y));
+      data[o + 1] = Math.round(255 * fb(tabs2, x, y));
+      data[o + 2] = Math.round(255 * (1 - Math.abs(fb(tabs3, x, y) * 2 - 1)));
+      data[o + 3] = 255;
+    }
+    const t = new T.DataTexture(data, S, S, T.RGBAFormat);
+    t.wrapS = t.wrapT = T.RepeatWrapping; t.magFilter = T.LinearFilter; t.minFilter = T.LinearMipmapLinearFilter; t.generateMipmaps = true; t.needsUpdate = true;
+    return t;
+  })();
+  /* tileable 3D cellular (inverted Worley) noise, 48³: the round billows of a cumulus */
+  const worleyTex = GL2 ? (() => {
+    const S = 48, data = new Uint8Array(S * S * S);
+    const layer = (cells, seed) => {
+      let s = seed; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+      const pts = new Float32Array(cells * cells * cells * 3);
+      for (let i = 0; i < pts.length; i++) pts[i] = rnd();
+      return (x, y, z) => {
+        const fx = x * cells, fy = y * cells, fz = z * cells, ix = Math.floor(fx), iy = Math.floor(fy), iz = Math.floor(fz);
+        let best = 9;
+        for (let dz = -1; dz <= 1; dz++) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++){
+          const cx = ix + dx, cy = iy + dy, cz = iz + dz;
+          const wx = ((cx % cells) + cells) % cells, wy = ((cy % cells) + cells) % cells, wz = ((cz % cells) + cells) % cells;
+          const k = ((wz * cells + wy) * cells + wx) * 3;
+          const px = cx + pts[k] - fx, py = cy + pts[k + 1] - fy, pz = cz + pts[k + 2] - fz;
+          const d = px * px + py * py + pz * pz; if (d < best) best = d;
+        }
+        return 1 - Math.min(1, Math.sqrt(best));
+      };
+    };
+    const w1 = layer(4, 7), w2 = layer(8, 13), w3 = layer(16, 19);
+    for (let k = 0; k < S; k++) for (let j = 0; j < S; j++) for (let i = 0; i < S; i++){
+      const x = i / S, y = j / S, z = k / S;
+      const v = w1(x, y, z) * 0.625 + w2(x, y, z) * 0.25 + w3(x, y, z) * 0.125;
+      data[(k * S + j) * S + i] = Math.round(255 * Math.min(1, Math.max(0, v)));
+    }
+    const t = new T.Data3DTexture(data, S, S, S);
+    t.format = T.RedFormat; t.type = T.UnsignedByteType;
+    t.wrapS = t.wrapT = t.wrapR = T.RepeatWrapping; t.magFilter = t.minFilter = T.LinearFilter; t.unpackAlignment = 1; t.needsUpdate = true;
+    return t;
+  })() : null;
+
+  /* ---- air flow: a small stable-fluids solver over the cloud field, 128² ---- */
+  const FL_N = 128;
+  const FLOW_DOM = new T.Vector4(-56, -60, 80, 84);           // world x, z of the corner, width, depth
+  const blankFlow = new T.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1); blankFlow.needsUpdate = true;
+  const flow = (() => {
+    let hf = GL2;
+    if (!hf) return null;
+    const mk = () => new T.WebGLRenderTarget(FL_N, FL_N, { type:T.HalfFloatType, format:T.RGBAFormat, minFilter:T.LinearFilter, magFilter:T.LinearFilter, depthBuffer:false, stencilBuffer:false, wrapS:T.ClampToEdgeWrapping, wrapT:T.ClampToEdgeWrapping });
+    const pair = () => ({ a:mk(), b:mk(), get r(){ return this.a; }, swap(){ const t = this.a; this.a = this.b; this.b = t; } });
+    const vel = pair(), prs = pair(), disp = pair(), div = mk(), crl = mk();
+    const cam = new T.OrthographicCamera(-1, 1, 1, -1, 0, 1), scn = new T.Scene();
+    const quad = new T.Mesh(new T.PlaneGeometry(2, 2)); quad.frustumCulled = false; scn.add(quad);
+    const VS = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
+    const tx = new T.Vector2(1 / FL_N, 1 / FL_N);
+    const M = (fs, u) => new T.ShaderMaterial({ uniforms:Object.assign({ uTx:{ value:tx } }, u), vertexShader:VS, fragmentShader:`precision highp float; varying vec2 vUv; uniform vec2 uTx; ${fs}`, depthTest:false, depthWrite:false });
+    const advect = M(`uniform sampler2D uVel, uSrc; uniform float uDt, uDiss; uniform vec2 uScale;
+      void main(){ vec2 c = vUv - uDt * texture2D(uVel, vUv).xy * uScale; gl_FragColor = uDiss * texture2D(uSrc, c); }`,
+      { uVel:{ value:null }, uSrc:{ value:null }, uDt:{ value:0 }, uDiss:{ value:1 }, uScale:{ value:new T.Vector2(1 / FLOW_DOM.z, 1 / FLOW_DOM.w) } });
+    const splat = M(`uniform sampler2D uSrc; uniform vec2 uA, uB; uniform vec3 uVal; uniform float uR, uMode;
+      void main(){
+        vec2 p = vUv, ab = uB - uA; float h = clamp(dot(p - uA, ab) / max(dot(ab, ab), 1e-8), 0.0, 1.0);
+        vec2 d = (p - uA - ab * h) * vec2(${(FLOW_DOM.z).toFixed(1)}, ${(FLOW_DOM.w).toFixed(1)});
+        float g = exp(-dot(d, d) / uR);
+        vec4 s = texture2D(uSrc, p);
+        if (uMode < 0.5) gl_FragColor = s + vec4(uVal * g, 0.0);
+        else gl_FragColor = vec4(s.xy, max(s.z, g * uVal.z), s.w);
+      }`, { uSrc:{ value:null }, uA:{ value:new T.Vector2() }, uB:{ value:new T.Vector2() }, uVal:{ value:new T.Vector3() }, uR:{ value:0.5 }, uMode:{ value:0 } });
+    const curlM = M(`uniform sampler2D uVel;
+      void main(){ float L = texture2D(uVel, vUv - vec2(uTx.x, 0.0)).y, R = texture2D(uVel, vUv + vec2(uTx.x, 0.0)).y;
+        float B = texture2D(uVel, vUv - vec2(0.0, uTx.y)).x, Tt = texture2D(uVel, vUv + vec2(0.0, uTx.y)).x;
+        gl_FragColor = vec4(0.5 * (R - L - Tt + B), 0.0, 0.0, 1.0); }`, { uVel:{ value:null } });
+    const vortM = M(`uniform sampler2D uVel, uCurl; uniform float uEps, uDt;
+      void main(){ float L = texture2D(uCurl, vUv - vec2(uTx.x, 0.0)).x, R = texture2D(uCurl, vUv + vec2(uTx.x, 0.0)).x;
+        float B = texture2D(uCurl, vUv - vec2(0.0, uTx.y)).x, Tt = texture2D(uCurl, vUv + vec2(0.0, uTx.y)).x, C = texture2D(uCurl, vUv).x;
+        vec2 f = 0.5 * vec2(abs(Tt) - abs(B), abs(R) - abs(L)); f /= length(f) + 1e-4; f *= uEps * C * vec2(1.0, -1.0);
+        vec4 v = texture2D(uVel, vUv); gl_FragColor = vec4(v.xy + f * uDt, 0.0, 1.0); }`, { uVel:{ value:null }, uCurl:{ value:null }, uEps:{ value:14 }, uDt:{ value:0 } });
+    const divM = M(`uniform sampler2D uVel;
+      void main(){ float L = texture2D(uVel, vUv - vec2(uTx.x, 0.0)).x, R = texture2D(uVel, vUv + vec2(uTx.x, 0.0)).x;
+        float B = texture2D(uVel, vUv - vec2(0.0, uTx.y)).y, Tt = texture2D(uVel, vUv + vec2(0.0, uTx.y)).y;
+        gl_FragColor = vec4(0.5 * (R - L + Tt - B), 0.0, 0.0, 1.0); }`, { uVel:{ value:null } });
+    const prsM = M(`uniform sampler2D uP, uDiv;
+      void main(){ float L = texture2D(uP, vUv - vec2(uTx.x, 0.0)).x, R = texture2D(uP, vUv + vec2(uTx.x, 0.0)).x;
+        float B = texture2D(uP, vUv - vec2(0.0, uTx.y)).x, Tt = texture2D(uP, vUv + vec2(0.0, uTx.y)).x;
+        gl_FragColor = vec4((L + R + B + Tt - texture2D(uDiv, vUv).x) * 0.25, 0.0, 0.0, 1.0); }`, { uP:{ value:null }, uDiv:{ value:null } });
+    const gradM = M(`uniform sampler2D uP, uVel;
+      void main(){ float L = texture2D(uP, vUv - vec2(uTx.x, 0.0)).x, R = texture2D(uP, vUv + vec2(uTx.x, 0.0)).x;
+        float B = texture2D(uP, vUv - vec2(0.0, uTx.y)).x, Tt = texture2D(uP, vUv + vec2(0.0, uTx.y)).x;
+        vec2 v = texture2D(uVel, vUv).xy - 0.5 * vec2(R - L, Tt - B); gl_FragColor = vec4(v, 0.0, 1.0); }`, { uP:{ value:null }, uVel:{ value:null } });
+    /* the cloud is carried by the air, then slowly settles back; the cut left by the cursor heals */
+    const dispM = M(`uniform sampler2D uD, uVel; uniform float uDt;
+      void main(){ vec4 d = texture2D(uD, vUv); vec2 v = texture2D(uVel, vUv).xy;
+        vec2 xy = d.xy * exp(-uDt * 0.35) + v * uDt * 0.85;
+        gl_FragColor = vec4(clamp(xy, vec2(-6.0), vec2(6.0)), d.z * exp(-uDt * 0.55), 1.0); }`, { uD:{ value:null }, uVel:{ value:null }, uDt:{ value:0 } });
+    const clearM = M(`uniform sampler2D uSrc; uniform float uK; void main(){ gl_FragColor = texture2D(uSrc, vUv) * uK; }`, { uSrc:{ value:null }, uK:{ value:0.8 } });
+    const run = (m, target) => { quad.material = m; renderer.setRenderTarget(target); renderer.render(scn, cam); };
+    [vel.a, vel.b, prs.a, prs.b, disp.a, disp.b, div, crl].forEach(t => { renderer.setRenderTarget(t); renderer.clear(true, false, false); });
+    renderer.setRenderTarget(null);
+    const queue = [];
+    let idle = 99;
+    return {
+      tex:() => disp.a.texture,
+      push(ax, az, bx, bz, vx, vz){ if (queue.length < 24) queue.push([ax, az, bx, bz, vx, vz]); },
+      step(dt){
+        if (queue.length) idle = 0; else idle += dt;
+        if (idle > 12) return;                       // nothing stirred for a while: everything has settled
+        dt = Math.min(dt, 1 / 30);
+        const prevRT = renderer.getRenderTarget(), prevAC = renderer.autoClear; renderer.autoClear = false;
+        advect.uniforms.uVel.value = vel.a.texture; advect.uniforms.uSrc.value = vel.a.texture; advect.uniforms.uDt.value = dt; advect.uniforms.uDiss.value = Math.exp(-dt * 0.8);
+        run(advect, vel.b); vel.swap();
+        const uv = (x, z) => [(x - FLOW_DOM.x) / FLOW_DOM.z, (z - FLOW_DOM.y) / FLOW_DOM.w];
+        queue.forEach(([ax, az, bx, bz, vx, vz]) => {
+          const A = uv(ax, az), B = uv(bx, bz);
+          splat.uniforms.uA.value.set(A[0], A[1]); splat.uniforms.uB.value.set(B[0], B[1]);
+          splat.uniforms.uSrc.value = vel.a.texture; splat.uniforms.uMode.value = 0; splat.uniforms.uR.value = 0.9;
+          splat.uniforms.uVal.value.set(vx, vz, 0); run(splat, vel.b); vel.swap();
+          splat.uniforms.uSrc.value = disp.a.texture; splat.uniforms.uMode.value = 1; splat.uniforms.uR.value = 0.06;
+          splat.uniforms.uVal.value.set(0, 0, 1); run(splat, disp.b); disp.swap();
+        });
+        queue.length = 0;
+        curlM.uniforms.uVel.value = vel.a.texture; run(curlM, crl);
+        vortM.uniforms.uVel.value = vel.a.texture; vortM.uniforms.uCurl.value = crl.texture; vortM.uniforms.uDt.value = dt; run(vortM, vel.b); vel.swap();
+        divM.uniforms.uVel.value = vel.a.texture; run(divM, div);
+        clearM.uniforms.uSrc.value = prs.a.texture; run(clearM, prs.b); prs.swap();
+        prsM.uniforms.uDiv.value = div.texture;
+        for (let i = 0; i < 14; i++){ prsM.uniforms.uP.value = prs.a.texture; run(prsM, prs.b); prs.swap(); }
+        gradM.uniforms.uP.value = prs.a.texture; gradM.uniforms.uVel.value = vel.a.texture; run(gradM, vel.b); vel.swap();
+        advect.uniforms.uVel.value = vel.a.texture; advect.uniforms.uSrc.value = disp.a.texture; advect.uniforms.uDiss.value = 1;
+        run(advect, disp.b); disp.swap();
+        dispM.uniforms.uD.value = disp.a.texture; dispM.uniforms.uVel.value = vel.a.texture; dispM.uniforms.uDt.value = dt; run(dispM, disp.b); disp.swap();
+        renderer.setRenderTarget(prevRT); renderer.autoClear = prevAC;
+      }
+    };
+  })();
+
+  U.uCov = { value:covTex };
+  if (GL2) U.uWorley = { value:worleyTex };
+  U.uFlow = { value:flow ? flow.tex() : blankFlow };
+  U.uFlowDom = { value:FLOW_DOM };
+  U.uCloudLayer = { value:new T.Vector2(0.2, 3.2) };
+  U.uCloud = { value:0 };
+  U.uCloudGap = { value:0 };
+
+  /* raymarch through the cloud slab; returns in-scattered light (rgb) and transmittance (a) */
+  const CLOUDS = `
+    ${GL2 ? "precision highp sampler3D;\n    uniform sampler3D uWorley;\n    #define CLOUD3D" : ""}
+    uniform sampler2D uCov, uFlow;
+    uniform vec4 uFlowDom;
+    uniform vec2 uCloudLayer;
+    uniform float uCloud, uCloudGap;
+    vec3 flowAt(vec2 xz){
+      vec2 uv = (xz - uFlowDom.xy) / uFlowDom.zw;
+      if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) return vec3(0.0);
+      return texture2D(uFlow, uv).xyz;
+    }
+    float cloudDens(vec3 x, vec3 fl, float cheap){
+      float h = (x.y - uCloudLayer.x) / (uCloudLayer.y - uCloudLayer.x);
+      if (h < 0.0 || h > 1.0) return 0.0;
+      vec2 xz = x.xz - fl.xy;
+      vec2 c = texture2D(uCov, xz * 0.0105 + vec2(uTime * 0.0011, uTime * 0.0004)).rg;
+      float cov = smoothstep(0.36, 0.7, c.r * 0.72 + c.g * 0.28);
+      float topH = 0.3 + 0.7 * cov;
+      /* flat base, rounded domed top */
+      float prof = smoothstep(0.0, 0.08, h) * (1.0 - smoothstep(topH * 0.72, topH, h));
+      float base = prof * cov;
+      if (base < 0.02) return 0.0;
+      #ifdef CLOUD3D
+      vec3 q = vec3(xz.x, x.y * 1.25, xz.y);
+      float w = texture(uWorley, q * 0.072 + vec3(uTime * 0.0035, 0.0, uTime * 0.0012)).r;
+      float w2 = cheap > 0.5 ? 0.62 : texture(uWorley, q * 0.2 + vec3(0.0, -uTime * 0.012, 0.0)).r;
+      #else
+      float w = texture2D(uCov, xz * 0.05 + vec2(x.y * 0.04)).b;
+      float w2 = 0.62;
+      #endif
+      float d = base - (1.0 - w) * (0.3 + 0.35 * h) - (1.0 - w2) * 0.16;
+      d = d * 3.4 - (1.0 - uCloud) * 2.6;           /* forming / dissolving: the densest cores come first */
+      d *= 1.0 - 0.96 * fl.z;                        /* the narrow cut left by the cursor */
+      return clamp(d, 0.0, 1.0);
+    }
+    float hgPh(float mu, float g){ float g2 = g * g; return (1.0 - g2) / (12.566 * pow(1.0 + g2 - 2.0 * g * mu, 1.5)); }
+    vec4 cloudMarch(vec3 ro, vec3 rd, float tMax, vec2 seed, vec3 fogc, vec2 fogR){
+      float tA, tB;
+      if (abs(rd.y) < 1e-4){
+        if (ro.y < uCloudLayer.x || ro.y > uCloudLayer.y) return vec4(0.0, 0.0, 0.0, 1.0);
+        tA = 0.0; tB = 80.0;
+      } else {
+        float t1 = (uCloudLayer.x - ro.y) / rd.y, t2 = (uCloudLayer.y - ro.y) / rd.y;
+        tA = max(min(t1, t2), 0.0); tB = max(t1, t2);
+      }
+      tB = min(min(tB, tMax), tA + 48.0);
+      if (tB <= tA) return vec4(0.0, 0.0, 0.0, 1.0);
+      const int STEPS = 24;
+      float dt = (tB - tA) / float(STEPS);
+      float t = tA + dt * fract(52.9829189 * fract(dot(seed, vec2(0.06711056, 0.00583715)) + uTime * 0.618));   /* interleaved gradient noise: finer grain than white noise */
+      vec3 L = normalize(vec3(uSunDir.x, max(uSunDir.y, 0.14), uSunDir.z));
+      float mu = dot(rd, uSunDir);
+      float phase = mix(hgPh(mu, 0.6), hgPh(mu, -0.2), 0.35) * 12.566;
+      vec3 skyUp = sky(vec3(0.0, 1.0, 0.0));
+      vec3 acc = vec3(0.0); float Tr = 1.0;
+      for (int i = 0; i < STEPS; i++){
+        vec3 x = ro + rd * t;
+        vec3 fl = flowAt(x.xz);
+        float d = cloudDens(x, fl, 0.0);
+        if (d > 0.004){
+          float ld = cloudDens(x + L * 0.45, fl, 1.0) + cloudDens(x + L * 1.3, fl, 1.0) * 0.8;
+          float h = clamp((x.y - uCloudLayer.x) / (uCloudLayer.y - uCloudLayer.x), 0.0, 1.0);
+          float sunT = exp(-ld * 1.35);
+          float powder = 1.0 - exp(-d * 2.2);
+          vec3 sunC = uLight * sunT * powder * phase * 1.25;
+          vec3 amb = mix(uDeep * 2.2 + uTide * 0.35, uTide * 1.5 + uHorizon * 0.9 + skyUp * 2.0, pow(h, 0.8));
+          vec3 S = sunC + amb;
+          S = mix(S, fogc, smoothstep(fogR.x, fogR.y + 30.0, t));
+          float a = 1.0 - exp(-d * dt * 1.7);
+          acc += Tr * S * a;
+          Tr *= 1.0 - a;
+          if (Tr < 0.03) break;
+        }
+        t += dt;
+      }
+      return vec4(acc, Tr);
+    }`;
   /* ---- sky dome with sun / moon disc ---- */
   const skyMat = new T.ShaderMaterial({
     uniforms:U, side:T.BackSide, depthWrite:false,
@@ -1141,6 +1473,8 @@ function initGL(){
       varying vec3 vDir;
       ${SKY}
       ${NOISE}
+      uniform vec2 uFog;
+      ${CLOUDS}
       float craters(vec2 q){
         float c = 0.0;
         for (int k = 0; k < 8; k++){
@@ -1200,6 +1534,10 @@ function initGL(){
         float st = step(0.991, r) * smoothstep(0.32, 0.0, length(f)) * smoothstep(0.04, 0.4, d.y);
         st *= 0.55 + 0.45 * sin(uTime * (0.8 + r * 2.5) + r * 60.0);
         c += uPearl * st * (0.55 + 0.6 * smoothstep(0.4, 0.8, uCel)) * uStars;
+        if (uCloud > 0.001 && cameraPosition.y < uCloudLayer.y){
+          vec4 cm = cloudMarch(cameraPosition, d, 400.0, gl_FragCoord.xy, sky(normalize(vec3(d.x, 0.015, d.z))), uFog);
+          c = c * cm.a + cm.rgb;
+        }
         gl_FragColor = vec4(c, 1.0);
         #include <encodings_fragment>
       }`
@@ -1210,29 +1548,11 @@ function initGL(){
   const waterVS = `
     ${WAVES}
     varying vec3 vWorld;
-    ${NOISE}
-    uniform float uCloud;
-    uniform vec3 uPartO; uniform vec2 uPartR, uPartF; uniform float uPartT;
-    /* half-width of the parted corridor at local z (−z runs down the path) */
-    float corrHalf(float z){
-      if (z < -7.72) return 1.3;
-      if (z < -4.68) return mix(1.3, 4.34, (z + 7.72) / 3.04);
-      return mix(4.34, 7.5, clamp((z + 4.68) / 8.68, 0.0, 1.0));
-    }
+    uniform float uCloud, uCloudGap;
     void main(){
       vec4 wp = modelMatrix * vec4(position, 1.0);
       float c; vec3 w = waves(wp.xz, c);
-      wp.y += w.x * (1.0 - uCloud);
-      /* the cloud sea is gently lumpy, so the horizon line isn't ruler-straight */
-      if (uCloud > 0.001) wp.y += (fbm(wp.xz * 0.085 + vec2(uTime * 0.015, 0.0)) - 0.4) * 1.6 * uCloud;
-      if (uPartT > 0.0){
-        vec2 d = wp.xz - uPartO.xz;
-        float lx = dot(d, uPartR), lz = -dot(d, uPartF);
-        float r = smoothstep(0.0, 0.35, uPartT - max(4.0 - lz - 8.0, 0.0) / 300.0);
-        float hw = corrHalf(lz);
-        float inside = (1.0 - smoothstep(hw + 0.25, hw + 1.4, abs(lx))) * (1.0 - smoothstep(3.5, 4.5, lz)) * step(-245.0, lz);
-        wp.y = mix(wp.y, -2.3, inside * r);
-      }
+      wp.y += w.x * (1.0 - uCloud * uCloudGap);
       vWorld = wp.xyz;
       gl_Position = projectionMatrix * viewMatrix * wp;
     }`;
@@ -1240,12 +1560,11 @@ function initGL(){
     ${WAVES}
     ${SKY}
     ${NOISE}
-    uniform float uRingVis, uStars, uUnder, uCloud;
+    uniform float uRingVis, uStars, uUnder;
     uniform vec2 uFog;
-    uniform vec4 uTrail[16];
-    uniform vec2 uTrailV[16];
     uniform vec3 uDeep, uTide, uPearl;
     varying vec3 vWorld;
+    ${CLOUDS}
     vec2 microGrad(vec2 p){
       vec2 g = vec2(0.0);
       vec2 d1 = vec2(0.83, 0.55); g += d1 * 3.4 * 0.0045 * cos(dot(p, d1) * 3.4 + uTime * 0.9);
@@ -1257,7 +1576,7 @@ function initGL(){
       vec2 p = vWorld.xz;
       float dist = length(cameraPosition - vWorld);
       float crest; vec3 w = waves(p, crest);
-      vec2 g = w.yz + microGrad(swirl(p)) * exp(-dist * 0.045);
+      vec2 g = w.yz + microGrad(swirl(p)) * exp(-dist * 0.045) * calmAt(p);
       vec3 N = normalize(vec3(-g.x, 1.0, -g.y));
       vec3 V = normalize(cameraPosition - vWorld);
       if (uUnder > 0.5){
@@ -1291,7 +1610,7 @@ function initGL(){
       /* light wandering through the water body: seen best from straight above */
       float c1 = fbm(p * 0.45 + vec2(uTime * 0.04, -uTime * 0.025) + w.yz * 1.6);
       float ca = pow(1.0 - abs(c1 * 2.0 - 1.0), 5.0);
-      body += mix(uLight, uPearl, 0.45) * ca * 0.028 * exp(-dist * 0.035) * (1.0 - 0.6 * uPort);
+      body += mix(uLight, uPearl, 0.45) * ca * 0.028 * exp(-dist * 0.035) * (1.0 - 0.6 * uPort) * calmAt(p);
       vec3 col = mix(body, refl, fres);
       col += uPearl * st * 0.22 * (1.0 - fres);
       vec3 Hs = normalize(uSunDir + V); float nh = max(dot(N, Hs), 0.0);
@@ -1317,45 +1636,12 @@ function initGL(){
       vec3 vd = -V;
       vec3 fogc = sky(normalize(vec3(vd.x, 0.015, vd.z)));
       if (uCloud > 0.001){
-        /* a stick drawn through the cloud: dents where it passed, material dragged along into streaks,
-           both healing over a few seconds */
-        float dent = 0.0; vec2 drag = vec2(0.0);
-        for (int i = 0; i < 16; i++){
-          vec4 Tp = uTrail[i];
-          float age = uTime - Tp.z;
-          if (Tp.w <= 0.0 || age < 0.0 || age > 5.0) continue;
-          vec2 dp = p - Tp.xy; float r2 = dot(dp, dp);
-          float life = exp(-age * 0.75) * smoothstep(0.0, 0.08, age + 0.04);
-          dent = max(dent, exp(-r2 / 0.22) * life * Tp.w);
-          drag += uTrailV[i] * exp(-r2 / 0.9) * life;
-        }
-        /* sea of cloud: big warped billows, lit from the side by the low sun,
-           glowing where it is thin against the light (forward scattering) */
-        vec2 wv = vec2(fbm(p * 0.05 + vec2(uTime * 0.01, 0.0)), fbm(p * 0.05 + vec2(5.2, -uTime * 0.008)));
-        vec2 cb = p * 0.085 + wv * 1.8 + vec2(uTime * 0.015, 0.0) - drag * 0.02;
-        float fade = exp(-dist * 0.012);
-        const float ce = 0.05;
-        float d0 = fbm(cb), dx = fbm(cb + vec2(ce, 0.0)), dz = fbm(cb + vec2(0.0, ce));
-        float bill = 1.0 - abs(fbm(p * 0.3 + wv * 1.2 - vec2(uTime * 0.022, 0.0) - drag * 0.05) * 2.0 - 1.0);
-        float dens = clamp(smoothstep(0.26, 0.64, d0) * 0.95 + (bill - 0.55) * 0.45 * fade, 0.0, 1.0);
-        dens *= 1.0 - 0.8 * dent;
-        vec3 Nc = normalize(vec3(-(dx - d0) / ce * 0.6 * fade, 1.0, -(dz - d0) / ce * 0.6 * fade));
-        vec3 Ls = normalize(vec3(uSunDir.x, max(uSunDir.y, 0.22), uSunDir.z));
-        float diff = clamp(dot(Nc, Ls) * 0.55 + 0.45, 0.0, 1.0);
-        float fwd = max(dot(-V, uSunDir), 0.0);
-        vec3 shadeC = mix(uDeep, uTide, 0.5) * 0.85;
-        vec3 litC = mix(uTide * 1.25, uLight * 0.65 + uPearl * 0.07, 0.4);
-        vec3 cc = mix(shadeC, litC, diff * (0.35 + 0.65 * dens)) * (0.86 + 0.3 * bill * fade);
-        cc += uLight * (pow(fwd, 5.0) * 0.3 + pow(fwd, 40.0) * 0.55) * (0.3 + 0.9 * (1.0 - dens));
-        cc += sky(vec3(0.0, 1.0, 0.0)) * 0.25;
-        cc *= 1.0 - 0.3 * dent;
-        vec3 gap = mix(uDeepSky, uDeep, 0.5) * 0.7;
-        vec3 cloud = mix(gap, cc, smoothstep(0.03, 0.4, dens));
-        /* the water doesn't cross-fade, it clouds over: the thickest puffs form first */
-        float cm = smoothstep((1.0 - dens) - 0.25, (1.0 - dens) + 0.25, uCloud * 1.5 - 0.25);
-        col = mix(col, cloud, cm);
-      }
-      col = mix(col, fogc, smoothstep(uFog.x, uFog.y, dist));
+        /* the sea of cumulus: below it, water or (in the landing) a dark depth shows through the gaps */
+        vec3 under = mix(col, mix(uDeepSky, uDeep, 0.5) * 0.6, uCloudGap);
+        under = mix(under, fogc, smoothstep(uFog.x, uFog.y, dist));
+        vec4 cm = cloudMarch(cameraPosition, -V, dist, gl_FragCoord.xy, fogc, uFog);
+        col = under * cm.a + cm.rgb;
+      } else col = mix(col, fogc, smoothstep(uFog.x, uFog.y, dist));
       gl_FragColor = vec4(col, 1.0);
       #include <encodings_fragment>
     }`;
@@ -1523,11 +1809,13 @@ function initGL(){
   }
 
   /* sizing */
-  let W = 1, H = 1, baseDist = 10.5, ballR = 0.3, aspect = 1, tanV = 0.36;
+  let W = 1, H = 1, baseDist = 10.5, ballR = 0.3, aspect = 1, tanV = 0.36, lowRes = false;
+  /* while the clouds are raymarched, cap the pixel count so it stays smooth */
+  function setLowRes(on){ if (on === lowRes) return; lowRes = on; resize(); }
   function resize(){
     W = innerWidth; H = innerHeight;
     aspect = W / H;
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, aspect < 1 ? 1.75 : 2));
+    renderer.setPixelRatio(lowRes ? Math.min(devicePixelRatio || 1, Math.max(0.6, Math.sqrt(2.2e6 / (W * H)))) : Math.min(devicePixelRatio || 1, aspect < 1 ? 1.75 : 2));
     renderer.setSize(W, H, false);
     camera.aspect = aspect;
     camera.fov = aspect < 1 ? 52 : 40;
@@ -1658,7 +1946,7 @@ function initGL(){
   canvas.addEventListener("pointermove", e => {
     ndc.set(e.clientX / W * 2 - 1, -(e.clientY / H) * 2 + 1);
     if (mode === "ring" || mode === "landing") par.set(ndc.x, ndc.y);
-    if (mode === "landing" && cloudMix > 0.2) poke();
+    pointerAir();
     if (down && mode === "ring"){
       if (!dragging && Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6){ dragging = true; pendingDive = -1; }
       if (dragging){ const dr = (e.clientX - down.lx) * 0.0075 + (e.clientY - down.ly) * 0.005; if (dr) lastDir = Math.sign(dr); targetRot += dr; down.lx = e.clientX; down.ly = e.clientY; }
@@ -1677,7 +1965,12 @@ function initGL(){
     if (mode === "landing"){
       if (Math.hypot(e.clientX - d0.x, e.clientY - d0.y) > 8) return;
       const h = ray.intersectObjects(lHits, false)[0];
-      if (h){ const i = h.object.userData.li; if (ldrops[i].grow > 0.5){ const a = lLinks[i]; if (a.hasAttribute("data-port")) toRing(); else if (a.hasAttribute("data-deep")) toDeep(); else leave(a.getAttribute("href"), i); return; } }
+      if (h){ const i = h.object.userData.li; if (ldrops[i].grow > 0.5){ const a = lLinks[i]; if (a.hasAttribute("data-port")) toRing(); else if (a.hasAttribute("data-deep")) toDeep(); else if (a.hasAttribute("data-part")) toPart(); else if (a.hasAttribute("data-tools")) toTools(); else if (a.hasAttribute("data-rain")) toRain(); else leave(a.getAttribute("href"), i); return; } }
+    }
+    if (mode === "rain"){
+      if (Math.hypot(e.clientX - d0.x, e.clientY - d0.y) > 8) return;
+      const hl = ray.intersectObjects(lensHits, false)[0];
+      if (hl){ catchLens(hl.object.userData.lens); return; }
     }
     if (mode === "ring"){
       const h = ray.intersectObjects(pickables, false)[0];
@@ -1707,25 +2000,28 @@ function initGL(){
     return Pland;
   }
   let cloudMix = 0, cloudFrom = 0;
-  /* the cursor as a stick in the cloud: a short trail of points with their velocities */
-  let tIdx = 0, tLast = null;
-  const tHit = new T.Vector3(), tPlane = new T.Plane(new T.Vector3(0, 1, 0), -0.1);
-  function poke(){
+  /* the cursor is where an air current starts: its path is pushed into the flow field over the clouds */
+  const tHit = new T.Vector3(), tPlane = new T.Plane(new T.Vector3(0, 1, 0), -1.6);
+  let aLast = null;
+  function pointerAir(){
     ray.setFromCamera(ndc, camera);
-    if (!ray.ray.intersectPlane(tPlane, tHit)) return;
-    if (tHit.distanceTo(camera.position) > 40) return;
+    if (mode === "part"){ mirrorPoke(); return; }
+    if (mode === "tools") toolsPoke();
+    if (mode === "rain") rainPoke();
+    if (!flow || U.uCloud.value < 0.15 || !(mode === "landing" || mode === "tools" || mode === "rain")){ aLast = null; return; }
     const now = elapsed;
-    if (tLast){
-      const dt = now - tLast.t, dx = tHit.x - tLast.x, dz = tHit.z - tLast.z, d = Math.hypot(dx, dz);
-      if (d < 0.12 && dt < 0.05) return;
-      let vx = dx / Math.max(dt, 0.016), vz = dz / Math.max(dt, 0.016); const vl = Math.hypot(vx, vz);
-      if (vl > 8){ vx *= 8 / vl; vz *= 8 / vl; }
-      if (d > 3 || dt > 0.4){ vx = 0; vz = 0; }
-      U.uTrail.value[tIdx].set(tHit.x, tHit.z, now, 1);
-      U.uTrailV.value[tIdx].set(vx, vz);
-      tIdx = (tIdx + 1) % 16;
+    tPlane.constant = -(mode === "rain" ? (U.uCloudLayer.value.x + U.uCloudLayer.value.y) / 2 : 1.6);
+    if (!ray.ray.intersectPlane(tPlane, tHit) || tHit.distanceTo(camera.position) > 70){ aLast = null; return; }
+    if (aLast){
+      const dt = Math.max(now - aLast.t, 1 / 120), dx = tHit.x - aLast.x, dz = tHit.z - aLast.z, d = Math.hypot(dx, dz);
+      if (d < 0.05) return;
+      if (d < 6 && now - aLast.t < 0.25){
+        let vx = dx / dt, vz = dz / dt; const vl = Math.hypot(vx, vz), cap = 14;
+        if (vl > cap){ vx *= cap / vl; vz *= cap / vl; }
+        flow.push(aLast.x, aLast.z, tHit.x, tHit.z, vx * 0.9, vz * 0.9);
+      }
     }
-    tLast = { x:tHit.x, z:tHit.z, t:now };
+    aLast = { x:tHit.x, z:tHit.z, t:now };
   }
   const LBALL_R = 0.17;
   /* slots in screen space: where each drop hangs, and how far from the lens */
@@ -2044,222 +2340,46 @@ function initGL(){
   }
 
 
-  /* ================= PARTING: "O mnie" — the sea opens into a narrow path =================
-     two vertical walls of water rise along a corridor that runs towards the sun; right in front of the
-     viewer each wall turns 45° like the pages of an open book, and those two faces carry the text */
-  const PART_IN = reduce ? 0.45 : 1.45, PART_OUT = reduce ? 0.45 : 1.2;
+  /* ================= O MNIE: "Odbicie" — the sea stills into a mirror =================
+     the drop falls, the waves die away from where it landed, and the text lies on the still water,
+     among the reflected stars; the cursor sends soft rings across it */
+  const PART_IN = reduce ? 0.45 : 1.3, PART_OUT = reduce ? 0.45 : 1.1;
   const PART_I = 1;                                   // index of the "O mnie" drop
-  const P_FWD = new T.Vector3(sunDir.x, 0, sunDir.z).normalize();   // the path leads straight at the sun
-  const P_RIGHT = new T.Vector3(-P_FWD.z, 0, P_FWD.x);
-  const P_O = LAND_POS.clone().setY(0).addScaledVector(P_FWD, 7);
-  const P_HW = 1.3, P_FLOOR = -1.5, P_TOP = 2.6;
-  const P_D = Math.SQRT1_2;
-  /* local coords: x to the right, z backwards (−z runs down the path) */
-  const pB = { x:-P_HW, z:-7.72 }, pA = { x:-P_HW - 4.3 * P_D, z:-7.72 + 4.3 * P_D };
-  const pC = { x:(pA.x + pB.x) / 2, z:(pA.z + pB.z) / 2 };
-  const SCR_HALF = 1.76, SCR_Y0 = -1.25, SCR_Y1 = 1.95;          // 3.52 × 3.2 — matches the 660 × 600 px panels
-  const scrA = { x:pC.x - SCR_HALF * P_D, z:pC.z + SCR_HALF * P_D }, scrB = { x:pC.x + SCR_HALF * P_D, z:pC.z - SCR_HALF * P_D };
-  const toWorld = (x, y, z, out) => (out || new T.Vector3()).copy(P_O).addScaledVector(P_RIGHT, x).addScaledVector(P_FWD, -z).setY(y);
-  U.uPartO = { value:P_O.clone() };
-  U.uPartR = { value:new T.Vector2(P_RIGHT.x, P_RIGHT.z) };
-  U.uPartF = { value:new T.Vector2(P_FWD.x, P_FWD.z) };
-  U.uPartT = { value:0 };
-
-  /* wall centre-line: straight sections joined by soft bends */
-  function wallLine(){
-    const pts = [{ x:-7.5, z:4 }, pA, pB, { x:-P_HW, z:-240 }], rad = [0, 1.2, 0.8, 0];
-    const out = [pts[0]];
-    for (let i = 1; i < pts.length - 1; i++){
-      const a = pts[i - 1], b = pts[i], c = pts[i + 1];
-      let ux = b.x - a.x, uz = b.z - a.z, l1 = Math.hypot(ux, uz); ux /= l1; uz /= l1;
-      let vx = c.x - b.x, vz = c.z - b.z, l2 = Math.hypot(vx, vz); vx /= l2; vz /= l2;
-      const th = Math.acos(Math.max(-1, Math.min(1, ux * vx + uz * vz))), t = rad[i] * Math.tan(th / 2);
-      const p1 = { x:b.x - ux * t, z:b.z - uz * t }, p2 = { x:b.x + vx * t, z:b.z + vz * t };
-      for (let k = 0; k <= 10; k++){ const s = k / 10, u = 1 - s; out.push({ x:u * u * p1.x + 2 * u * s * b.x + s * s * p2.x, z:u * u * p1.z + 2 * u * s * b.z + s * s * p2.z }); }
-    }
-    out.push(pts[pts.length - 1]);
-    const cum = [0]; for (let i = 1; i < out.length; i++) cum.push(cum[i - 1] + Math.hypot(out[i].x - out[i - 1].x, out[i].z - out[i - 1].z));
-    return { pts:out, cum, len:cum[cum.length - 1] };
-  }
-  const WL = wallLine();
-  function atS(s){
-    let i = 1; while (i < WL.cum.length - 1 && WL.cum[i] < s) i++;
-    const a = WL.pts[i - 1], b = WL.pts[i], f = (s - WL.cum[i - 1]) / Math.max(1e-6, WL.cum[i] - WL.cum[i - 1]);
-    const tx = b.x - a.x, tz = b.z - a.z, tl = Math.hypot(tx, tz);
-    return { x:a.x + tx * f, z:a.z + tz * f, tx:tx / tl, tz:tz / tl };
-  }
-  function sOf(p){ let best = 0, bd = 1e9; for (let s = 0; s < 30; s += 0.01){ const q = atS(s), d = (q.x - p.x) ** 2 + (q.z - p.z) ** 2; if (d < bd){ bd = d; best = s; } } return best; }
-  const SCR_S = new T.Vector2(sOf(scrA), sOf(scrB));
-  function wallGeo(side){                          // side −1 = left, +1 = right (mirror)
-    const ss = []; for (let s = 0; s < WL.len; s += 0.2 + Math.max(0, s - 15) * 0.03) ss.push(s); ss.push(WL.len);
-    const ROWS = 24, n = ss.length, pos = new Float32Array(n * (ROWS + 1) * 3), nor = new Float32Array(n * (ROWS + 1) * 3), uv = new Float32Array(n * (ROWS + 1) * 2), idx = [];
-    const w = new T.Vector3();
-    ss.forEach((s, i) => {
-      const q = atS(s), lx = side < 0 ? q.x : -q.x;
-      const nlx = side < 0 ? -q.tz : q.tz, nlz = side < 0 ? q.tx : q.tx;   // inward normal in local coords
-      toWorld(lx, 0, q.z, w);
-      const nx = P_RIGHT.x * nlx - P_FWD.x * nlz, nz = P_RIGHT.z * nlx - P_FWD.z * nlz;
-      for (let r = 0; r <= ROWS; r++){
-        const o = i * (ROWS + 1) + r;
-        pos[o * 3] = w.x; pos[o * 3 + 1] = 0; pos[o * 3 + 2] = w.z;
-        nor[o * 3] = nx; nor[o * 3 + 1] = 0; nor[o * 3 + 2] = nz;
-        uv[o * 2] = s; uv[o * 2 + 1] = r / ROWS;
-      }
-    });
-    for (let i = 0; i < n - 1; i++) for (let r = 0; r < ROWS; r++){
-      const a = i * (ROWS + 1) + r, b = a + ROWS + 1;
-      idx.push(a, b, a + 1, b, b + 1, a + 1);
-    }
-    const g = new T.BufferGeometry();
-    g.setAttribute("position", new T.BufferAttribute(pos, 3));
-    g.setAttribute("normal", new T.BufferAttribute(nor, 3));
-    g.setAttribute("aUv", new T.BufferAttribute(uv, 2));
-    g.setIndex(idx);
-    return g;
-  }
-  const wallU = Object.assign({}, U, {
-    uScr:{ value:new T.Vector4(SCR_S.x, SCR_S.y, SCR_Y0, SCR_Y1) }, uScrOn:{ value:0 }
-  });
-  const wallMat = new T.ShaderMaterial({
-    uniforms:wallU, side:T.DoubleSide,
-    vertexShader:`
-      uniform float uTime, uPartT;
-      attribute vec2 aUv;
-      varying vec3 vWorld; varying vec3 vN; varying vec2 vS; varying float vV;
-      void main(){
-        float s = aUv.x;
-        float r = smoothstep(0.0, 0.35, uPartT - max(s - 8.0, 0.0) / 300.0);
-        float top = mix(-0.3, ${P_TOP.toFixed(2)}, r) + (0.07 * sin(s * 1.3 - uTime * 1.6) + 0.035 * sin(s * 3.1 + uTime * 2.3)) * r;
-        float y = mix(${P_FLOOR.toFixed(2)}, top, aUv.y);
-        vec3 p = vec3(position.x, y, position.z);
-        p += normal * (0.05 * aUv.y * aUv.y + 0.025 * sin(y * 2.0 + s * 0.8 - uTime * 1.1)) * r;
-        vWorld = p; vN = normal; vS = vec2(s, y); vV = aUv.y;
-        gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
-      }`,
-    fragmentShader:`
-      uniform float uTime, uStars, uScrOn; uniform vec3 uDeep, uTide, uPearl; uniform vec2 uFog; uniform vec4 uScr;
-      ${SKY}
-      ${NOISE}
-      varying vec3 vWorld; varying vec3 vN; varying vec2 vS; varying float vV;
-      void main(){
-        float s = vS.x, y = vS.y;
-        float h01 = clamp((y - ${P_FLOOR.toFixed(2)}) / ${(P_TOP - P_FLOOR).toFixed(2)}, 0.0, 1.0);
-        vec3 V = normalize(cameraPosition - vWorld);
-        float dist = length(cameraPosition - vWorld);
-        /* the screen: a calm, darker pane of water with a thin lit rim */
-        float dS = min(s - uScr.x, uScr.y - s), dY = min(y - uScr.z, uScr.w - y), dE = min(dS, dY);
-        float inS = smoothstep(-0.02, 0.1, dE) * uScrOn;
-        float rim = exp(-abs(dE) * 38.0) * step(-0.25, dE) * uScrOn;
-        float calm = 1.0 - 0.85 * inS;
-        /* the sheet: slow downward flow, finer ripples on top */
-        float f1 = fbm(vec2(s * 0.9, y * 0.55 - uTime * 0.35));
-        float f2 = fbm(vec2(s * 2.7 + 3.1, y * 1.8 - uTime * 0.9));
-        vec3 Nn = normalize(vN);
-        vec3 Tt = normalize(cross(Nn, vec3(0.0, 1.0, 0.0)));
-        vec3 N = normalize(Nn + (Tt * (f1 - 0.5) * 0.55 + vec3(0.0, 1.0, 0.0) * (f2 - 0.5) * 0.4) * calm);
-        float ndv = max(dot(N, V), 0.0);
-        float fres = 0.03 + 0.8 * pow(1.0 - ndv, 5.0);
-        vec3 R = reflect(-V, N);
-        vec3 refl = sky(R);
-        vec3 body = mix(uDeep * 0.55, uTide * 0.95, pow(h01, 1.8));
-        float ca = pow(1.0 - abs(fbm(vec2(s * 0.6, y * 0.35 - uTime * 0.25)) * 2.0 - 1.0), 6.0);
-        body += mix(uLight, uPearl, 0.5) * ca * 0.08 * (0.3 + h01) * calm;
-        vec3 col = mix(body, refl, fres);
-        vec3 Hs = normalize(uSunDir + V);
-        col += uLight * pow(max(dot(N, Hs), 0.0), 500.0) * 1.2 * calm;
-        col += mix(uTide, uLight, 0.35) * smoothstep(0.92, 1.0, vV) * (0.1 + 0.15 * f2);
-        col = mix(col, uDeep * 0.5 + refl * 0.06, 0.62 * inS);
-        col += mix(uLight, uPearl, 0.3) * rim * 0.45;
-        vec3 vd = -V;
-        col = mix(col, sky(normalize(vec3(vd.x, 0.015, vd.z))), smoothstep(uFog.x, uFog.y, dist));
-        gl_FragColor = vec4(col, 1.0);
-        #include <encodings_fragment>
-      }`
-  });
-  const wallL = new T.Mesh(wallGeo(-1), wallMat), wallR = new T.Mesh(wallGeo(1), wallMat);
-  wallL.frustumCulled = wallR.frustumCulled = false;
-  scene.add(wallL); scene.add(wallR);
-
-  /* the wet path between the walls */
-  const floorMat = new T.ShaderMaterial({
-    uniforms:U,
-    vertexShader:`
-      uniform vec3 uPartO; uniform vec2 uPartR, uPartF;
-      varying vec3 vWorld; varying vec2 vL;
-      void main(){
-        vec4 wp = modelMatrix * vec4(position, 1.0);
-        vec2 d = wp.xz - uPartO.xz;
-        vL = vec2(dot(d, uPartR), -dot(d, uPartF));
-        vWorld = wp.xyz;
-        gl_Position = projectionMatrix * viewMatrix * wp;
-      }`,
-    fragmentShader:`
-      uniform float uTime; uniform vec3 uDeep, uTide, uPearl; uniform vec2 uFog, uPartR, uPartF;
-      ${SKY}
-      ${NOISE}
-      varying vec3 vWorld; varying vec2 vL;
-      void main(){
-        vec2 q = vL;
-        float n = fbm(q * 1.7);
-        float rip = sin(q.y * 11.0 + q.x * 1.7 + fbm(q * 0.9) * 7.0) * (0.5 + 0.5 * fbm(q * 0.4 + 3.0));
-        float puddle = smoothstep(0.48, 0.58, fbm(q * vec2(0.8, 0.22) + 7.0));
-        vec2 gl = vec2((fbm(q * 3.0 + 2.0) - 0.5) * 0.16, rip * 0.02) * (1.0 - puddle * 0.9);
-        vec3 N = normalize(vec3(uPartR.x * gl.x - uPartF.x * gl.y, 1.0, uPartR.y * gl.x - uPartF.y * gl.y));
-        vec3 V = normalize(cameraPosition - vWorld);
-        float dist = length(cameraPosition - vWorld);
-        vec3 R = reflect(-V, N);
-        float fres = 0.04 + 0.96 * pow(1.0 - max(dot(N, V), 0.0), 5.0);
-        vec3 sand = mix(vec3(0.016, 0.02, 0.021), vec3(0.04, 0.045, 0.043), n) * (0.92 + 0.08 * rip);
-        sand = mix(sand, uDeep * 0.8, 0.35);
-        vec3 col = mix(sand, sky(R), mix(fres * 0.9, 0.9, puddle));
-        float m = max(dot(R, uSunDir), 0.0);
-        col += uLight * (pow(m, 260.0) * 1.6 * (0.35 + puddle) + pow(m, 24.0) * 0.07);
-        /* the walls' shadow near their feet */
-        col *= mix(0.55, 1.0, smoothstep(0.0, 0.9, ${P_HW.toFixed(2)} - abs(q.x)) * step(q.y, -8.0) + step(-8.0, q.y));
-        vec3 vd = -V;
-        col = mix(col, sky(normalize(vec3(vd.x, 0.015, vd.z))), smoothstep(uFog.x, uFog.y, dist));
-        gl_FragColor = vec4(col, 1.0);
-        #include <encodings_fragment>
-      }`
-  });
-  const floorMesh = new T.Mesh(new T.PlaneGeometry(16, 246, 1, 1), floorMat);
-  floorMesh.rotation.x = -Math.PI / 2;
-  const floorPivot = new T.Group(); floorPivot.add(floorMesh);
-  floorMesh.position.z = (4 - 242) / 2;                    // local z from +4 to −242
-  floorPivot.position.copy(P_O).setY(P_FLOOR);
-  floorPivot.rotation.y = Math.atan2(-P_FWD.x, -P_FWD.z);   // local −z runs down the path
-  scene.add(floorPivot);
-  floorMesh.frustumCulled = false;
-  const setPart = on => { wallL.visible = wallR.visible = floorPivot.visible = floorMesh.visible = on; };
-  setPart(false);
-
-  /* the viewer's spot on the path, and a point above it the camera arcs through */
+  U.uMirror = { value:new T.Vector4(0, 0, 0, 0) };    // centre x, z, calm radius, strength
   const Ppart = pose(), Pp = pose();
-  {
-    const eye = toWorld(0, -0.35, 2.0);
-    const tgt = eye.clone().addScaledVector(P_FWD, 10); tgt.y += 10 * Math.tan(0.05);
-    look(Ppart, eye, tgt, UP);
+  const MI = new T.Vector3(LAND_POS.x - 1.5, 0, LAND_POS.z - 2.3);
+  const partMid = new T.Vector3();
+  const PANEL_W = 660, PANEL_H = 600, P3W = 2.9, P3D = P3W * PANEL_H / PANEL_W;
+  const corners = [[], []];
+  function mirrorSetup(I){
+    MI.set(I.x, 0, I.z);
+    const eye = new T.Vector3(I.x, 4.2, I.z + 2.6);
+    look(Ppart, eye, new T.Vector3(I.x, 0, I.z - 0.5), UP);
+    [-1, 1].forEach((sd, k) => {
+      const cx = I.x + sd * 1.56, cz = I.z - 0.5, y = 0.03;
+      corners[k] = [new T.Vector3(cx - P3W / 2, y, cz - P3D / 2), new T.Vector3(cx + P3W / 2, y, cz - P3D / 2),
+                    new T.Vector3(cx - P3W / 2, y, cz + P3D / 2), new T.Vector3(cx + P3W / 2, y, cz + P3D / 2)];
+    });
   }
-  const partMid = toWorld(0, 2.4, 3.0);
+  mirrorSetup(MI);
   let pv = null;
 
-  /* text panels: real HTML mapped onto the two wall faces with a projective transform */
+  /* text panels: real HTML laid onto the still water with a projective transform */
   const scrEls = [$("wallL"), $("wallR")];
-  const PANEL_W = 660, PANEL_H = 600;
-  const corners = [
-    [toWorld(scrA.x, SCR_Y1, scrA.z), toWorld(scrB.x, SCR_Y1, scrB.z), toWorld(scrA.x, SCR_Y0, scrA.z), toWorld(scrB.x, SCR_Y0, scrB.z)],
-    [toWorld(-scrB.x, SCR_Y1, scrB.z), toWorld(-scrA.x, SCR_Y1, scrA.z), toWorld(-scrB.x, SCR_Y0, scrB.z), toWorld(-scrA.x, SCR_Y0, scrA.z)]
-  ];
   const adj = m => [m[4]*m[8]-m[5]*m[7], m[2]*m[7]-m[1]*m[8], m[1]*m[5]-m[2]*m[4], m[5]*m[6]-m[3]*m[8], m[0]*m[8]-m[2]*m[6], m[2]*m[3]-m[0]*m[5], m[3]*m[7]-m[4]*m[6], m[1]*m[6]-m[0]*m[7], m[0]*m[4]-m[1]*m[3]];
   const mulMM = (a, b) => { const c = new Array(9); for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++){ let s = 0; for (let k = 0; k < 3; k++) s += a[3 * i + k] * b[3 * k + j]; c[3 * i + j] = s; } return c; };
   const mulMV = (m, v) => [m[0]*v[0]+m[1]*v[1]+m[2]*v[2], m[3]*v[0]+m[4]*v[1]+m[5]*v[2], m[6]*v[0]+m[7]*v[1]+m[8]*v[2]];
   const basis = (x1, y1, x2, y2, x3, y3, x4, y4) => { const m = [x1, x2, x3, y1, y2, y3, 1, 1, 1]; const v = mulMV(adj(m), [x4, y4, 1]); return mulMM(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]]); };
-  const SRC = basis(0, 0, PANEL_W, 0, 0, PANEL_H, PANEL_W, PANEL_H), SRC_ADJ = adj(SRC);
+  const SRC_ADJ = adj(basis(0, 0, PANEL_W, 0, 0, PANEL_H, PANEL_W, PANEL_H));
   const pc = new T.Vector3();
   let flatWas = null;
+  const shimMap = $("shimMap");
+  let shimmer = 1.2, shimShown = -1;
   function placePanels(){
     const flat = aspect < 1.15 || W < 820;
     if (flat !== flatWas){ flatWas = flat; htmlEl.classList.toggle("part-flat", flat); if (flat) scrEls.forEach(el => { el.style.transform = ""; }); }
+    shimmer += (1.2 - shimmer) * 0.06;
+    if (shimMap && Math.abs(shimmer - shimShown) > 0.05){ shimShown = shimmer; shimMap.setAttribute("scale", shimmer.toFixed(2)); }
     if (flat) return;
     scrEls.forEach((el, i) => {
       const d = []; let ok = true;
@@ -2271,61 +2391,463 @@ function initGL(){
       el.style.transform = `matrix3d(${t[0]},${t[3]},0,${t[6]},${t[1]},${t[4]},0,${t[7]},0,0,1,0,${t[2]},${t[5]},0,1)`;
     });
   }
+  /* the cursor touching the mirror: a soft ring, and the reflected text trembles for a moment */
+  let mLast = null;
+  const mPlane = new T.Plane(new T.Vector3(0, 1, 0), 0), mHit = new T.Vector3();
+  function mirrorPoke(){
+    if (!ray.ray.intersectPlane(mPlane, mHit)) return;
+    if (mLast && (elapsed - mLast.t < 0.09 || Math.hypot(mHit.x - mLast.x, mHit.z - mLast.z) < 0.25)) return;
+    addRipple(mHit.x, mHit.z, 0.018, 7.5);
+    if (Math.hypot(mHit.x - MI.x, mHit.z - (MI.z - 0.5)) < 4.5) shimmer = Math.min(7, shimmer + 2.2);
+    mLast = { x:mHit.x, z:mHit.z, t:elapsed };
+  }
 
   function toPart(push){
     if (mode !== "landing") return;
     const b = ldrops[PART_I];
     const P = b.mesh.visible ? b.mesh.position.clone() : slotLocal(PART_I, new T.Vector3()).applyMatrix4(camera.matrixWorld);
     if (P.y < 0.6) P.y = 0.6;
+    mirrorSetup(new T.Vector3(P.x, 0, P.z));
     const fallT = reduce ? 0.12 : 0.28;
     b.fall = { t0:elapsed, P, g:2 * P.y / (fallT * fallT), hit:false };
     ldrops.forEach(d => { d.on = false; });
     cloudFrom = cloudMix;
-    pv = { t0:elapsed, from:capture(), shown:false, fell:false };
-    setPart(true);
+    pv = { t0:elapsed, from:capture(), shown:false };
+    partMid.copy(pv.from.p).lerp(Ppart.p, 0.5); partMid.y = Math.max(pv.from.p.y, Ppart.p.y) + 0.6;
     mode = "toPart"; htmlEl.classList.add("in-part");
     if (push !== false) try { history.pushState(null, "", "#o-mnie"); } catch (_) {}
   }
   function fromPart(push){
     if (mode !== "part") return;
-    pv = { t0:elapsed, from:capture(), fell:false };
+    pv = { t0:elapsed, from:capture() };
+    landPose(); partMid.copy(pv.from.p).lerp(Pland.p, 0.5); partMid.y = Math.max(pv.from.p.y, Pland.p.y) + 0.6;
     mode = "fromPart"; htmlEl.classList.remove("part-on");
     if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {}
   }
   if (mode === "part"){
     pv = { t0:0, from:{ p:Ppart.p.clone(), q:Ppart.q.clone() }, shown:true };
-    U.uPartT.value = 1.2; wallU.uScrOn.value = 1; setPart(true);
+    U.uMirror.value.set(MI.x, MI.z - 0.5, 45, 1);
   }
   function partCamera(){
     const t = pv ? elapsed - pv.t0 : 0;
     if (mode === "part"){
-      Pp.p.copy(Ppart.p); Pp.p.y += Math.sin(elapsed * 0.5) * 0.012;
+      Pp.p.copy(Ppart.p); Pp.p.y += Math.sin(elapsed * 0.45) * 0.01;
       Pp.q.copy(Ppart.q);
-      U.uPartT.value = 1.2; wallU.uScrOn.value = Math.min(1, wallU.uScrOn.value + 0.05);
+      U.uMirror.value.set(MI.x, MI.z - 0.5, 45, 1);
       return Pp;
     }
     if (mode === "toPart"){
       qbez(pv.from.p, partMid, Ppart.p, ease((t - 0.05) / (PART_IN - 0.05)), Pp.p);
-      Pp.q.slerpQuaternions(pv.from.q, Ppart.q, ease((t - 0.05) / (PART_IN - 0.15)));
-      U.uPartT.value = 1.2 * easeOut((t - 0.16) / 0.9);
-      wallU.uScrOn.value = smooth(PART_IN - 0.55, PART_IN - 0.05, t);
-      if (!pv.shown && t > PART_IN - 0.45){ pv.shown = true; htmlEl.classList.add("part-on"); }
+      Pp.q.slerpQuaternions(pv.from.q, Ppart.q, ease((t - 0.05) / (PART_IN - 0.1)));
+      /* stillness spreads out from where the drop landed */
+      U.uMirror.value.set(MI.x, MI.z - 0.5, 45 * easeOut((t - 0.25) / 0.95), smooth(0.25, 0.85, t));
+      if (!pv.shown && t > PART_IN - 0.45){ pv.shown = true; htmlEl.classList.add("part-on"); shimmer = 5; }
       if (t >= PART_IN) mode = "part";
       return Pp;
     }
-    /* fromPart: rise out of the path, the walls fall back into the sea behind us */
+    /* fromPart: the wind comes back, the waves return, the camera rises to the landing view */
     landPose();
     qbez(pv.from.p, partMid, Pland.p, ease(t / PART_OUT), Pp.p);
-    Pp.q.slerpQuaternions(pv.from.q, Pland.q, ease((t - 0.18) / (PART_OUT - 0.18)));
-    U.uPartT.value = 1.2 * (1 - smooth(0.12, 0.95, t / PART_OUT));
-    wallU.uScrOn.value = 1 - smooth(0, 0.25, t);
-    if (!pv.fell && t > PART_OUT * 0.6){
-      pv.fell = true;
-      for (let k = 0; k < 3; k++){ const w = toWorld(k % 2 ? 1.2 : -1.2, 0, -3 - k * 3); addRipple(w.x, w.z, 0.12, 3.4); }
-    }
-    if (t >= PART_OUT){ mode = "landing"; htmlEl.classList.remove("in-part"); pv = null; U.uPartT.value = 0; setPart(false); }
+    Pp.q.slerpQuaternions(pv.from.q, Pland.q, ease((t - 0.05) / (PART_OUT - 0.05)));
+    U.uMirror.value.set(MI.x, MI.z - 0.5, 45, 1 - smooth(0.05, 0.8, t / PART_OUT));
+    if (t >= PART_OUT){ mode = "landing"; htmlEl.classList.remove("in-part"); pv = null; U.uMirror.value.w = 0; }
     return Pp;
   }
+
+
+  /* ================= NARZĘDZIA: "Kondensacja" =================
+     the drop turns to mist and rises; the camera rises with it above the sea of cumulus,
+     where the tools gather into four small clouds that the cursor's wind can push around */
+  const TOOLS_IN = reduce ? 0.45 : 1.4, TOOLS_OUT = reduce ? 0.45 : 1.15;
+  const TOOLS_I = 2;
+  const Ptools = pose(), Pt = pose();
+  {
+    const eye = LAND_POS.clone().add(new T.Vector3(0, 8.5, 1.0));
+    look(Ptools, eye, eye.clone().add(new T.Vector3(0, -Math.tan(0.16) * 10, -10)), UP);
+  }
+  /* a soft puff, lit from above: the brick every little cloud is made of */
+  const puffTex = (() => {
+    const S = 128, c = document.createElement("canvas"); c.width = c.height = S; const g = c.getContext("2d");
+    const gr = g.createRadialGradient(S * 0.5, S * 0.46, 2, S * 0.5, S * 0.5, S * 0.5);
+    gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(0.45, "rgba(255,255,255,.75)"); gr.addColorStop(0.8, "rgba(255,255,255,.18)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, S, S);
+    const img = g.getImageData(0, 0, S, S), px = img.data; let s = 99;
+    const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let y = 0; y < S; y++) for (let x = 0; x < S; x++){
+      const o = (y * S + x) * 4, sh = 0.72 + 0.28 * (1 - y / S);
+      px[o] = px[o] * sh; px[o + 1] = px[o + 1] * sh; px[o + 2] = Math.min(255, px[o + 2] * (sh + 0.06));
+      px[o + 3] = px[o + 3] * (0.85 + 0.15 * rnd());
+    }
+    g.putImageData(img, 0, 0);
+    const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; return t;
+  })();
+  const TOOL_HOME = [ new T.Vector3(-0.6, -2.3, -12.5), new T.Vector3(0.9, 1.3, -16.5), new T.Vector3(5.0, -1.9, -13), new T.Vector3(6.4, 1.6, -17.5) ];
+  const toolEls = Array.from(document.querySelectorAll(".tool-cloud"));
+  const tools = TOOL_HOME.map((h, gi) => {
+    const grp = new T.Group(); scene.add(grp); grp.visible = false;
+    let s = 17 + gi * 31; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const puffs = [];
+    for (let k = 0; k < 15; k++){
+      const sp = new T.Sprite(new T.SpriteMaterial({ map:puffTex, color:0xffffff, transparent:true, depthWrite:false, opacity:0 }));
+      const off = new T.Vector3((rnd() - 0.5) * 3.8, (rnd() - 0.3) * 1.1 * (1 - Math.abs(k - 7) / 10), (rnd() - 0.5) * 1.6);
+      const sz = 1.5 + rnd() * 1.5 - Math.max(0, off.y) * 0.3;
+      sp.scale.set(sz, sz * 0.86, 1); grp.add(sp);
+      puffs.push({ sp, off, sz, ph:rnd() * 6.28 });
+    }
+    return { grp, puffs, home:h.clone(), pos:h.clone(), vel:new T.Vector3(), grow:0, el:toolEls[gi] };
+  });
+  /* the drop evaporating: a rising, spreading wisp */
+  const mist = new T.Sprite(new T.SpriteMaterial({ map:puffTex, transparent:true, depthWrite:false, opacity:0 })); mist.visible = false; scene.add(mist);
+  let tsv = null, mistT = -1;
+  const tmpV = new T.Vector3(), camR = new T.Vector3(), camU = new T.Vector3(), camF = new T.Vector3();
+  function toTools(push){
+    if (mode !== "landing") return;
+    const b = ldrops[TOOLS_I];
+    const P = b.mesh.visible ? b.mesh.position.clone() : slotLocal(TOOLS_I, new T.Vector3()).applyMatrix4(camera.matrixWorld);
+    b.on = false; b.grow = 0; b.gv = 0;
+    ldrops.forEach(d => { d.on = false; });
+    mist.position.copy(P); mist.userData.p0 = P.clone(); mistT = elapsed; mist.visible = true;
+    cloudFrom = cloudMix;
+    tsv = { t0:elapsed, from:capture(), mid:null, shown:false };
+    tsv.mid = tsv.from.p.clone().lerp(Ptools.p, 0.5); tsv.mid.y += 1.5;
+    tools.forEach(t => { t.pos.copy(t.home); t.vel.set(0, 0, 0); t.grow = 0; });
+    mode = "toTools"; htmlEl.classList.add("in-tools");
+    if (push !== false) try { history.pushState(null, "", "#narzedzia"); } catch (_) {}
+  }
+  function fromTools(push){
+    if (mode !== "tools") return;
+    tsv = { t0:elapsed, from:capture(), mid:null };
+    landPose(); tsv.mid = tsv.from.p.clone().lerp(Pland.p, 0.5); tsv.mid.y += 1.0;
+    mode = "fromTools"; htmlEl.classList.remove("tools-on");
+    if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {}
+  }
+  if (mode === "tools"){ tsv = { t0:0, from:{ p:Ptools.p.clone(), q:Ptools.q.clone() }, shown:true }; tools.forEach(t => { t.grow = 1; }); }
+  function toolsCamera(){
+    const t = tsv ? elapsed - tsv.t0 : 0;
+    if (mode === "tools"){
+      Pt.p.copy(Ptools.p); Pt.p.y += Math.sin(elapsed * 0.35) * 0.06; Pt.q.copy(Ptools.q);
+      return Pt;
+    }
+    if (mode === "toTools"){
+      qbez(tsv.from.p, tsv.mid, Ptools.p, ease((t - 0.08) / (TOOLS_IN - 0.08)), Pt.p);
+      Pt.q.slerpQuaternions(tsv.from.q, Ptools.q, ease((t - 0.08) / (TOOLS_IN - 0.12)));
+      if (!tsv.shown && t > TOOLS_IN - 0.4){ tsv.shown = true; htmlEl.classList.add("tools-on"); }
+      if (t >= TOOLS_IN) mode = "tools";
+      return Pt;
+    }
+    landPose();
+    qbez(tsv.from.p, tsv.mid, Pland.p, ease(t / TOOLS_OUT), Pt.p);
+    Pt.q.slerpQuaternions(tsv.from.q, Pland.q, ease(t / (TOOLS_OUT * 0.95)));
+    if (t >= TOOLS_OUT){ mode = "landing"; htmlEl.classList.remove("in-tools"); tsv = null; }
+    return Pt;
+  }
+  /* the cursor's wind pushes the little clouds */
+  let tPoke = null;
+  function toolsPoke(){
+    const now = elapsed, sx = ndc.x, sy = ndc.y;
+    if (tPoke){
+      const dt = Math.max(now - tPoke.t, 1 / 120), vx = (sx - tPoke.x) / dt, vy = (sy - tPoke.y) / dt;
+      if (dt < 0.25) tools.forEach(tc => {
+        tmpV.copy(tc.pos).applyMatrix4(Ptools_M()).project(camera);
+        const d = Math.hypot(tmpV.x - sx, (tmpV.y - sy) / aspect);
+        if (d < 0.28){
+          const k = (1 - d / 0.28) * 0.9 * Math.min(1, dt * 6);
+          tc.vel.x += vx * k * 1.6; tc.vel.y += vy * k * 0.9;
+        }
+      });
+    }
+    tPoke = { x:sx, y:sy, t:now };
+  }
+  function updateToolsFx(realDt){
+    /* mist from the evaporating drop */
+    if (mistT >= 0){
+      const a = (elapsed - mistT) / 0.9;
+      if (a >= 1){ mistT = -1; mist.visible = false; }
+      else {
+        mist.position.copy(mist.userData.p0); mist.position.y += a * 1.6;
+        const sz = 0.3 + a * 2.4; mist.scale.set(sz, sz * 0.8, 1);
+        mist.material.opacity = 0.55 * Math.sin(Math.PI * Math.min(1, a * 1.2)) * (1 - a);
+        mist.material.color.copy(Lcol).lerp(new T.Color(1, 1, 1), 0.6);
+      }
+    }
+    const active = mode === "toTools" || mode === "tools" || mode === "fromTools";
+    const t = tsv ? elapsed - tsv.t0 : 0;
+    camR.setFromMatrixColumn(camera.matrixWorld, 0); camU.setFromMatrixColumn(camera.matrixWorld, 1); camF.setFromMatrixColumn(camera.matrixWorld, 2).negate();
+    tools.forEach((tc, i) => {
+      let g = 0;
+      if (mode === "toTools") g = easeOut((t - 0.5 - i * 0.12) / 0.55);
+      else if (mode === "tools") g = 1;
+      else if (mode === "fromTools") g = 1 - smooth(0, 0.45, t);
+      tc.grow = g;
+      tc.grp.visible = active && g > 0.01;
+      if (!tc.grp.visible){ if (tc.el) tc.el.style.opacity = "0"; return; }
+      /* wind impulses in screen space → camera plane; a spring brings the cloud home */
+      tc.vel.multiplyScalar(Math.exp(-realDt * 1.6));
+      const off = tmpV.copy(tc.pos).sub(tc.home);
+      tc.vel.x -= off.x * realDt * 0.9; tc.vel.y -= off.y * realDt * 0.9;
+      tc.pos.x += tc.vel.x * realDt; tc.pos.y += tc.vel.y * realDt;
+      const world = tmpV.set(tc.pos.x * (aspect < 1 ? 0.42 : 1) - (aspect < 1 ? 1.2 : 0), tc.pos.y * (aspect < 1 ? 1.7 : 1), tc.pos.z).applyMatrix4(Ptools_M());
+      tc.grp.position.copy(world);
+      const shear = Math.max(-1, Math.min(1, tc.vel.x * 0.25));
+      tc.puffs.forEach((pf, k) => {
+        const wob = Math.sin(elapsed * 0.4 + pf.ph) * 0.08;
+        pf.sp.position.copy(camR).multiplyScalar(pf.off.x * (0.6 + 0.4 * g) + shear * (pf.off.y + 0.5) * 0.6)
+          .addScaledVector(camU, pf.off.y * (0.6 + 0.4 * g) + wob).addScaledVector(camF, pf.off.z);
+        const s = pf.sz * (0.3 + 0.7 * g) * (mode === "fromTools" ? 1 + (1 - g) * 0.6 : 1);
+        pf.sp.scale.set(s, s * 0.86, 1);
+        pf.sp.material.opacity = 0.55 * g;
+        pf.sp.material.color.copy(Lcol).multiplyScalar(0.55).add(new T.Color(0.32, 0.4, 0.44));
+      });
+      if (tc.el){
+        tmpV.copy(world).project(camera);
+        const x = (tmpV.x * 0.5 + 0.5) * W, y = (-tmpV.y * 0.5 + 0.5) * H;
+        tc.el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) translate(-50%,-50%)`;
+        tc.el.style.opacity = (smooth(0.55, 1, g) * (mode === "fromTools" ? 0 : 1)).toFixed(3);
+      }
+    });
+  }
+  /* tool cloud positions are kept in the frame of the tools view (x right, y up, −z ahead) */
+  const PtM = new T.Matrix4(), ONE3 = new T.Vector3(1, 1, 1);
+  function Ptools_M(){ return PtM.compose(Ptools.p, Ptools.q, ONE3); }
+
+
+  /* ================= GALERIA: "Deszcz" =================
+     the drop falls into the clouds; the camera goes down through them and they lift into a ceiling;
+     below it, it rains — and some of the drops fall slowly, each one a lens holding a photograph */
+  const RAIN_IN = reduce ? 0.45 : 1.3, RAIN_OUT = reduce ? 0.45 : 1.2;
+  const RAIN_I = 4;
+  const LAYER_SEA = new T.Vector2(0.2, 3.2), LAYER_CEIL = new T.Vector2(4.4, 8.4);
+  const Prain = pose(), Pr = pose();
+  {
+    const eye = new T.Vector3(LAND_POS.x, 1.6, LAND_POS.z - 2);
+    look(Prain, eye, eye.clone().add(new T.Vector3(0, Math.tan(0.06) * 10, -10)), UP);
+  }
+  let rv = null;
+
+  /* rain streaks: positions live in the shader, only time and wind change */
+  const RC = 2400;
+  const rainGeo = (() => {
+    const pos = new Float32Array(RC * 2 * 3), seed = new Float32Array(RC * 2 * 3), end = new Float32Array(RC * 2);
+    let s = 7; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < RC; i++){
+      const a = rnd(), b = rnd(), c = rnd();
+      for (let e = 0; e < 2; e++){ const o = i * 2 + e; seed[o * 3] = a; seed[o * 3 + 1] = b; seed[o * 3 + 2] = c; end[o] = e; }
+    }
+    const g = new T.BufferGeometry();
+    g.setAttribute("position", new T.BufferAttribute(pos, 3));
+    g.setAttribute("aSeed", new T.BufferAttribute(seed, 3));
+    g.setAttribute("aEnd", new T.BufferAttribute(end, 1));
+    return g;
+  })();
+  const rainMat = new T.ShaderMaterial({
+    uniforms:{ uTime:U.uTime, uCenter:{ value:new T.Vector3() }, uWind:{ value:new T.Vector2() }, uAlpha:{ value:0 }, uCol:{ value:new T.Color() } },
+    transparent:true, depthWrite:false, blending:T.AdditiveBlending,
+    vertexShader:`
+      uniform float uTime; uniform vec3 uCenter; uniform vec2 uWind;
+      attribute vec3 aSeed; attribute float aEnd;
+      varying float vA;
+      void main(){
+        float sp = 8.5 + aSeed.x * 3.0;
+        float y = mod(aSeed.y * 6.2 - uTime * sp, 6.2) - 0.3;
+        vec3 p = vec3(uCenter.x + (aSeed.x - 0.5) * 26.0, y, uCenter.z + 3.0 - aSeed.z * 32.0);
+        p.xz += uWind * (y - 3.0) * 0.12;
+        p += aEnd * vec3(uWind.x * 0.05, 0.42, uWind.y * 0.05);
+        vA = (0.35 + 0.65 * aEnd) * smoothstep(-0.3, 0.2, y);
+        gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
+      }`,
+    fragmentShader:`uniform float uAlpha; uniform vec3 uCol; varying float vA;
+      void main(){ gl_FragColor = vec4(uCol * vA * uAlpha, 1.0); }`
+  });
+  const rain = new T.LineSegments(rainGeo, rainMat); rain.frustumCulled = false; rain.visible = false; scene.add(rain);
+
+  /* lens drops: a photograph seen through a falling drop */
+  const lensMat = (tex) => new T.ShaderMaterial({
+    uniforms:{ uTex:{ value:tex }, uAlpha:{ value:0 }, uHover:{ value:0 }, uLight:U.uLight, uHorizon:U.uHorizon, uSunDir:U.uSunDir },
+    transparent:true,
+    vertexShader:`varying vec3 vN; varying vec3 vV;
+      void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = -mv.xyz; gl_Position = projectionMatrix * mv; }`,
+    fragmentShader:`uniform sampler2D uTex; uniform float uAlpha, uHover; uniform vec3 uLight, uHorizon, uSunDir;
+      varying vec3 vN; varying vec3 vV;
+      void main(){
+        vec3 N = normalize(vN), V = normalize(vV);
+        float nz = max(dot(N, V), 0.0);
+        /* spherical lens: magnified in the middle, squeezed and flipped towards the rim */
+        vec2 uv = 0.5 + N.xy * vec2(0.46, 0.42) * (0.75 + 0.35 * (1.0 - nz));
+        vec3 img = pow(texture2D(uTex, uv).rgb, vec3(0.85)) * (1.15 + 0.35 * uHover);
+        float fres = pow(1.0 - nz, 3.0);
+        vec3 col = mix(img, uHorizon * 1.6 + uLight * 0.12, fres * 0.75);
+        vec3 K = normalize(vec3(-0.45, 0.6, 0.65));
+        col += vec3(1.0) * pow(max(dot(reflect(-V, N), K), 0.0), 90.0) * 0.9;
+        col += uLight * pow(1.0 - nz, 5.0) * (0.35 + 0.5 * uHover);
+        gl_FragColor = vec4(col, uAlpha * (0.9 + 0.1 * nz));
+        #include <encodings_fragment>
+      }`
+  });
+  const blankLens = new T.DataTexture(new Uint8Array([20, 40, 48, 255]), 1, 1); blankLens.needsUpdate = true;
+  const lensTex = PHOTOS.map(() => null);
+  function lensTexture(k){
+    if (!lensTex[k]){ const c = studyCanvas(k); const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; lensTex[k] = t; }
+    return lensTex[k];
+  }
+  const LN_COUNT = 7;
+  const lensGeo = new T.SphereGeometry(1, 48, 36);
+  const lensHit = new T.SphereGeometry(1.25, 10, 8);
+  const lenses = Array.from({ length:LN_COUNT }, (_, i) => {
+    const mat = lensMat(blankLens);
+    const mesh = new T.Mesh(lensGeo, mat); mesh.visible = false; mesh.renderOrder = 2; scene.add(mesh);
+    const hit = new T.Mesh(lensHit, new T.MeshBasicMaterial()); hit.visible = false; hit.userData.lens = i; mesh.add(hit);
+    return { mesh, mat, hit, k:i % PHOTOS.length, x:-3.2 + i * (6.4 / (LN_COUNT - 1)), z:-3.6 - ((i * 5) % 7) * 0.6, y:0, sp:0.32 + ((i * 3) % 5) * 0.05, r:0.3 + ((i * 7) % 4) * 0.04, vx:0, hov:0, caught:0 };
+  });
+  const lensHits = lenses.map(l => l.hit);
+  let lensHovered = -1, nextPhoto = LN_COUNT, rainGen = 0, ripT = 0;
+  const lensLab = $("lensLabel");
+  function resetLens(l, top){
+    l.k = nextPhoto++ % PHOTOS.length;
+    l.mat.uniforms.uTex.value = lensTex[l.k] || blankLens;
+    l.y = top ? 3.9 + Math.random() * 0.8 : 0.4 + Math.random() * 3.4;
+    l.vx = 0; l.caught = 0;
+  }
+  function toRain(push){
+    if (mode !== "landing") return;
+    const b = ldrops[RAIN_I];
+    const P = b.mesh.visible ? b.mesh.position.clone() : slotLocal(RAIN_I, new T.Vector3()).applyMatrix4(camera.matrixWorld);
+    if (P.y < 0.6) P.y = 0.6;
+    b.fall = { t0:elapsed, P, g:2 * P.y / 0.3 / 0.3, hit:false };
+    ldrops.forEach(d => { d.on = false; });
+    cloudFrom = cloudMix;
+    rv = { t0:elapsed, from:capture(), mid:new T.Vector3(LAND_POS.x, 3.4, LAND_POS.z - 1.2), shown:false };
+    lenses.forEach(l => resetLens(l, false));
+    mode = "toRain"; htmlEl.classList.add("in-rain");
+    if (push !== false) try { history.pushState(null, "", "#galeria"); } catch (_) {}
+  }
+  function fromRain(push){
+    if (mode !== "rain") return;
+    if (!lb.hidden) closeLightbox();
+    rv = { t0:elapsed, from:capture(), mid:new T.Vector3(LAND_POS.x, 3.4, LAND_POS.z - 1.2) };
+    mode = "fromRain"; htmlEl.classList.remove("rain-on");
+    if (push !== false) try { history.pushState(null, "", "#start"); } catch (_) {}
+  }
+  if (mode === "rain"){ rv = { t0:0, from:{ p:Prain.p.clone(), q:Prain.q.clone() }, mid:new T.Vector3(), shown:true }; lenses.forEach(l => resetLens(l, false)); }
+  function rainCamera(){
+    const t = rv ? elapsed - rv.t0 : 0;
+    if (mode === "rain"){ Pr.p.copy(Prain.p); Pr.p.y += Math.sin(elapsed * 0.4) * 0.02; Pr.q.copy(Prain.q); return Pr; }
+    if (mode === "toRain"){
+      qbez(rv.from.p, rv.mid, Prain.p, ease((t - 0.1) / (RAIN_IN - 0.1)), Pr.p);
+      Pr.q.slerpQuaternions(rv.from.q, Prain.q, ease((t - 0.12) / (RAIN_IN - 0.15)));
+      if (!rv.shown && t > RAIN_IN - 0.35){ rv.shown = true; htmlEl.classList.add("rain-on"); }
+      if (t >= RAIN_IN) mode = "rain";
+      return Pr;
+    }
+    landPose();
+    qbez(rv.from.p, rv.mid, Pland.p, ease(t / RAIN_OUT), Pr.p);
+    Pr.q.slerpQuaternions(rv.from.q, Pland.q, ease((t - 0.05) / (RAIN_OUT - 0.1)));
+    if (t >= RAIN_OUT){ mode = "landing"; htmlEl.classList.remove("in-rain"); rv = null; }
+    return Pr;
+  }
+  /* where the cloud layer sits and what shows beneath it, per mode */
+  function cloudLayerUpdate(){
+    const L = U.uCloudLayer.value;
+    let k = 0, gap = cloudMix;
+    const t = rv ? elapsed - rv.t0 : 0;
+    if (mode === "toRain"){ k = smooth(0.3, 0.75, t / RAIN_IN); gap = cloudMix * (1 - smooth(0.4, 0.72, t / RAIN_IN)); }
+    else if (mode === "rain"){ k = 1; gap = 0; }
+    else if (mode === "fromRain"){ k = 1 - smooth(0.25, 0.7, t / RAIN_OUT); gap = cloudMix * smooth(0.3, 0.6, t / RAIN_OUT); }
+    L.set(LAYER_SEA.x + (LAYER_CEIL.x - LAYER_SEA.x) * k, LAYER_SEA.y + (LAYER_CEIL.y - LAYER_SEA.y) * k);
+    U.uCloudGap.value = gap;
+  }
+  /* the cursor's wind: tilts the rain and nudges the lenses */
+  let rPoke = null, windX = 0;
+  function rainPoke(){
+    const now = elapsed, sx = ndc.x, sy = ndc.y;
+    if (rPoke){
+      const dt = Math.max(now - rPoke.t, 1 / 120);
+      if (dt < 0.25){
+        const vx = (sx - rPoke.x) / dt;
+        windX += vx * Math.min(1, dt * 5) * 2.2;
+        lenses.forEach(l => {
+          if (!l.mesh.visible) return;
+          tmpV.copy(l.mesh.position).project(camera);
+          const d = Math.hypot(tmpV.x - sx, (tmpV.y - sy) / aspect);
+          if (d < 0.25) l.vx += vx * (1 - d / 0.25) * Math.min(1, dt * 6) * 1.4;
+        });
+      }
+    }
+    rPoke = { x:sx, y:sy, t:now };
+  }
+  function catchLens(i){
+    const l = lenses[i];
+    if (l.caught) return;
+    l.caught = elapsed;
+    setTimeout(() => { if (mode === "rain") openLightbox(l.k); }, reduce ? 0 : 380);
+  }
+  function updateRainFx(realDt, dt){
+    const active = mode === "toRain" || mode === "rain" || mode === "fromRain";
+    const t = rv ? elapsed - rv.t0 : 0;
+    /* photographs are painted a few at a time, not all at once */
+    if ((active || (mode === "landing" && p > 0.8)) && rainGen < PHOTOS.length){ lensTexture(rainGen); lenses.forEach(l => { if (l.k === rainGen) l.mat.uniforms.uTex.value = lensTex[rainGen]; }); rainGen++; }
+    let ra = 0, la = 0;
+    if (mode === "toRain"){ ra = smooth(0.55, 1.0, t / RAIN_IN); la = smooth(0.75, 1.0, t / RAIN_IN); }
+    else if (mode === "rain"){ ra = 1; la = 1; }
+    else if (mode === "fromRain"){ ra = 1 - smooth(0, 0.4, t / RAIN_OUT); la = 1 - smooth(0, 0.25, t / RAIN_OUT); }
+    rain.visible = ra > 0.01;
+    windX *= Math.exp(-realDt * 1.2); windX = Math.max(-4, Math.min(4, windX));
+    if (rain.visible){
+      rainMat.uniforms.uAlpha.value = ra * 0.5;
+      rainMat.uniforms.uCenter.value.copy(camera.position);
+      rainMat.uniforms.uWind.value.set(windX * 3 - 0.6, 0);
+      rainMat.uniforms.uCol.value.copy(Lcol).multiplyScalar(0.25).add(new T.Color(0.28, 0.34, 0.36));
+      if (!reduce && elapsed > ripT){
+        tmpV.set((Math.random() - 0.5) * 9, 0, -1.5 - Math.random() * 10).applyQuaternion(Prain.q).add(Prain.p);
+        addRipple(tmpV.x, tmpV.z, 0.012 + Math.random() * 0.01, 9 + Math.random() * 3);
+        ripT = elapsed + 0.035;
+      }
+    }
+    /* hover */
+    lensHovered = -1;
+    if (mode === "rain"){
+      ray.setFromCamera(ndc, camera);
+      const h = ray.intersectObjects(lensHits.filter((_, i) => lenses[i].mesh.visible), false)[0];
+      if (h) lensHovered = h.object.userData.lens;
+    }
+    const camRr = camR.setFromMatrixColumn(Prain_M(), 0);
+    lenses.forEach((l, i) => {
+      l.mesh.visible = la > 0.01;
+      if (!l.mesh.visible) return;
+      l.hov += ((lensHovered === i ? 1 : 0) - l.hov) * (1 - Math.exp(-realDt * 8));
+      const slow = lensHovered === i ? 0.25 : 1;
+      if (l.caught){
+        const a = Math.min(1, (elapsed - l.caught) / 0.38);
+        l.mesh.position.lerp(tmpV.set(0, 0, -1.6).applyMatrix4(Prain_M()), 1 - Math.exp(-realDt * 9));
+        l.mesh.scale.setScalar(l.r * (1 + a * 0.6));
+        l.mat.uniforms.uAlpha.value = la * (1 - smooth(0.7, 1, a) * (lb.hidden ? 0 : 1));
+        if (a >= 1 && lb.hidden && elapsed - l.caught > 0.6) resetLens(l, true);
+        return;
+      }
+      l.y -= l.sp * slow * dt;
+      l.vx *= Math.exp(-realDt * 1.5);
+      l.x += (l.vx + windX * 0.15) * dt;
+      if (l.x > 4.2) l.x -= 8.4; if (l.x < -4.2) l.x += 8.4;
+      if (l.y < -0.35) resetLens(l, true);
+      l.mesh.position.set(l.x, l.y - Prain.p.y, l.z).applyMatrix4(Prain_M());
+      const st = 1 + Math.min(0.12, l.sp * 0.2);
+      l.mesh.scale.set(l.r / Math.sqrt(st), l.r * st, l.r / Math.sqrt(st));
+      l.mesh.rotation.set(0, 0, 0);
+      l.mat.uniforms.uHover.value = l.hov;
+      l.mat.uniforms.uAlpha.value = la * smooth(-0.35, 0.1, l.y) * smooth(4.8, 4.2, l.y);
+    });
+    canvas.classList.toggle("is-hover", canvas.classList.contains("is-hover") || lensHovered >= 0);
+    if (lensLab){
+      if (lensHovered >= 0){
+        const l = lenses[lensHovered];
+        tmpV.copy(l.mesh.position).project(camera);
+        lensLab.textContent = `${String(l.k + 1).padStart(2, "0")} · ${PHOTOS[l.k]}`;
+        lensLab.style.transform = `translate3d(${((tmpV.x * 0.5 + 0.5) * W).toFixed(1)}px,${((-tmpV.y * 0.5 + 0.5) * H + 34).toFixed(1)}px,0) translate(-50%,0)`;
+        lensLab.style.opacity = "1";
+      } else lensLab.style.opacity = "0";
+    }
+  }
+  const PrM = new T.Matrix4();
+  function Prain_M(){ return PrM.compose(Prain.p, Prain.q, ONE3); }
 
   let nextAmbient = 0;
 
@@ -2346,7 +2868,7 @@ function initGL(){
     if (mode === "content" || mode === "swap") rv = 0;
     else if (mode === "dive" && seq.impactT !== null && elapsed - seq.impactT > 0.18) rv = 0;
     else if (mode === "return" && elapsed - seq.t0 < 0.38) rv = 0;
-    const sea = ["landing", "toDeep", "deep", "fromDeep", "toPart", "part", "fromPart"].includes(mode);
+    const sea = ["landing", "toDeep", "deep", "fromDeep", "toPart", "part", "fromPart", "toTools", "tools", "fromTools", "toRain", "rain", "fromRain"].includes(mode);
     if (sea || mode === "toLand") rv = 0;
     ringVis += (rv - ringVis) * (1 - Math.exp(-realDt * 5));
     const trK = tr ? Math.min(1, Math.max(0, (elapsed - tr.t0) / TR_DUR)) : 0;
@@ -2366,8 +2888,15 @@ function initGL(){
     else if (mode === "fromDeep"){ cT = camY > 0.05 ? cLand : 0; cRate = camY > 0.05 ? 5 : 1e4; }
     else if (mode === "toPart") cT = cloudFrom * (1 - smooth(0.12, 0.55, pv ? (elapsed - pv.t0) / PART_IN : 1));
     else if (mode === "fromPart") cT = cLand * smooth(0.45, 1.0, pv ? (elapsed - pv.t0) / PART_OUT : 1);
+    else if (mode === "toTools") cT = cloudFrom + (1 - cloudFrom) * smooth(0.15, 0.85, tsv ? (elapsed - tsv.t0) / TOOLS_IN : 1);
+    else if (mode === "tools" || mode === "toRain" || mode === "rain"){ cT = 1; if (mode === "toRain") cRate = 8; }
+    else if (mode === "fromTools") cT = 1 + (cLand - 1) * smooth(0.3, 1.0, tsv ? (elapsed - tsv.t0) / TOOLS_OUT : 1);
+    else if (mode === "fromRain") cT = 1 + (cLand - 1) * smooth(0.6, 1.0, rv ? (elapsed - rv.t0) / RAIN_OUT : 1);
     cloudMix += (cT - cloudMix) * (1 - Math.exp(-realDt * cRate));
     U.uCloud.value = cloudMix < 0.002 ? 0 : cloudMix;
+    cloudLayerUpdate();
+    if (flow && U.uCloud.value > 0.05){ flow.step(realDt); U.uFlow.value = flow.tex(); }
+    setLowRes(U.uCloud.value > 0.02);
     const vis = ringVis;
     ringMat.uniforms.uVis.value = vis;
     U.uRingVis.value = vis;
@@ -2530,6 +3059,10 @@ function initGL(){
       const P = deepCamera(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
     } else if (mode === "toPart" || mode === "part" || mode === "fromPart"){
       const P = partCamera(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
+    } else if (mode === "toTools" || mode === "tools" || mode === "fromTools"){
+      const P = toolsCamera(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
+    } else if (mode === "toRain" || mode === "rain" || mode === "fromRain"){
+      const P = rainCamera(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
     } else if (mode === "ring"){
       const P = ringPose(); camera.position.copy(P.p); camera.quaternion.copy(P.q);
     } else if (mode === "dive"){
@@ -2572,6 +3105,8 @@ function initGL(){
     updateLandingDrops(realDt);
     updateDeepFx(realDt, dt);
     if (pv) placePanels();
+    updateToolsFx(realDt);
+    updateRainFx(realDt, dt);
 
     /* keep the invisible hit target over the sun disc */
     if (mode === "ring" || mode === "landing"){
@@ -2600,7 +3135,7 @@ function initGL(){
     try { renderer.compile(scene, camera); } catch (_) {}
     hid.forEach(o => { o.visible = false; });
   }
-  return { update, back, swap, targetScale, toggleCel, toRing, toLand, toDeep, fromDeep, toPart, fromPart, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
+  return { update, back, swap, targetScale, toggleCel, toRing, toLand, toDeep, fromDeep, toPart, fromPart, toTools, fromTools, toRain, fromRain, pulse: i => { if (ldrops[i]) ldrops[i].pulse = 1; } };
 }
 
 /* fallback without WebGL: open content directly */
