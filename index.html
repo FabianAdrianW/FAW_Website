@@ -345,6 +345,11 @@ html.part-flat .wall-back{height:44px;font-size:15px;padding:0 20px;margin-top:6
 /* landing words: smoke on the way down, droplets on the way up */
 #txtDrops{position:fixed;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
 .fx-drops,.fx-drops *{text-shadow:none!important}
+/* the name sits in the sky, top left, clear of the cloud sea */
+.hero{top:calc(env(safe-area-inset-top,0px) + clamp(64px,10vh,118px));bottom:auto}
+.hero h1{font-size:clamp(46px,6.4vw,100px)}
+@media (max-width:760px){.hero{top:calc(env(safe-area-inset-top,0px) + 64px);bottom:auto}}
+.hero p{max-width:32ch}
 
 /* ---------- Narzędzia above the clouds, Galeria under the rain ---------- */
 html.in-tools,html.in-tools body,html.in-rain,html.in-rain body{overflow:hidden}
@@ -897,9 +902,9 @@ const smr = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * 
    then low over the water to the horizon and the sun. Always upright: nothing ever rolls. */
 const PHI0 = 0.12;
 const altOf  = q => 19 - 2 * sm(0, 0.26, q) - 11.2 * smr(0.26, 0.5, q) - 2.4 * sm(0.5, 1, q);
-const tiltOf = q => 0.1 + 0.12 * sm(0.24, 0.5, q) - 0.1 * sm(0.55, 1, q);
+const tiltOf = q => -0.05 + 0.27 * sm(0.14, 0.5, q) - 0.1 * sm(0.55, 1, q);   // at first a little up: sky above the cloud sea
 const yawOf  = q => 0;
-const cloudOf = q => 1 - 0.25 * sm(0.55, 1, q);   // the deck thins a little towards the sun
+const cloudOf = q => 1;                          // the same clouds everywhere
 const liftOf  = q => 0;
 const isInv   = q => false;
 const P_DIRECT = mode === "deep" ? 0.84 : mode === "part" ? 0.68 : mode === "tools" ? 0.18 : mode === "rain" ? 0.34 : mode === "ring" ? 0.52 : 0;
@@ -1618,7 +1623,7 @@ function initGL(){
         float t1 = (uCloudLayer.x - ro.y) / rd.y, t2 = (uCloudLayer.y - ro.y) / rd.y;
         tA = max(min(t1, t2), 0.0); tB = max(t1, t2);
       }
-      tB = min(min(tB, tMax), tA + 48.0);
+      tB = min(min(tB, tMax), tA + mix(48.0, 170.0, smoothstep(30.0, 180.0, tA)));   /* far away, a longer, coarser look */
       if (tB <= tA) return vec4(0.0, 0.0, 0.0, 1.0);
       const int STEPS = 24;
       float dt = (tB - tA) / float(STEPS);
@@ -1644,7 +1649,7 @@ function initGL(){
           vec3 sunC = uLight * sunT * powder * phase * 1.25;
           vec3 amb = mix(uDeep * 2.2 + uTide * 0.35, uTide * 1.5 + uHorizon * 0.9 + skyUp * 2.0, pow(h, 0.8));
           vec3 S = sunC + amb;
-          S = mix(S, fogc, smoothstep(fogR.x, fogR.y + 30.0, t));
+          S = mix(S, fogc, smoothstep(fogR.x, fogR.y + 280.0, t));   /* domes keep their shape far out, then melt into the horizon haze */
           float a = 1.0 - exp(-d * dt * 1.35);
           acc += Tr * S * a;
           Tr *= 1.0 - a;
@@ -1724,9 +1729,14 @@ function initGL(){
         float st = step(0.991, r) * smoothstep(0.32, 0.0, length(f)) * smoothstep(0.04, 0.4, d.y);
         st *= 0.55 + 0.45 * sin(uTime * (0.8 + r * 2.5) + r * 60.0);
         c += uPearl * st * (0.55 + 0.6 * smoothstep(0.4, 0.8, uCel)) * uStars;
-        if (uCloud > 0.001 && cameraPosition.y < uCloudLayer.y){
-          vec4 cm = cloudMarch(cameraPosition, d, 400.0, gl_FragCoord.xy, sky(normalize(vec3(d.x, 0.015, d.z))), uFog);
+        if (uCloud > 0.001 && (cameraPosition.y < uCloudLayer.y || d.y < 0.0)){
+          /* also below the horizon beyond the water mesh: the sea of cumulus runs on into the haze */
+          vec3 hz = sky(normalize(vec3(d.x, 0.015, d.z)));
+          if (d.y < 0.0) c = hz;
+          vec4 cm = cloudMarch(cameraPosition, d, 600.0, gl_FragCoord.xy, hz, uFog);
           c = c * cm.a + cm.rgb;
+          /* seen from above, the cloud sea melts into the horizon haze instead of ending on a line */
+          if (d.y < 0.0 && cameraPosition.y > uCloudLayer.y) c = mix(c, hz, smoothstep(-0.11, 0.0, d.y));
         }
         gl_FragColor = vec4(c, 1.0);
         #include <encodings_fragment>
@@ -1831,6 +1841,7 @@ function initGL(){
         under = mix(under, fogc, smoothstep(uFog.x, uFog.y, dist));
         vec4 cm = cloudMarch(cameraPosition, -V, dist, gl_FragCoord.xy, fogc, uFog);
         col = under * cm.a + cm.rgb;
+        if (cameraPosition.y > uCloudLayer.y) col = mix(col, fogc, smoothstep(-0.11, 0.0, vd.y));
       } else col = mix(col, fogc, smoothstep(uFog.x, uFog.y, dist));
       gl_FragColor = vec4(col, 1.0);
       #include <encodings_fragment>
@@ -2282,8 +2293,12 @@ function initGL(){
       f = mode === "fromTools" ? smooth(1.3, 0.8, h) : smooth(-0.05, 0.3, h);
     } else if (!RET_ALL.includes(mode)) retSet = false;
     if (fillFadeT >= 0){ const a = elapsed - fillFadeT; f = Math.max(f, 1 - smooth(0, 0.9, a)); if (a > 0.9) fillFadeT = -1; }
+    /* whenever the camera passes through the deck it is wrapped in thick fog — and only there, unseen,
+       does the far edge of the deck (the clear strip under which the sun hangs) switch on or off */
+    const Ly = U.uCloudLayer.value, hc = (camera.position.y - Ly.x) / (Ly.y - Ly.x);
+    f = Math.max(f, smooth(-0.15, 0.25, hc) * (1 - smooth(0.75, 1.15, hc)));
     fillK = f;
-    deckK += ((mode === "landing" ? smooth(0.46, 0.64, p) : 0) - deckK) * 0.06;
+    deckK = hc < 0.5 ? 1 : 0;
     U.uDeck.value.set(LAND_POS.z - 30, deckK);
     U.uFill.value.set(camera.position.x, camera.position.z, f);
   }
@@ -3170,18 +3185,8 @@ function initGL(){
     /* past the middle of the scroll the sea is cloud; transitions trade it for water only where it can't be seen:
        under the surface, or while the camera sweeps across */
     const cLand = cloudOf(p), camY = camera.position.y;
-    let cT = 0, cRate = 60;
-    if (mode === "landing"){ cT = unwind ? Math.max(cLand, 0.4) : cLand; cRate = 10; }
-    else if (mode === "toRing") cT = cloudFrom * Math.pow(1 - smooth(0.04, 0.52, trK), 2.2);   // thins out from the first moment of the turn, gone by its middle
-    else if (mode === "toLand") cT = cLand * smooth(0.35, 0.95, trK);
-    else if (mode === "toDeep"){ cT = camY > 0.05 ? cloudFrom : 0; if (camY <= 0.05) cRate = 1e4; }
-    else if (mode === "fromDeep"){ cT = camY > 0.05 ? cLand : 0; cRate = camY > 0.05 ? 5 : 1e4; }
-    else if (mode === "toPart") cT = cloudFrom * (1 - smooth(0.12, 0.55, pv ? (elapsed - pv.t0) / PART_IN : 1));
-    else if (mode === "fromPart") cT = cLand * smooth(0.45, 1.0, pv ? (elapsed - pv.t0) / PART_OUT : 1);
-    else if (mode === "toTools") cT = cloudFrom + (1 - cloudFrom) * smooth(0.15, 0.85, tsv ? (elapsed - tsv.t0) / TOOLS_IN : 1);
-    else if (mode === "tools" || mode === "toRain" || mode === "rain"){ cT = 1; if (mode === "toRain") cRate = 8; }
-    else if (mode === "fromTools") cT = 1 + (cloudOf(pT) - 1) * smooth(0.3, 1.0, tsv ? (elapsed - tsv.t0) / TOOLS_OUT : 1);
-    else if (mode === "fromRain") cT = 1 + (cloudOf(pT) - 1) * smooth(0.6, 1.0, rv ? (elapsed - rv.t0) / RAIN_OUT : 1);
+    /* one world: the clouds are what they are wherever the scroll left the camera, whatever button was pressed */
+    let cT = cLand, cRate = 10;
     cloudMix += (cT - cloudMix) * (1 - Math.exp(-realDt * cRate));
     U.uCloud.value = cloudMix < 0.002 ? 0 : cloudMix;
     passFill();
