@@ -1177,8 +1177,8 @@ function textFx(i, a, op, dy, base, L){
     }
   }
   s.a = a;
-  el.style.opacity = o.toFixed(3);
-  el.style.transform = `translate3d(0,calc(${base} + ${(dy + lift).toFixed(1)}px),0)`;
+  css(el, "opacity", o.toFixed(3));
+  css(el, "transform", `translate3d(0,calc(${base} + ${(dy + lift).toFixed(1)}px),0)`);
 }
 function fxDraw(){
   const any = fx.some(s => s.mode === "drops" && s.pts);
@@ -1203,29 +1203,31 @@ function fxDraw(){
   });
   fxCtx.globalAlpha = 1;
 }
+/* write a style only when it actually changes: fewer style recalculations per frame */
+const css = (el, k, v) => { const c = el.__css || (el.__css = {}); if (c[k] !== v){ c[k] = v; el.style[k] = v; } };
 function updateOverlay(){
   const L = landVis;
   if (L < 0.002 && mode !== "landing" && updateOverlay.off) return;
   updateOverlay.off = L < 0.002;
   const heroOp = 1 - sm(0.015, 0.08, p);
   textFx(0, 1 - heroOp, heroOp * L, -p * 260, "0px", L);
-  hintEl.style.opacity = ((1 - sm(0.005, 0.04, p)) * L).toFixed(3);
-  markEl.style.opacity = ((1 - heroOp) * L).toFixed(3);
+  css(hintEl, "opacity", ((1 - sm(0.005, 0.04, p)) * L).toFixed(3));
+  css(markEl, "opacity", ((1 - heroOp) * L).toFixed(3));
   markEl.classList.toggle("is-on", heroOp < 0.5 && L > 0.5);
-  gauge.style.opacity = L.toFixed(3);
+  css(gauge, "opacity", L.toFixed(3));
   lPanels.forEach((el, pi) => {
     const c = +el.dataset.c, d = p - c;
     const op = (c >= 1 ? sm(0.885, 0.94, p) : 1 - sm(0.055, 0.1, Math.abs(d))) * L;
     /* only the band past the panel (scrolled beyond it) turns to smoke / gathers from droplets */
     if (c < 1) textFx(pi + 1, d > 0 ? sm(0.055, 0.1, d) : 0, op, -d * 180, innerWidth > 760 ? "-50%" : "0px", L);
-    else { el.style.opacity = op.toFixed(3); el.style.transform = `translate3d(0,calc(${innerWidth > 760 ? "-50%" : "0px"} + ${(-d * 180).toFixed(1)}px),0)`; }
+    else { css(el, "opacity", op.toFixed(3)); css(el, "transform", `translate3d(0,calc(${innerWidth > 760 ? "-50%" : "0px"} + ${(-d * 180).toFixed(1)}px),0)`); }
     el.classList.toggle("is-on", op > 0.5);
-    el.setAttribute("aria-hidden", op > 0.5 ? "false" : "true");
+    { const ah = op > 0.5 ? "false" : "true"; if (el.__ah !== ah){ el.__ah = ah; el.setAttribute("aria-hidden", ah); } }
   });
   fxDraw();
   let on = 0; STAGES.forEach((s, i) => { if (Math.abs(p - s.c) < Math.abs(p - STAGES[on].c)) on = i; });
   ticks.forEach((b, i) => { b.classList.toggle("is-on", i === on); b.classList.toggle("is-past", STAGES[i].c <= p + 0.001); });
-  gFill.style.height = (p * 100).toFixed(2) + "%";
+  css(gFill, "height", (p * 100).toFixed(2) + "%");
   const alt = Math.round(altOf(p) * 10) * 10;   // metres, for the read-out
   if (alt !== lastDeg){ lastDeg = alt; gRead.innerHTML = `WYSOKOŚĆ<b>${alt.toLocaleString("pl-PL")} m</b>`; }
 }
@@ -1239,7 +1241,7 @@ function initGL(){
   const T = THREE;
   if (T.ColorManagement) T.ColorManagement.legacyMode = false;
   const canvas = $("scene");
-  const renderer = new T.WebGLRenderer({ canvas, antialias:true, powerPreference:"high-performance" });
+  const renderer = new T.WebGLRenderer({ canvas, antialias:!matchMedia("(pointer: coarse)").matches, powerPreference:"high-performance" });
   canvas.addEventListener("webglcontextlost", e => e.preventDefault());
   canvas.addEventListener("webglcontextrestored", () => location.reload());
   renderer.outputEncoding = T.sRGBEncoding;
@@ -1364,6 +1366,7 @@ function initGL(){
       if (R.w <= 0.0 || age < 0.0 || age > 14.0) return vec3(0.0);
       vec2 dp = p - R.xy; float d = length(dp) + 1e-4;
       float speed = 0.6 + 0.14 * k;
+      if (d - age * speed > 3.0) return vec3(0.0);          /* the ring has not reached this point yet */
       float x = d - age * speed;
       float env = x > 0.0 ? exp(-x * x * 1.2 * k) : exp(x * (0.12 * k + 0.1));
       env *= R.w * exp(-age * (0.18 + 0.03 * k)) / (1.0 + d * 0.9) * smoothstep(0.0, 0.12, age);
@@ -1402,7 +1405,8 @@ function initGL(){
       vec2 q = spinWarp(p);
       gWarp = q;
       vec3 w = (centerWave(q) * mix(0.3, 1.0, uPort) + ocean(p) * uOcean) * calmAt(p) + impactWave(p);
-      for (int i = 0; i < NR; i++) w += rippleWave(q, uRipples[i], uRippleK[i], crest);
+      /* ripples are only a few centimetres tall: beyond ~40 m they cannot be seen */
+      if (length(p - cameraPosition.xz) < 40.0) for (int i = 0; i < NR; i++) w += rippleWave(q, uRipples[i], uRippleK[i], crest);
       return w;
     }`;
 
@@ -1706,14 +1710,21 @@ function initGL(){
       depthTest:false, depthWrite:false
     });
     const quad = new T.Mesh(new T.PlaneGeometry(2, 2), mat); quad.frustumCulled = false; scn.add(quad);
-    const bs = new T.Vector2();
+    const bs = new T.Vector2(), lastP = new T.Vector3(1e9, 0, 0), lastQ = new T.Quaternion();
+    let skip = 0;
     return {
       render(){
         renderer.getDrawingBufferSize(bs);
         U.uScreen.value.copy(bs);
         const w = Math.max(8, Math.round(bs.x * cloudQ.scale)), h = Math.max(8, Math.round(bs.y * cloudQ.scale));
-        if (cloudRT.width !== w || cloudRT.height !== h) cloudRT.setSize(w, h);
+        let fresh = false;
+        if (cloudRT.width !== w || cloudRT.height !== h){ cloudRT.setSize(w, h); fresh = true; }
         if (U.uCloud.value < 0.001) return;
+        /* the clouds drift slowly: while the camera stands still they are refreshed only every 2nd frame
+           (every 3rd on a phone); as soon as it moves, every frame */
+        const still = camera.position.distanceToSquared(lastP) < 4e-4 && camera.quaternion.angleTo(lastQ) < 0.0015;
+        lastP.copy(camera.position); lastQ.copy(camera.quaternion);
+        if (still && !fresh && (++skip % (COARSE ? 3 : 2)) !== 0) return;
         mat.uniforms.uInvProj.value.copy(camera.projectionMatrixInverse);
         mat.uniforms.uCamMat.value.copy(camera.matrixWorld);
         mat.uniforms.uCamPos.value.copy(camera.position);
@@ -1738,6 +1749,28 @@ function initGL(){
     if (qSlow > 1.2 && cloudQ.tier < TIERS.length - 1){ applyTier(cloudQ.tier + 1); qSlow = 0; qWarm = 1.5; }
   }
   if (COARSE){ const T0 = TIERS[2]; cloudQ.tier = 2; cloudQ.scale = T0.scale; U.uSteps.value = T0.steps; U.uLite.value = T0.lite; pxBudget = T0.px; }
+
+  /* ---- ?debug : a small read-out of what the page is doing on this device ---- */
+  const debugTick = (() => {
+    if (!/[?&]debug/.test(location.search)) return () => {};
+    const el = document.createElement("div");
+    el.style.cssText = "position:fixed;right:8px;bottom:8px;z-index:99;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.72);color:#E6ECE8;font:11px/1.45 ui-monospace,monospace;pointer-events:none;white-space:pre";
+    document.body.appendChild(el);
+    let gpu = "?";
+    try { const g = renderer.getContext(), ext = g.getExtension("WEBGL_debug_renderer_info"); gpu = ext ? g.getParameter(ext.UNMASKED_RENDERER_WEBGL) : g.getParameter(g.RENDERER); } catch (_) {}
+    let acc = 0, n = 0, worst = 0, t = 0;
+    const bs = new T.Vector2();
+    return realDt => {
+      acc += realDt; n++; worst = Math.max(worst, realDt); t += realDt;
+      if (t < 0.5) return;
+      renderer.getDrawingBufferSize(bs);
+      el.textContent = `FPS ${(n / acc).toFixed(0)}  (najgorsza klatka ${(worst * 1000).toFixed(0)} ms)\n` +
+        `jakość ${cloudQ.tier}/3  chmury ${cloudRT.width}×${cloudRT.height}  kroki ${U.uSteps.value}\n` +
+        `obraz ${bs.x}×${bs.y}  dpr ${renderer.getPixelRatio().toFixed(2)}  ${COARSE ? "dotyk" : "mysz"}\n` +
+        `wywołania ${renderer.info.render.calls}  trójkąty ${renderer.info.render.triangles}\n${gpu}`;
+      acc = 0; n = 0; worst = 0; t = 0;
+    };
+  })();
   /* ---- sky dome with sun / moon disc ---- */
   const skyMat = new T.ShaderMaterial({
     uniforms:U, side:T.BackSide, depthWrite:false,
@@ -1853,7 +1886,7 @@ function initGL(){
       vec2 p = vWorld.xz;
       float dist = length(cameraPosition - vWorld);
       float crest; vec3 w = waves(p, crest);
-      vec2 g = w.yz + microGrad(swirl(p)) * exp(-dist * 0.045) * calmAt(p);
+      vec2 g = w.yz + (dist < 70.0 ? microGrad(swirl(p)) * exp(-dist * 0.045) * calmAt(p) : vec2(0.0));
       vec3 N = normalize(vec3(-g.x, 1.0, -g.y));
       vec3 V = normalize(cameraPosition - vWorld);
       if (uUnder > 0.5){
@@ -1885,9 +1918,11 @@ function initGL(){
       vec3 refl = sky(R) + mix(uLight, uPearl, 0.5) * 0.03 * smoothstep(0.5, 1.0, R.y) + uPearl * st * 0.9;
       vec3 body = mix(uDeep, uTide, clamp(w.x * 4.0 + 0.25, 0.0, 1.0) * 0.4);
       /* light wandering through the water body: seen best from straight above */
-      float c1 = fbm(p * 0.45 + vec2(uTime * 0.04, -uTime * 0.025) + w.yz * 1.6);
-      float ca = pow(1.0 - abs(c1 * 2.0 - 1.0), 5.0);
-      body += mix(uLight, uPearl, 0.45) * ca * 0.028 * exp(-dist * 0.035) * (1.0 - 0.6 * uPort) * calmAt(p);
+      if (dist < 80.0){
+        float c1 = fbm(p * 0.45 + vec2(uTime * 0.04, -uTime * 0.025) + w.yz * 1.6);
+        float ca = pow(1.0 - abs(c1 * 2.0 - 1.0), 5.0);
+        body += mix(uLight, uPearl, 0.45) * ca * 0.028 * exp(-dist * 0.035) * (1.0 - 0.6 * uPort) * calmAt(p);
+      }
       vec3 col = mix(body, refl, fres);
       col += uPearl * st * 0.22 * (1.0 - fres);
       vec3 Hs = normalize(uSunDir + V); float nh = max(dot(N, Hs), 0.0);
@@ -1904,7 +1939,9 @@ function initGL(){
       for (int i = 0; i < ND; i++){
         vec4 D = uDrops[i];
         if (D.w <= 0.001) continue;
-        vec3 L = D.xyz - vWorld; float d2 = dot(L, L); vec3 Ln = L * inversesqrt(d2);
+        vec3 L = D.xyz - vWorld; float d2 = dot(L, L);
+        if (d2 > 900.0) continue;                             /* a drop's glint and pool only matter nearby */
+        vec3 Ln = L * inversesqrt(d2);
         float spec = pow(max(dot(N, normalize(Ln + V)), 0.0), 260.0);
         float pool = exp(-dot(L.xz, L.xz) * 1.6) / (1.0 + L.y * L.y * 0.9);
         float pw = i <= ${N} ? 1.0 : 0.0;
@@ -1924,8 +1961,9 @@ function initGL(){
     }`;
   /* one polar mesh, exponentially dense towards its centre; the centre sits where the action is */
   const waterGeo = (() => {
-    const A = 256, rs = [];
-    for (let r = 0.008; r < 330; r *= 1.0248) rs.push(r);
+    /* level of detail: a phone gets a coarser mesh (fine rings only where they matter, near the camera) */
+    const A = COARSE ? 144 : 256, rs = [];
+    for (let r = 0.008; r < 330; r *= (COARSE ? 1.036 : 1.0248)) rs.push(r);
     const pos = new Float32Array((1 + rs.length * A) * 3), idx = [];
     rs.forEach((r, i) => { for (let a = 0; a < A; a++){ const t = a / A * Math.PI * 2, o = (1 + i * A + a) * 3; pos[o] = Math.cos(t) * r; pos[o + 2] = Math.sin(t) * r; } });
     for (let a = 0; a < A; a++) idx.push(0, 1 + (a + 1) % A, 1 + a);
@@ -3499,7 +3537,8 @@ function initGL(){
     mGeo.attributes.position.needsUpdate = true;
     motesMat.opacity = 0.55 * (0.3 + 0.7 * vis) * portMix;
 
-    qualityWatch(realDt);
+    qualityWatch(realDt / frameDiv); frameDiv = 1;   // a deliberately skipped frame is not a slow one
+    debugTick(realDt);
     cloudPass.render();
     renderer.render(scene, camera);
   }
@@ -3522,7 +3561,13 @@ if (!gl){
 /* ================= LOOP ================= */
 renderCaption(true);
 let last = -1, prevMode = mode;
+/* touch devices: while nothing is happening, draw every other frame (the sea still moves, the phone stays cool) */
+const IDLE30 = matchMedia("(pointer: coarse)").matches && !reduce;
+let lastInput = 0, skipTick = false, frameDiv = 1;
+["pointerdown", "pointermove", "wheel", "touchstart", "touchmove", "keydown", "scroll"].forEach(ev => addEventListener(ev, () => { lastInput = performance.now(); }, { passive:true }));
+const STEADY = ["landing", "ring", "content", "deep", "part", "tools", "rain"];
 function frame(now){
+  if (IDLE30 && !unwind && STEADY.includes(mode) && Math.abs(pT - p) < 1e-4 && now - lastInput > 1200 && (skipTick = !skipTick)){ requestAnimationFrame(frame); frameDiv = 2; return; }
   if (last < 0) last = now;
   const rawDt = Math.min(0.5, Math.max(0, (now - last) / 1000)); last = now;
   const realDt = Math.min(0.05, rawDt);
